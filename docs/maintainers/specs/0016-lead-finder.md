@@ -34,7 +34,7 @@ The app drives enrichment from the browser, one batch per request, while the sea
 
 Each address gets free checks: its syntax, whether its domain publishes mail exchangers, and whether it is a personal address, a shared inbox such as info@, or a free provider address. A domain that does not exist, or exists without mail exchangers, marks the address as unable to receive mail. A failed DNS lookup is treated as unknown and leaves the address usable.
 
-The primary address is the reachable address that best combines being on the site's own domain and belonging to a person. Recruiting and billing inboxes are never chosen first.
+The primary address is the reachable address that best combines being on the site's own domain and belonging to a person. Recruiting and billing inboxes are never chosen first. An address on some other company's domain, often a theme or app vendor whose support address appears in the site's code, ranks below the business's own free-provider inbox.
 
 These checks cannot prove that a mailbox exists or detect catch-all domains. That requires an SMTP conversation on port 25, which Workers cannot open.
 

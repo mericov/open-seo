@@ -143,10 +143,7 @@ async function enrichNextBatch(projectId: string, searchId: string) {
           whatsappUrl: contacts.whatsappUrl,
           ...(store
             ? {
-                name:
-                  lead.name === lead.domain && store.name
-                    ? store.name
-                    : lead.name,
+                name: store.name ?? lead.name,
                 productCount: store.productCount,
                 lastProductAt: store.lastProductAt,
                 currency: store.currency,

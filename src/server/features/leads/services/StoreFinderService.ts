@@ -66,7 +66,7 @@ async function startStoreSearch(
     return [
       {
         domain,
-        name: parsed.data.title?.trim() || domain,
+        name: parsed.data.title?.replace(/\s+/g, " ").trim() || domain,
         countryCode: parsed.data.country_iso_code?.toUpperCase() ?? null,
         domainRank: parsed.data.domain_rank ?? null,
         phone: parsed.data.phone_numbers?.[0]?.trim() || null,

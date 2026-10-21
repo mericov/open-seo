@@ -130,17 +130,17 @@ export function classifyEmail(
 /** The address to write to first: reachable, on the site's domain, a person. */
 export function pickPrimaryEmail(checks: EmailCheck[]): string | null {
   const score = (check: EmailCheck) => {
-    if (check.checkStatus !== "mx_ok") return -1;
     const local = check.email.split("@")[0] ?? "";
     let value = 0;
     if (check.onOwnDomain) value += 4;
+    else if (check.kind !== "free_provider") value -= 3;
     if (check.kind === "personal") value += 2;
     if (check.kind === "role") value += 1;
     if (DEPRIORITIZED_LOCAL_PARTS.has(local)) value -= 4;
     return value;
   };
   const best = sortBy(
-    checks.filter((check) => score(check) >= 0),
+    checks.filter((check) => check.checkStatus === "mx_ok"),
     (check) => -score(check),
   )[0];
   return best?.email ?? null;

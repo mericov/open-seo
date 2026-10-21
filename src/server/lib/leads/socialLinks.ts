@@ -39,7 +39,7 @@ function socialQuery(url: URL): string {
 }
 
 const SOCIAL_SKIP_PATHS =
-  /^\/(p|reel|reels|explore|stories|share|sharer|plugins|tr|dialog|hashtag)(\/|$)/i;
+  /^\/(p|reel|reels|explore|stories|share|sharer|plugins|tr|dialog|hashtag|groups|events|watch)(\/|$)/i;
 
 function isInstagramProfile(url: URL) {
   return (

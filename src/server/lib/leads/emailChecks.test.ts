@@ -61,4 +61,13 @@ describe("pickPrimaryEmail", () => {
       pickPrimaryEmail(checks.filter((c) => c.email !== "kyle@studio.test")),
     ).toBe("info@studio.test");
   });
+
+  it("prefers the store's own free inbox over a theme or app vendor's address", async () => {
+    const checks = await checkEmails(
+      ["support@halothemes.test", "romanbridal@gmail.com"],
+      "romanbridal.test",
+    );
+
+    expect(pickPrimaryEmail(checks)).toBe("romanbridal@gmail.com");
+  });
 });
