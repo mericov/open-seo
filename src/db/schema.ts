@@ -137,4 +137,5 @@ export const {
   leadSearches,
   leads,
   leadEmails,
+  leadFindings,
 } = schema;

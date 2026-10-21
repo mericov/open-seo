@@ -1,7 +1,8 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { executeInBatches, runBatch } from "@/db/runBatch";
-import { leadEmails, leads, leadSearches } from "@/db/schema";
+import { leadEmails, leadFindings, leads, leadSearches } from "@/db/schema";
+import type { LeadFindingCode } from "@/shared/leadFindings";
 
 type SearchInsert = Omit<
   typeof leadSearches.$inferInsert,
@@ -154,6 +155,7 @@ async function listPendingLeads(
       name: leads.name,
       website: leads.website,
       domain: leads.domain,
+      reviewsCount: leads.reviewsCount,
     })
     .from(leads)
     .where(
@@ -184,9 +186,11 @@ async function saveEnrichment(
       | "productCount"
       | "lastProductAt"
       | "currency"
+      | "opportunityScore"
     >
   >,
   emails: EmailInsert[],
+  findings: LeadFindingCode[] = [],
 ) {
   const now = new Date().toISOString();
   await runBatch((tx) => [
@@ -194,6 +198,15 @@ async function saveEnrichment(
       .update(leads)
       .set({ ...values, updatedAt: now })
       .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId))),
+    tx.delete(leadFindings).where(eq(leadFindings.leadId, leadId)),
+    ...findings.map((code) =>
+      tx.insert(leadFindings).values({
+        id: crypto.randomUUID(),
+        leadId,
+        code,
+        createdAt: now,
+      }),
+    ),
     ...emails.map((email) =>
       tx
         .insert(leadEmails)

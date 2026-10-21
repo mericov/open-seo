@@ -107,6 +107,9 @@ export function LeadSearchDetail({
     lead.enrichmentStatus !== "pending" &&
     lead.productCount == null;
   const hiddenStores = searchQuery.data.leads.filter(isHiddenStore).length;
+  const trackedLeads = searchQuery.data.leads.filter(
+    (lead) => lead.outreachStatus !== "new",
+  ).length;
   const leads =
     isStoreSearch && verifiedOnly
       ? searchQuery.data.leads.filter((lead) => !isHiddenStore(lead))
@@ -306,6 +309,11 @@ export function LeadSearchDetail({
           onClose={() => setConfirmDelete(false)}
         >
           {t("detail.deleteDescription")}
+          {trackedLeads > 0 ? (
+            <span className="mt-2 block font-medium text-destructive">
+              {t("detail.deleteTracked", { count: trackedLeads })}
+            </span>
+          ) : null}
         </ConfirmDialog>
       ) : null}
     </div>

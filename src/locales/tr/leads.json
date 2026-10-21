@@ -51,7 +51,8 @@
     "hiddenStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gizlendi (kapanmış, şifreli, Shopify'dan ayrılmış ya da okunamamış).",
     "shownStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gösteriliyor.",
     "showAll": "Göster",
-    "hideUnverified": "Gizle"
+    "hideUnverified": "Gizle",
+    "deleteTracked": "Bu aramadaki {{count}} lead'in takip durumu var. Arama silinirse bu leadler ve durumları da silinir."
   },
   "reachability": {
     "ready": "Mail atılabilir",
@@ -126,5 +127,62 @@
       "AU": "Avustralya",
       "AE": "Birleşik Arap Emirlikleri"
     }
+  },
+  "views": {
+    "searches": "Aramalar",
+    "all": "Tüm leadler"
+  },
+  "score": {
+    "label": "Fırsat",
+    "hint": "Fırsat skoru: sitede görünen pazarlama eksiklerinin toplamı. Yüksek skor, sunabileceğin daha çok iş demek."
+  },
+  "findings": {
+    "no_website": "Web sitesi yok",
+    "no_https": "HTTPS yok",
+    "not_mobile_friendly": "Mobil uyumsuz",
+    "no_analytics": "Analytics yok",
+    "no_meta_pixel": "Meta pixel yok",
+    "no_meta_description": "Meta açıklama yok",
+    "no_schema": "Schema yok",
+    "no_blog": "Blog yok",
+    "heavy_page": "Sayfa ağır",
+    "few_reviews": "Az yorum"
+  },
+  "outreach": {
+    "all": "Tümü",
+    "new": "Yeni",
+    "contacted": "Mail atıldı",
+    "replied": "Cevap verdi",
+    "not_interested": "İlgilenmiyor",
+    "client": "Müşteri oldu"
+  },
+  "all": {
+    "sourceAll": "Tüm kaynaklar",
+    "sourceLocal": "Yerel",
+    "sourceShopify": "Online mağazalar",
+    "hasEmail": "Sadece e-postası olanlar",
+    "minScoreAll": "Tüm skorlar",
+    "minScore": "Skor {{score}}+",
+    "columns": {
+      "lead": "Lead",
+      "score": "Skor",
+      "gaps": "Eksikler",
+      "email": "E-posta",
+      "status": "Durum"
+    },
+    "empty": "Burada henüz lead yok",
+    "emptyDescription": "Bir arama yaptığında leadleri bu listede görünür.",
+    "range": "{{from}}–{{to}} / {{total}}",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "selected": "{{count}} seçili",
+    "markContacted": "Mail atıldı",
+    "setStatus": "Durum değiştir",
+    "clear": "Temizle",
+    "updated": "{{count}} lead güncellendi",
+    "fromSearch": "{{label}} aramasından",
+    "contactedOn": "mail {{when}}",
+    "selectAll": "Bu sayfadakilerin hepsini seç",
+    "selectLead": "{{name}} seç"
   }
 }

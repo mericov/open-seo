@@ -1,8 +1,9 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import {
   getLeadSearch,
   listLeadCategories,
   listLeadSearches,
+  listProjectLeads,
 } from "@/serverFunctions/leads";
 
 export const leadsQueryKey = (projectId: string) => ["leads", projectId];
@@ -29,6 +30,26 @@ export function leadCategoriesOptions(projectId: string, query: string) {
     staleTime: 60 * 60 * 1000,
   });
 }
+
+export type ProjectLeadFilters = Omit<
+  Parameters<typeof listProjectLeads>[0]["data"],
+  "projectId"
+>;
+
+export function projectLeadsOptions(
+  projectId: string,
+  filters: ProjectLeadFilters,
+) {
+  return queryOptions({
+    queryKey: [...leadsQueryKey(projectId), "all", filters],
+    queryFn: () => listProjectLeads({ data: { projectId, ...filters } }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export type ProjectLeadRow = Awaited<
+  ReturnType<typeof listProjectLeads>
+>["leads"][number];
 
 export type LeadSearchDetailData = Awaited<ReturnType<typeof getLeadSearch>>;
 export type LeadRow = LeadSearchDetailData["leads"][number];

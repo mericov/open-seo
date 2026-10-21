@@ -8,6 +8,10 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 import { projects } from "./app.schema";
+import {
+  LEAD_FINDING_CODES,
+  LEAD_OUTREACH_STATUSES,
+} from "@/shared/leadFindings";
 
 // ============================================================================
 // Lead finder: a search pulls business listings for one category around one
@@ -87,6 +91,11 @@ export const leads = sqliteTable(
     productCount: integer("product_count"),
     lastProductAt: text("last_product_at"),
     currency: text("currency"),
+    opportunityScore: integer("opportunity_score"),
+    outreachStatus: text("outreach_status", { enum: LEAD_OUTREACH_STATUSES })
+      .notNull()
+      .default("new"),
+    contactedAt: text("contacted_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -100,6 +109,10 @@ export const leads = sqliteTable(
       table.businessKey,
     ),
     index("leads_search_status_idx").on(table.searchId, table.enrichmentStatus),
+    index("leads_project_outreach_idx").on(
+      table.projectId,
+      table.outreachStatus,
+    ),
   ],
 );
 
@@ -129,5 +142,22 @@ export const leadEmails = sqliteTable(
   },
   (table) => [
     uniqueIndex("lead_emails_lead_email_unique").on(table.leadId, table.email),
+  ],
+);
+
+export const leadFindings = sqliteTable(
+  "lead_findings",
+  {
+    id: text("id").primaryKey(),
+    leadId: text("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("lead_findings_lead_code_unique").on(table.leadId, table.code),
   ],
 );

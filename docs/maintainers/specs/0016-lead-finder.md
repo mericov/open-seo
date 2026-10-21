@@ -42,6 +42,16 @@ These checks cannot prove that a mailbox exists or detect catch-all domains. Tha
 
 Every lead is placed in one group: ready to email, reachable only by phone or social profiles, showing an email whose domain cannot receive mail, no contact found, or not yet read. The groups drive sorting, filters, the export and the MCP summaries, and are computed from stored data on read.
 
+## Opportunity score
+
+While reading a site, the app also notes marketing gaps visible in the home page's HTML: no HTTPS, no mobile viewport, no analytics tag, no Meta pixel, no meta description, no structured data, no link to a blog, and an unusually heavy page. A business without a website, and a local business with few reviews, get their own findings. Each finding is a row of its own, and a weighted sum capped at 100 is stored on the lead as its opportunity score, so lists can sort on it.
+
+The checks read only the HTML the server returns, so a tag injected later by a script, or by Shopify's sandboxed pixel manager without a visible ID, can read as missing. Findings are therefore presented as gaps that are not visible, and the score ranks leads rather than grading them. A site that could not be read gets no score instead of a perfect one.
+
+## Outreach list
+
+Every lead in a project, across all of its searches, appears in one list sorted by opportunity score, with unscored leads last. Each lead carries an outreach status: new, emailed, replied, not interested or client. Marking a lead as emailed records when it was first emailed. Because leads are deduplicated per project, a lead that was emailed or turned the offer down is never added again by a later search. Deleting a search deletes its leads and their statuses, and the confirmation says how many tracked leads that affects.
+
 ## Alternatives
 
 Scraping Google Maps directly would avoid the listings provider, but Maps blocks automated access, needs rotating proxies and breaks whenever the page changes. The licensed listings data is stable and already used by the local SEO tools.

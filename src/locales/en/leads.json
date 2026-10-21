@@ -51,7 +51,8 @@
     "hiddenStores": "{{count}} sites are hidden because they couldn't be confirmed as live Shopify stores (closed, password protected, moved off Shopify, or unreadable).",
     "shownStores": "Showing {{count}} sites that couldn't be confirmed as live Shopify stores.",
     "showAll": "Show them",
-    "hideUnverified": "Hide them"
+    "hideUnverified": "Hide them",
+    "deleteTracked": "{{count}} leads in this search have an outreach status. Deleting the search removes them and their status too."
   },
   "reachability": {
     "ready": "Ready to email",
@@ -126,5 +127,62 @@
       "AU": "Australia",
       "AE": "United Arab Emirates"
     }
+  },
+  "views": {
+    "searches": "Searches",
+    "all": "All leads"
+  },
+  "score": {
+    "label": "Opportunity",
+    "hint": "Opportunity score: how many visible marketing gaps the site has. Higher means more you can offer."
+  },
+  "findings": {
+    "no_website": "No website",
+    "no_https": "No HTTPS",
+    "not_mobile_friendly": "Not mobile friendly",
+    "no_analytics": "No analytics",
+    "no_meta_pixel": "No Meta pixel",
+    "no_meta_description": "No meta description",
+    "no_schema": "No schema",
+    "no_blog": "No blog",
+    "heavy_page": "Heavy page",
+    "few_reviews": "Few reviews"
+  },
+  "outreach": {
+    "all": "All",
+    "new": "New",
+    "contacted": "Emailed",
+    "replied": "Replied",
+    "not_interested": "Not interested",
+    "client": "Client"
+  },
+  "all": {
+    "sourceAll": "All sources",
+    "sourceLocal": "Local",
+    "sourceShopify": "Online stores",
+    "hasEmail": "With email only",
+    "minScoreAll": "Any score",
+    "minScore": "Score {{score}}+",
+    "columns": {
+      "lead": "Lead",
+      "score": "Score",
+      "gaps": "Gaps",
+      "email": "Email",
+      "status": "Status"
+    },
+    "empty": "No leads here yet",
+    "emptyDescription": "Run a search and its leads will show up in this list.",
+    "range": "{{from}}–{{to}} of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "selected": "{{count}} selected",
+    "markContacted": "Mark emailed",
+    "setStatus": "Set status",
+    "clear": "Clear",
+    "updated": "{{count}} leads updated",
+    "fromSearch": "from {{label}}",
+    "contactedOn": "emailed {{when}}",
+    "selectAll": "Select all on this page",
+    "selectLead": "Select {{name}}"
   }
 }

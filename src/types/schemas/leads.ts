@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LEAD_OUTREACH_STATUSES } from "@/shared/leadFindings";
 
 const projectIdShape = { projectId: z.string().min(1) };
 
@@ -51,6 +52,26 @@ export const startStoreSearchSchema = z.object({
 export const importStoresSchema = z.object({
   ...projectIdShape,
   domains: z.string().trim().min(3).max(20_000),
+});
+
+export const LEAD_LIST_MAX_PAGE_SIZE = 2000;
+export const LEAD_STATUS_MAX_IDS = 500;
+
+export const listProjectLeadsSchema = z.object({
+  ...projectIdShape,
+  status: z.enum(LEAD_OUTREACH_STATUSES).optional(),
+  source: z.enum(["local", "shopify"]).optional(),
+  searchId: z.string().min(1).optional(),
+  hasEmail: z.boolean().optional(),
+  minScore: z.number().int().min(0).max(100).optional(),
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(LEAD_LIST_MAX_PAGE_SIZE).default(50),
+});
+
+export const setLeadStatusSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(LEAD_STATUS_MAX_IDS),
+  status: z.enum(LEAD_OUTREACH_STATUSES),
 });
 
 export const leadSearchIdSchema = z.object({

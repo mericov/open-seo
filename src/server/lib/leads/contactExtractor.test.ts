@@ -141,6 +141,24 @@ describe("findSiteContacts", () => {
     });
   });
 
+  it("lists the marketing gaps visible on the home page", async () => {
+    routes["https://gaps.test/"] = {
+      body: `<html><head>
+        <meta name="viewport" content="width=device-width">
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-ABC1234"></script>
+        <script type="application/ld+json">{}</script>
+      </head><body><a href="mailto:hi@gaps.test">mail</a></body></html>`,
+    };
+
+    const result = await findSiteContacts("https://gaps.test/");
+
+    expect(result.findings).toEqual([
+      "no_meta_pixel",
+      "no_meta_description",
+      "no_blog",
+    ]);
+  });
+
   it("respects a robots.txt that disallows the site", async () => {
     routes["https://private.test/"] = {
       body: `<a href="mailto:owner@private.test">mail</a>`,

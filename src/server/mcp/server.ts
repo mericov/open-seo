@@ -125,6 +125,10 @@ import {
   findShopifyStoresTool,
   getLeadsTool,
 } from "@/server/mcp/tools/lead-finder-tools";
+import {
+  listLeadsTool,
+  updateLeadsTool,
+} from "@/server/mcp/tools/lead-outreach-tools";
 
 type ToolSchema = z.ZodType | z.ZodRawShape;
 
@@ -300,6 +304,8 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(saveBlogImagesTool);
   register(findLeadsTool);
   register(findShopifyStoresTool);
+  register(listLeadsTool);
+  register(updateLeadsTool);
   register(enrichLeadsTool);
   register(getLeadsTool);
 

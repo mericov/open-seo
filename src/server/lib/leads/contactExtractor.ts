@@ -8,7 +8,9 @@ import {
   readShopifyStats,
   type ShopifyStats,
 } from "@/server/lib/leads/shopifyStore";
+import { detectSiteFindings } from "@/server/lib/leads/siteSignals";
 import { socialProfiles } from "@/server/lib/leads/socialLinks";
+import type { LeadFindingCode } from "@/shared/leadFindings";
 
 // Reads a business website for the contact details it publishes: emails,
 // social profiles and a WhatsApp link. It visits the home page and, only when
@@ -69,6 +71,7 @@ type SiteContacts = {
   linkedinUrl: string | null;
   whatsappUrl: string | null;
   shopify: ShopifyStats | null;
+  findings: LeadFindingCode[];
 };
 
 type FindOptions = { shopify?: boolean };
@@ -93,6 +96,7 @@ const EMPTY: Omit<SiteContacts, "status"> = {
   linkedinUrl: null,
   whatsappUrl: null,
   shopify: null,
+  findings: [],
 };
 
 export async function findSiteContacts(
@@ -158,6 +162,7 @@ export async function findSiteContacts(
     contactPageUrl,
     ...socialProfiles(pages.flatMap((page) => page.anchors)),
     shopify,
+    findings: detectSiteFindings(home.body, home.finalUrl),
   };
 }
 

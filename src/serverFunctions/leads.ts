@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
+import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
@@ -7,6 +8,8 @@ import {
   leadLocationQuerySchema,
   importStoresSchema,
   leadSearchIdSchema,
+  listProjectLeadsSchema,
+  setLeadStatusSchema,
   listLeadSearchesSchema,
   startLeadSearchSchema,
   startStoreSearchSchema,
@@ -92,4 +95,28 @@ export const deleteLeadSearch = createServerFn({ method: "POST" })
   .validator(leadSearchIdSchema)
   .handler(async ({ data, context }) =>
     LeadFinderService.deleteSearch(context.projectId, data.searchId),
+  );
+
+export const listProjectLeads = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(listProjectLeadsSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.listLeads(
+      context.projectId,
+      {
+        status: data.status,
+        source: data.source,
+        searchId: data.searchId,
+        hasEmail: data.hasEmail,
+        minScore: data.minScore,
+      },
+      { page: data.page, pageSize: data.pageSize },
+    ),
+  );
+
+export const setLeadStatus = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(setLeadStatusSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.setStatus(context.projectId, data.leadIds, data.status),
   );

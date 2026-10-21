@@ -7,7 +7,13 @@ import { AppError } from "@/server/lib/errors";
 import { findSiteContacts } from "@/server/lib/leads/contactExtractor";
 import { checkEmails, pickPrimaryEmail } from "@/server/lib/leads/emailChecks";
 import { findPlaces } from "@/server/lib/leads/geocode";
+import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
+import {
+  opportunityScore,
+  sortFindingsByWeight,
+  type LeadFindingCode,
+} from "@/shared/leadFindings";
 import {
   LEAD_REACHABILITY_ORDER,
   leadReachability,
@@ -107,12 +113,21 @@ async function enrichNextBatch(projectId: string, searchId: string) {
 
   await Promise.all(
     pending.map(async (lead) => {
+      const reviewFindings: LeadFindingCode[] =
+        !isStoreSearch && lead.reviewsCount != null && lead.reviewsCount < 10
+          ? ["few_reviews"]
+          : [];
       if (!lead.website) {
+        const findings: LeadFindingCode[] = ["no_website", ...reviewFindings];
         await LeadRepository.saveEnrichment(
           projectId,
           lead.id,
-          { enrichmentStatus: "no_website" },
+          {
+            enrichmentStatus: "no_website",
+            opportunityScore: opportunityScore(findings),
+          },
           [],
+          findings,
         );
         return;
       }
@@ -131,11 +146,17 @@ async function enrichNextBatch(projectId: string, searchId: string) {
       const checks = await checkEmails(emails, siteDomain);
       const primary = pickPrimaryEmail(checks);
       const store = contacts.shopify;
+      const findings =
+        contacts.status === "done"
+          ? [...contacts.findings, ...reviewFindings]
+          : [];
       await LeadRepository.saveEnrichment(
         projectId,
         lead.id,
         {
           enrichmentStatus: contacts.status,
+          opportunityScore:
+            contacts.status === "done" ? opportunityScore(findings) : null,
           contactPageUrl: contacts.contactPageUrl,
           instagramUrl: contacts.instagramUrl,
           facebookUrl: contacts.facebookUrl,
@@ -157,6 +178,7 @@ async function enrichNextBatch(projectId: string, searchId: string) {
           ...check,
           isPrimary: check.email === primary,
         })),
+        findings,
       );
     }),
   );
@@ -199,6 +221,9 @@ async function getSearchDetail(projectId: string, searchId: string) {
     LeadRepository.listLeads(projectId, searchId),
     LeadRepository.listEmailsForSearch(projectId, searchId),
   ]);
+  const findingRows = await LeadListRepository.listFindings(
+    leadRows.map((lead) => lead.id),
+  );
 
   const leads = leadRows.map((lead) => {
     const emails = emailRows.filter((email) => email.leadId === lead.id);
@@ -234,6 +259,13 @@ async function getSearchDetail(projectId: string, searchId: string) {
       productCount: lead.productCount,
       lastProductAt: lead.lastProductAt,
       currency: lead.currency,
+      opportunityScore: lead.opportunityScore,
+      outreachStatus: lead.outreachStatus,
+      findings: sortFindingsByWeight(
+        findingRows
+          .filter((row) => row.leadId === lead.id)
+          .map((row) => row.code),
+      ),
       primaryEmail,
       emails: emails.map(({ email, checkStatus, kind, onOwnDomain }) => ({
         email,

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SafeExternalLink } from "@/client/components/SafeExternalLink";
 import { Badge } from "@/client/components/ui/badge";
 import { TableCell, TableRow } from "@/client/components/ui/table";
+import { FindingChips, ScoreBadge } from "@/client/features/leads/leadBadges";
 import type { LeadRow } from "@/client/features/leads/leadQueries";
 import { formatRelativeTime } from "@/client/lib/relative-time";
 import type { LeadReachability } from "@/shared/leads";
@@ -36,7 +37,12 @@ export function LeadTableRow({
     <TableRow>
       <TableCell className="min-w-56 align-top">
         <div className="space-y-1">
-          <p className="font-medium leading-snug">{lead.name}</p>
+          <div className="flex items-start gap-2">
+            <p className="font-medium leading-snug">{lead.name}</p>
+            {lead.opportunityScore != null ? (
+              <ScoreBadge score={lead.opportunityScore} />
+            ) : null}
+          </div>
           {lead.category ? (
             <p className="text-xs text-muted-foreground">{lead.category}</p>
           ) : null}
@@ -46,6 +52,7 @@ export function LeadTableRow({
           >
             {t(`reachability.${lead.reachability}`)}
           </Badge>
+          <FindingChips findings={lead.findings} />
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
             {lead.website ? (
               <SafeExternalLink

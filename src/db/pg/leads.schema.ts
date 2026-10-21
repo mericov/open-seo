@@ -9,6 +9,10 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { projects } from "./app.schema";
+import {
+  LEAD_FINDING_CODES,
+  LEAD_OUTREACH_STATUSES,
+} from "@/shared/leadFindings";
 
 // Timestamps are stored as *text* (same column shape as the SQLite schema); see
 // the note in pg/app.schema.ts.
@@ -83,6 +87,11 @@ export const leads = pgTable(
     productCount: integer("product_count"),
     lastProductAt: text("last_product_at"),
     currency: text("currency"),
+    opportunityScore: integer("opportunity_score"),
+    outreachStatus: text("outreach_status", { enum: LEAD_OUTREACH_STATUSES })
+      .notNull()
+      .default("new"),
+    contactedAt: text("contacted_at"),
     createdAt: text("created_at").notNull().default(isoNow),
     updatedAt: text("updated_at").notNull().default(isoNow),
   },
@@ -92,6 +101,10 @@ export const leads = pgTable(
       table.businessKey,
     ),
     index("leads_search_status_idx").on(table.searchId, table.enrichmentStatus),
+    index("leads_project_outreach_idx").on(
+      table.projectId,
+      table.outreachStatus,
+    ),
   ],
 );
 
@@ -115,5 +128,20 @@ export const leadEmails = pgTable(
   },
   (table) => [
     uniqueIndex("lead_emails_lead_email_unique").on(table.leadId, table.email),
+  ],
+);
+
+export const leadFindings = pgTable(
+  "lead_findings",
+  {
+    id: text("id").primaryKey(),
+    leadId: text("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    createdAt: text("created_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("lead_findings_lead_code_unique").on(table.leadId, table.code),
   ],
 );
