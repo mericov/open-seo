@@ -17,7 +17,7 @@ import type { LeadFindingCode } from "@/shared/leadFindings";
 // the home page shows no email on the site's own domain, up to two contact
 // pages. Every URL is SSRF-screened and redirects are followed by hand.
 
-const USER_AGENT = "Mozilla/5.0 (compatible; MericSEO-LeadFinder/1.0)";
+const USER_AGENT = "MericSEO-LeadFinder/1.0 (+https://seo.mericozyon.com)";
 const PAGE_TIMEOUT_MS = 8_000;
 const MAX_REDIRECT_HOPS = 6;
 const MAX_HTML_CHARS = 1_500_000;

@@ -24,7 +24,7 @@ A separate ten-minute cron runs due searches and, when none ran, reads one small
 
 ## Shopify stores
 
-A store search asks the provider's technology index for domains running Shopify, filtered by country and an optional ceiling on backlink rank so large brands can be left out, and matched against niche keywords in the site's title and description. Results are ordered by rank. The index records emails and phone numbers it saw on each site; those emails are saved with the lead and checked alongside the ones the app reads itself. A pasted list skips the lookup entirely and costs nothing.
+A store search asks the provider's technology index for domains running Shopify, filtered by country and an optional ceiling on backlink rank so large brands can be left out, and matched against niche keywords in the site's title and description. The provider treats several keywords in one request as all required, so each keyword is sent as its own request with a share of the limit, and the results are merged; any keyword can match. Results are ordered by rank. The index records emails and phone numbers it saw on each site; those emails are saved with the lead and checked alongside the ones the app reads itself. A pasted list skips the lookup entirely and costs nothing.
 
 Stores are identified by domain, so a store already found in any earlier search of the project, local or store, is skipped.
 
@@ -32,7 +32,9 @@ While reading a store, the app also requests the storefront's public `meta.json`
 
 ## Reading websites
 
-Enrichment reads one small batch of pending leads per call. For each lead it opens the home page and, only when the home page shows no email on the site's own domain, up to three contact pages. Contact pages are found from links whose address or text suggests a contact or about page, in English and Turkish; contact links are read before about links, and when a page links to no contact page, the conventional path for the page's language is tried once. The site's robots.txt is honored.
+Enrichment reads one small batch of pending leads per call. For each lead it opens the home page and, only when the home page shows no email on the site's own domain, up to three contact pages. Contact pages are found from links whose address or text suggests a contact or about page, in English and Turkish; contact links are read before about links, and when a page links to no contact page, the conventional path for the page's language is tried once. The site's robots.txt is honored. Requests identify themselves as the lead finder with a link to the app rather than imitating a browser; Shopify's bot protection challenged a browser-like agent sent from Workers.
+
+Leads whose site could not be read can be queued again from the search, which sets them back to pending.
 
 Every fetched address is screened for SSRF. The site's start address and each redirect hop are validated as untrusted start URLs; discovered contact links must be same-origin and crawlable. Redirects are followed by hand.
 

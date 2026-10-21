@@ -105,14 +105,24 @@ export async function fetchStoreRows(
     conditions.push(["domain_rank", "<=", params.maxRank]);
   }
   const client = createDataforseoClient(billing);
-  const items = await client.domainAnalytics.domainsByTechnology({
-    technologies: [params.technology],
-    keywords: params.keywords,
-    filters: joinWithAnd(conditions),
-    orderBy: ["domain_rank,desc"],
-    limit: page.limit,
-    offset: page.offset,
-  });
+  const keywordSets =
+    params.keywords.length > 1
+      ? params.keywords.map((keyword) => [keyword])
+      : [params.keywords];
+  const share = Math.ceil(page.limit / keywordSets.length);
+  const results = await Promise.all(
+    keywordSets.map((keywords) =>
+      client.domainAnalytics.domainsByTechnology({
+        technologies: [params.technology],
+        keywords,
+        filters: joinWithAnd(conditions),
+        orderBy: ["domain_rank,desc"],
+        limit: share,
+        offset: Math.floor(page.offset / keywordSets.length),
+      }),
+    ),
+  );
+  const items = results.flat();
 
   const rows = items.flatMap((item) => {
     const parsed = technologyItemSchema.safeParse(item);

@@ -53,7 +53,9 @@
     "showAll": "Göster",
     "hideUnverified": "Gizle",
     "deleteTracked": "Bu aramadaki {{count}} lead'in takip durumu var. Arama silinirse bu leadler ve durumları da silinir.",
-    "allKeywords": "tüm nişler"
+    "allKeywords": "tüm nişler",
+    "failedReads": "{{count}} site okunamadı.",
+    "retryFailed": "Tekrar dene"
   },
   "reachability": {
     "ready": "Mail atılabilir",
@@ -103,7 +105,7 @@
     "import": "Domain listesi yapıştır",
     "keywords": "Niş anahtar kelimeler",
     "keywordsPlaceholder": "çiçek, mum, takı",
-    "keywordsHint": "Virgülle ayırın. Mağaza başlığı ve açıklamasında aranır.",
+    "keywordsHint": "Virgülle ayırın. Her kelime ayrı aranır, herhangi biri eşleşen mağaza gelir; her ek kelime yaklaşık $0.01 ekler.",
     "country": "Ülke",
     "maxRank": "En fazla site gücü",
     "anyRank": "Fark etmez",

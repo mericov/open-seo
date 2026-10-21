@@ -159,3 +159,10 @@ export const updateLeadFirstLine = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     LeadFirstLineService.update(context.projectId, data.leadId, data.firstLine),
   );
+
+export const retryFailedLeads = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(leadSearchIdSchema)
+  .handler(async ({ data, context }) =>
+    LeadFinderService.retryFailed(context.projectId, data.searchId),
+  );

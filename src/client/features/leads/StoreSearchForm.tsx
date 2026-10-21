@@ -197,7 +197,10 @@ export function StoreSearchForm({ projectId }: { projectId: string }) {
           {mode === "import"
             ? t("stores.importCostNote")
             : t("stores.costNote", {
-                cost: (0.012 + limit * 0.0012).toFixed(2),
+                cost: (
+                  0.012 * Math.max(1, keywordList.length) +
+                  limit * 0.0012
+                ).toFixed(2),
               })}
         </span>
       </div>

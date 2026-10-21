@@ -296,6 +296,21 @@ async function findAutoRunSearchWithPending() {
   return row ?? null;
 }
 
+async function resetFailedLeads(projectId: string, searchId: string) {
+  const rows = await db
+    .update(leads)
+    .set({ enrichmentStatus: "pending", updatedAt: new Date().toISOString() })
+    .where(
+      and(
+        eq(leads.projectId, projectId),
+        eq(leads.searchId, searchId),
+        eq(leads.enrichmentStatus, "failed"),
+      ),
+    )
+    .returning({ id: leads.id });
+  return rows.length;
+}
+
 export const LeadRepository = {
   createSearch,
   listSearches,
@@ -315,4 +330,5 @@ export const LeadRepository = {
   listDueSearches,
   claimDueSearch,
   findAutoRunSearchWithPending,
+  resetFailedLeads,
 };

@@ -322,6 +322,11 @@ async function getSearchDetail(projectId: string, searchId: string) {
   };
 }
 
+async function retryFailed(projectId: string, searchId: string) {
+  await requireSearch(projectId, searchId);
+  return { reset: await LeadRepository.resetFailedLeads(projectId, searchId) };
+}
+
 async function deleteSearch(projectId: string, searchId: string) {
   await requireSearch(projectId, searchId);
   await LeadRepository.deleteSearch(projectId, searchId);
@@ -350,4 +355,5 @@ export const LeadFinderService = {
   listSearches,
   getSearchDetail,
   deleteSearch,
+  retryFailed,
 };

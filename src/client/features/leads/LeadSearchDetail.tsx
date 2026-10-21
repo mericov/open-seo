@@ -30,7 +30,11 @@ import { LeadAutoScan } from "@/client/features/leads/LeadAutoScan";
 import { LeadTableRow } from "@/client/features/leads/LeadTableRow";
 import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
-import { deleteLeadSearch, enrichLeadBatch } from "@/serverFunctions/leads";
+import {
+  deleteLeadSearch,
+  enrichLeadBatch,
+  retryFailedLeads,
+} from "@/serverFunctions/leads";
 import { LEAD_REACHABILITY_ORDER, type LeadReachability } from "@/shared/leads";
 
 type Filter = LeadReachability | "all";
@@ -54,6 +58,16 @@ export function LeadSearchDetail({
   const enrichMutation = useMutation({
     mutationFn: () => enrichLeadBatch({ data: { projectId, searchId } }),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: leadSearchOptions(projectId, searchId).queryKey,
+      });
+    },
+  });
+
+  const retryMutation = useMutation({
+    mutationFn: () => retryFailedLeads({ data: { projectId, searchId } }),
+    onSuccess: async () => {
+      setPaused(false);
       await queryClient.invalidateQueries({
         queryKey: leadSearchOptions(projectId, searchId).queryKey,
       });
@@ -109,6 +123,9 @@ export function LeadSearchDetail({
     lead.enrichmentStatus !== "pending" &&
     lead.productCount == null;
   const hiddenStores = searchQuery.data.leads.filter(isHiddenStore).length;
+  const failedReads = searchQuery.data.leads.filter(
+    (lead) => lead.enrichmentStatus === "failed",
+  ).length;
   const trackedLeads = searchQuery.data.leads.filter(
     (lead) => lead.outreachStatus !== "new",
   ).length;
@@ -199,6 +216,20 @@ export function LeadSearchDetail({
 
         {!isStoreSearch || search.technology ? (
           <LeadAutoScan projectId={projectId} search={search} />
+        ) : null}
+
+        {failedReads > 0 && pending === 0 ? (
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>{t("detail.failedReads", { count: failedReads })}</span>
+            <Button
+              size="sm"
+              variant="ghost"
+              pending={retryMutation.isPending}
+              onClick={() => retryMutation.mutate()}
+            >
+              {t("detail.retryFailed")}
+            </Button>
+          </div>
         ) : null}
 
         {search.skippedDuplicates > 0 ? (

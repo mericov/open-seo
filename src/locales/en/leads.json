@@ -53,7 +53,9 @@
     "showAll": "Show them",
     "hideUnverified": "Hide them",
     "deleteTracked": "{{count}} leads in this search have an outreach status. Deleting the search removes them and their status too.",
-    "allKeywords": "any niche"
+    "allKeywords": "any niche",
+    "failedReads": "{{count}} sites couldn't be read.",
+    "retryFailed": "Try again"
   },
   "reachability": {
     "ready": "Ready to email",
@@ -103,7 +105,7 @@
     "import": "Paste a domain list",
     "keywords": "Niche keywords",
     "keywordsPlaceholder": "candle, jewelry, çiçek",
-    "keywordsHint": "Comma separated. Matched against store titles and descriptions.",
+    "keywordsHint": "Comma separated. Each keyword is searched on its own and any match counts; each extra keyword adds about $0.01.",
     "country": "Country",
     "maxRank": "Maximum site strength",
     "anyRank": "Any",

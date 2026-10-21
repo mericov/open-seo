@@ -100,3 +100,27 @@ it("turns a pasted list into unique store domains without a paid lookup", async 
     "bar.co.uk",
   ]);
 });
+
+it("searches each keyword on its own so any keyword can match", async () => {
+  mocks.domainsByTechnology.mockResolvedValue([]);
+
+  await StoreFinderService.startStoreSearch(
+    {
+      projectId: "p1",
+      technology: "Shopify",
+      keywords: ["skincare", "serum"],
+      limit: 20,
+    },
+    billing,
+  );
+
+  expect(
+    mocks.domainsByTechnology.mock.calls.map(([input]) => [
+      input.keywords,
+      input.limit,
+    ]),
+  ).toEqual([
+    [["skincare"], 10],
+    [["serum"], 10],
+  ]);
+});
