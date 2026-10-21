@@ -10,6 +10,18 @@ Each listing becomes a lead in the project. A business is identified by its Goog
 
 Emails are stored as their own rows, one per address found on a lead's site, each with its own check result. One of them is marked as the primary address to write to first.
 
+## Broad searches
+
+A local search does not need a single category. The user can pick a preset sector group, such as health and clinics, legal and finance, or home services, which sends up to ten matching categories in one request, or search every category in the area. A need filter narrows any local search to businesses without a website, with an unclaimed Google profile, or with fewer than ten reviews; these are passed to the provider as listing filters, so only matching businesses are billed.
+
+Online store searches choose a platform (Shopify, WooCommerce, Wix, Squarespace or BigCommerce) and treat niche keywords as optional, so a search can cover every small store of a platform in a country. Only Shopify stores are checked against the storefront's `meta.json`, so unconfirmed sites are hidden only in Shopify searches.
+
+## Automatic runs
+
+Any search except a pasted domain list can run again, either on demand or weekly. Each search stores how far into the provider's ordered results it has read, and a run continues from there, asking for as many rows as it still needs, until it has added the requested number of new leads (ten by default), three calls have been made, or the results run out. When the results run out, the next run starts again from the top, which picks up businesses that were listed since. New leads join the same search and are shown as new in the outreach list.
+
+A separate ten-minute cron runs due searches and, when none ran, reads one small batch of pending leads from searches with weekly runs turned on, so automatic runs fill in without a browser open. It is its own cron trigger so its subrequests do not share an invocation with rank checks. Due searches are claimed by compare-and-set on their next run time, so overlapping ticks cannot run the same search twice. The Docker self-host scheduler only fires the main cron, so automatic runs need the Cloudflare deployment.
+
 ## Shopify stores
 
 A store search asks the provider's technology index for domains running Shopify, filtered by country and an optional ceiling on backlink rank so large brands can be left out, and matched against niche keywords in the site's title and description. Results are ordered by rank. The index records emails and phone numbers it saw on each site; those emails are saved with the lead and checked alongside the ones the app reads itself. A pasted list skips the lookup entirely and costs nothing.

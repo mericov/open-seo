@@ -1,19 +1,23 @@
 import { sortBy } from "remeda";
 import type { BillingCustomerContext } from "@/server/billing/subscription";
-import { createDataforseoClient } from "@/server/lib/dataforseo";
 import { getBusinessCategories } from "@/server/lib/dataforseo/businessCategories";
-import { isRecord } from "@/server/lib/dataforseo/envelope";
 import { AppError } from "@/server/lib/errors";
 import { findSiteContacts } from "@/server/lib/leads/contactExtractor";
 import { checkEmails, pickPrimaryEmail } from "@/server/lib/leads/emailChecks";
 import { findPlaces } from "@/server/lib/leads/geocode";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
+import { fetchAndSaveLocal } from "@/server/features/leads/services/leadSources";
 import {
   opportunityScore,
   sortFindingsByWeight,
   type LeadFindingCode,
 } from "@/shared/leadFindings";
+import {
+  categoriesForSearch,
+  type LeadCategoryGroup,
+  type LeadNeedFilter,
+} from "@/shared/leadScan";
 import {
   LEAD_REACHABILITY_ORDER,
   leadReachability,
@@ -28,7 +32,9 @@ export const LEAD_ENRICH_BATCH_SIZE = 3;
 
 type StartLeadSearchInput = {
   projectId: string;
-  category: string;
+  category?: string;
+  categoryGroup?: LeadCategoryGroup;
+  needFilter?: LeadNeedFilter;
   nameQuery?: string;
   location: string;
   place?: { label: string; latitude: number; longitude: number };
@@ -53,49 +59,49 @@ async function startSearch(
   const place = input.place ?? (await findPlaces(input.location))[0];
   if (!place) throw new AppError("LEAD_LOCATION_NOT_FOUND");
   const radiusKm = Math.max(1, Math.round(input.radiusKm));
-  const client = createDataforseoClient(billing);
-  const rows = await client.business.businessListings({
-    categories: [input.category],
-    title: input.nameQuery || undefined,
-    locationCoordinate: `${formatCoordinate(place.latitude)},${formatCoordinate(place.longitude)},${radiusKm}`,
-    filters:
-      input.minRating != null
-        ? [["rating.value", ">=", input.minRating]]
-        : undefined,
-    orderBy: ["rating.votes_count,desc"],
-    limit: input.limit,
-  });
-
-  const listings = rows.flatMap((row) => {
-    const listing = toListing(row);
-    return listing ? [listing] : [];
-  });
-  const existing = await LeadRepository.existingBusinessKeys(
-    input.projectId,
-    listings.map((listing) => listing.businessKey),
-  );
-  const fresh = listings.filter(
-    (listing) => !existing.has(listing.businessKey),
-  );
-
+  const groupLabel = input.categoryGroup
+    ? `${humanizeCategory(input.categoryGroup)}`
+    : humanizeCategory(input.category ?? "");
   const searchId = await LeadRepository.createSearch(input.projectId, {
-    label: `${humanizeCategory(input.category)} · ${shortPlace(input.location)}`,
-    category: input.category,
+    label: `${groupLabel}${input.needFilter ? ` · ${humanizeCategory(input.needFilter)}` : ""} · ${shortPlace(input.location)}`,
+    category: input.category ?? input.categoryGroup ?? "all",
+    categoryGroup: input.categoryGroup ?? null,
+    needFilter: input.needFilter ?? null,
     nameQuery: input.nameQuery || null,
     locationLabel: place.label,
     latitude: place.latitude,
     longitude: place.longitude,
     radiusKm,
+    minRating: input.minRating ?? null,
     requestedLimit: input.limit,
-    skippedDuplicates: listings.length - fresh.length,
   });
-  await LeadRepository.insertLeads(input.projectId, searchId, fresh);
+  const result = await fetchAndSaveLocal(
+    billing,
+    { projectId: input.projectId, searchId },
+    {
+      categories: categoriesForSearch({
+        category: input.category ?? "",
+        categoryGroup: input.categoryGroup ?? null,
+      }),
+      nameQuery: input.nameQuery,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      radiusKm,
+      minRating: input.minRating,
+      needFilter: input.needFilter,
+    },
+    { limit: input.limit, offset: 0 },
+  );
+  await LeadRepository.updateSearch(input.projectId, searchId, {
+    skippedDuplicates: result.found - result.added,
+    nextOffset: result.returned,
+  });
 
   return {
     searchId,
-    found: listings.length,
-    added: fresh.length,
-    skippedDuplicates: listings.length - fresh.length,
+    found: result.found,
+    added: result.added,
+    skippedDuplicates: result.found - result.added,
   };
 }
 
@@ -298,6 +304,13 @@ async function getSearchDetail(projectId: string, searchId: string) {
       countryCode: search.countryCode,
       keywordQuery: search.keywordQuery,
       nameQuery: search.nameQuery,
+      technology: search.technology,
+      categoryGroup: search.categoryGroup,
+      needFilter: search.needFilter,
+      autoRun: search.autoRun,
+      runSize: search.runSize,
+      nextRunAt: search.nextRunAt,
+      lastRunAt: search.lastRunAt,
       locationLabel: search.locationLabel,
       radiusKm: search.radiusKm,
       requestedLimit: search.requestedLimit,
@@ -318,51 +331,6 @@ async function requireSearch(projectId: string, searchId: string) {
   const search = await LeadRepository.getSearch(projectId, searchId);
   if (!search) throw new AppError("NOT_FOUND");
   return search;
-}
-
-function toListing(row: Record<string, unknown>) {
-  const name = stringField(row.title);
-  if (!name) return null;
-  const cid = stringField(row.cid);
-  const placeId = stringField(row.place_id);
-  const domain = stringField(row.domain)?.toLowerCase() ?? null;
-  const address = stringField(row.address);
-  const businessKey =
-    (cid && `cid:${cid}`) ||
-    (placeId && `place:${placeId}`) ||
-    (domain && `domain:${domain}`) ||
-    `name:${name.toLowerCase()}|${address?.toLowerCase() ?? ""}`;
-  const rating = isRecord(row.rating) ? row.rating : {};
-  const website = stringField(row.url);
-  return {
-    businessKey,
-    name,
-    category: stringField(row.category),
-    address,
-    phone: stringField(row.phone),
-    website,
-    domain,
-    rating: numberField(rating.value),
-    reviewsCount: numberField(rating.votes_count),
-    mapsUrl:
-      stringField(row.check_url) ??
-      (cid ? `https://www.google.com/maps?cid=${cid}` : null),
-    enrichmentStatus: website ? ("pending" as const) : ("no_website" as const),
-  };
-}
-
-function formatCoordinate(value: number): string {
-  return Number(value.toFixed(6)).toString();
-}
-
-function stringField(value: unknown): string | null {
-  if (typeof value === "string" && value.trim()) return value.trim();
-  if (typeof value === "number") return String(value);
-  return null;
-}
-
-function numberField(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function humanizeCategory(category: string) {

@@ -13,6 +13,7 @@ import {
   LEAD_FINDING_CODES,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
+import { LEAD_NEED_FILTERS } from "@/shared/leadScan";
 
 // Timestamps are stored as *text* (same column shape as the SQLite schema); see
 // the note in pg/app.schema.ts.
@@ -41,6 +42,16 @@ export const leadSearches = pgTable(
     skippedDuplicates: integer("skipped_duplicates").notNull().default(0),
     countryCode: text("country_code"),
     keywordQuery: text("keyword_query"),
+    categoryGroup: text("category_group"),
+    needFilter: text("need_filter", { enum: LEAD_NEED_FILTERS }),
+    technology: text("technology"),
+    minRating: real("min_rating"),
+    maxRank: integer("max_rank"),
+    autoRun: boolean("auto_run").notNull().default(false),
+    runSize: integer("run_size").notNull().default(10),
+    nextOffset: integer("next_offset").notNull().default(0),
+    nextRunAt: text("next_run_at"),
+    lastRunAt: text("last_run_at"),
     createdAt: text("created_at").notNull().default(isoNow),
     updatedAt: text("updated_at").notNull().default(isoNow),
   },
@@ -49,6 +60,7 @@ export const leadSearches = pgTable(
       table.projectId,
       table.createdAt,
     ),
+    index("lead_searches_auto_run_idx").on(table.autoRun, table.nextRunAt),
   ],
 );
 

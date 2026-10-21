@@ -29,6 +29,7 @@ beforeAll(async () => {
       ...migration("0058_lead_finder.sql"),
       ...migration("0059_lead_finder_stores.sql"),
       ...migration("0060_lead_outreach.sql"),
+      ...migration("0061_lead_scans.sql"),
       `INSERT INTO lead_searches (id, project_id, label, source, category, location_label, latitude, longitude, radius_km, requested_limit)
         VALUES ('s1', 'p1', 'Florists', 'local', 'florist', 'Austin', 0, 0, 10, 10),
                ('s2', 'p1', 'Stores', 'shopify', 'shopify', '', 0, 0, 0, 10),

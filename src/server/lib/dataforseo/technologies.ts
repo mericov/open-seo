@@ -14,6 +14,7 @@ export async function fetchDomainsByTechnology(input: {
   filters?: unknown[];
   orderBy?: string[];
   limit: number;
+  offset?: number;
 }): Promise<DataforseoApiResponse<DomainTechnologyItem[]>> {
   const response = await dataforseoPost<
     DataforseoItemsTask<DomainTechnologyItem>
@@ -25,6 +26,7 @@ export async function fetchDomainsByTechnology(input: {
       filters: input.filters?.length ? input.filters : undefined,
       order_by: input.orderBy,
       limit: input.limit,
+      offset: input.offset || undefined,
     },
   ]);
   const task = assertOk(response, { treatNoResultsAsEmpty: true });

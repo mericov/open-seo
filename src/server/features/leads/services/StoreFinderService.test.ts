@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   createSearch: vi.fn(),
   insertLeads: vi.fn(),
   insertFoundEmails: vi.fn(),
+  updateSearch: vi.fn(),
 }));
 
 vi.mock("@/server/lib/dataforseo", () => ({
@@ -20,6 +21,7 @@ vi.mock("@/server/features/leads/repositories/LeadRepository", () => ({
     createSearch: mocks.createSearch,
     insertLeads: mocks.insertLeads,
     insertFoundEmails: mocks.insertFoundEmails,
+    updateSearch: mocks.updateSearch,
   },
 }));
 
@@ -45,6 +47,7 @@ it("looks up Shopify stores by country and size, and keeps the emails the lookup
   const result = await StoreFinderService.startStoreSearch(
     {
       projectId: "p1",
+      technology: "Shopify",
       keywords: ["mum"],
       countryCode: "TR",
       maxRank: 300,

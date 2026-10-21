@@ -46,13 +46,14 @@
     "deleted": "Lead search deleted",
     "filterAll": "All",
     "noLeads": "No leads match this filter.",
-    "storeScope": "Shopify stores · {{keywords}} · {{country}}",
+    "storeScope": "{{platform}} · {{keywords}} · {{country}}",
     "domainList": "pasted list",
     "hiddenStores": "{{count}} sites are hidden because they couldn't be confirmed as live Shopify stores (closed, password protected, moved off Shopify, or unreadable).",
     "shownStores": "Showing {{count}} sites that couldn't be confirmed as live Shopify stores.",
     "showAll": "Show them",
     "hideUnverified": "Hide them",
-    "deleteTracked": "{{count}} leads in this search have an outreach status. Deleting the search removes them and their status too."
+    "deleteTracked": "{{count}} leads in this search have an outreach status. Deleting the search removes them and their status too.",
+    "allKeywords": "any niche"
   },
   "reachability": {
     "ready": "Ready to email",
@@ -95,7 +96,7 @@
   },
   "sources": {
     "local": "Local businesses",
-    "shopify": "Shopify stores"
+    "shopify": "Online stores"
   },
   "stores": {
     "discover": "Find by niche",
@@ -126,7 +127,8 @@
       "CA": "Canada",
       "AU": "Australia",
       "AE": "United Arab Emirates"
-    }
+    },
+    "platform": "Platform"
   },
   "views": {
     "searches": "Searches",
@@ -184,5 +186,39 @@
     "contactedOn": "emailed {{when}}",
     "selectAll": "Select all on this page",
     "selectLead": "Select {{name}}"
+  },
+  "scan": {
+    "byCategory": "One category",
+    "byGroup": "Sector group",
+    "group": "Sector group",
+    "need": "Need",
+    "groups": {
+      "all": "All sectors",
+      "health": "Health & clinics",
+      "legal_finance": "Legal & finance",
+      "beauty": "Beauty & spa",
+      "home_services": "Home services & contractors",
+      "real_estate": "Real estate & design",
+      "food": "Food & drink",
+      "fitness": "Fitness & sports",
+      "auto": "Automotive",
+      "events": "Weddings & events",
+      "education": "Education & courses",
+      "retail": "Retail shops"
+    },
+    "needs": {
+      "any": "Any",
+      "no_website": "No website",
+      "unclaimed": "Google profile not claimed",
+      "few_reviews": "Fewer than 10 reviews"
+    },
+    "autoTitle": "Automatic search",
+    "autoHint": "Turn on to pull new leads every week, continuing where the last run stopped.",
+    "nextRun": "Next run {{when}}",
+    "lastRun": "last run {{when}}",
+    "weekly": "Weekly",
+    "perRun": "Leads per run",
+    "runNow": "Run now ({{count}})",
+    "ranNow": "{{count}} new leads added"
   }
 }

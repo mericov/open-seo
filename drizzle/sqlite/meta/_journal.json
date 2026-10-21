@@ -428,6 +428,13 @@
       "when": 1792586412165,
       "tag": "0060_lead_outreach",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "6",
+      "when": 1792588087244,
+      "tag": "0061_lead_scans",
+      "breakpoints": true
     }
   ]
 }

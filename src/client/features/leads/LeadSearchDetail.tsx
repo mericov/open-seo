@@ -26,6 +26,7 @@ import {
   type LeadRow,
 } from "@/client/features/leads/leadQueries";
 import { buildLeadExport } from "@/client/features/leads/leadExport";
+import { LeadAutoScan } from "@/client/features/leads/LeadAutoScan";
 import { LeadTableRow } from "@/client/features/leads/LeadTableRow";
 import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
@@ -104,6 +105,7 @@ export function LeadSearchDetail({
   const isStoreSearch = search.source === "shopify";
   const isHiddenStore = (lead: LeadRow) =>
     isStoreSearch &&
+    search.technology === "Shopify" &&
     lead.enrichmentStatus !== "pending" &&
     lead.productCount == null;
   const hiddenStores = searchQuery.data.leads.filter(isHiddenStore).length;
@@ -158,7 +160,8 @@ export function LeadSearchDetail({
             <p className="text-sm text-muted-foreground">
               {isStoreSearch
                 ? t("detail.storeScope", {
-                    keywords: search.keywordQuery ?? t("detail.domainList"),
+                    platform: search.technology ?? t("detail.domainList"),
+                    keywords: search.keywordQuery ?? t("detail.allKeywords"),
                     country: search.countryCode ?? t("stores.countries.any"),
                   })
                 : t("detail.radius", {
@@ -192,6 +195,10 @@ export function LeadSearchDetail({
               {verifiedOnly ? t("detail.showAll") : t("detail.hideUnverified")}
             </Button>
           </div>
+        ) : null}
+
+        {!isStoreSearch || search.technology ? (
+          <LeadAutoScan projectId={projectId} search={search} />
         ) : null}
 
         {search.skippedDuplicates > 0 ? (

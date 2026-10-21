@@ -11,18 +11,16 @@ import {
   FieldLabel,
 } from "@/client/components/ui/field";
 import { Input } from "@/client/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/client/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/client/components/ui/tabs";
 import { Textarea } from "@/client/components/ui/textarea";
 import { leadsQueryKey } from "@/client/features/leads/leadQueries";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
+import { OptionSelect } from "@/client/features/leads/OptionSelect";
 import { importStores, startStoreSearch } from "@/serverFunctions/leads";
+import {
+  LEAD_STORE_PLATFORMS,
+  type LeadStorePlatform,
+} from "@/shared/leadScan";
 import { LEAD_SEARCH_MAX_LIMIT } from "@/types/schemas/leads";
 
 const COUNTRIES = [
@@ -48,6 +46,7 @@ export function StoreSearchForm({ projectId }: { projectId: string }) {
   const [mode, setMode] = useState<Mode>("discover");
   const [keywords, setKeywords] = useState("");
   const [country, setCountry] = useState<Country>("TR");
+  const [platform, setPlatform] = useState<LeadStorePlatform>("Shopify");
   const [maxRank, setMaxRank] = useState("");
   const [limit, setLimit] = useState(30);
   const [domains, setDomains] = useState("");
@@ -65,6 +64,7 @@ export function StoreSearchForm({ projectId }: { projectId: string }) {
         : startStoreSearch({
             data: {
               projectId,
+              technology: platform,
               keywords: keywordList,
               countryCode: country === "any" ? undefined : country,
               maxRank: maxRank ? Number(maxRank) : undefined,
@@ -133,32 +133,22 @@ export function StoreSearchForm({ projectId }: { projectId: string }) {
             />
             <FieldDescription>{t("stores.keywordsHint")}</FieldDescription>
           </Field>
-          <Field>
-            <FieldLabel htmlFor="store-country">
-              {t("stores.country")}
-            </FieldLabel>
-            <Select
-              items={COUNTRIES.map((code) => ({
-                value: code,
-                label: t(`stores.countries.${code}`),
-              }))}
-              value={country}
-              onValueChange={(value) => {
-                if (value !== null) setCountry(value);
-              }}
-            >
-              <SelectTrigger id="store-country" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((code) => (
-                  <SelectItem key={code} value={code}>
-                    {t(`stores.countries.${code}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+          <OptionSelect
+            id="store-platform"
+            label={t("stores.platform")}
+            value={platform}
+            options={LEAD_STORE_PLATFORMS}
+            optionLabel={(value) => value}
+            onChange={setPlatform}
+          />
+          <OptionSelect
+            id="store-country"
+            label={t("stores.country")}
+            value={country}
+            options={COUNTRIES}
+            optionLabel={(code) => t(`stores.countries.${code}`)}
+            onChange={setCountry}
+          />
           <Field>
             <FieldLabel htmlFor="store-max-rank">
               {t("stores.maxRank")}

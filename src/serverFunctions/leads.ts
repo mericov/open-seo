@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
+import { LeadScanService } from "@/server/features/leads/services/LeadScanService";
 import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
@@ -9,6 +10,7 @@ import {
   importStoresSchema,
   leadSearchIdSchema,
   listProjectLeadsSchema,
+  setLeadScheduleSchema,
   setLeadStatusSchema,
   listLeadSearchesSchema,
   startLeadSearchSchema,
@@ -42,6 +44,8 @@ export const startLeadSearch = createServerFn({ method: "POST" })
       {
         projectId: context.projectId,
         category: data.category,
+        categoryGroup: data.categoryGroup,
+        needFilter: data.needFilter,
         nameQuery: data.nameQuery,
         location: data.location,
         place: data.place,
@@ -60,6 +64,7 @@ export const startStoreSearch = createServerFn({ method: "POST" })
     StoreFinderService.startStoreSearch(
       {
         projectId: context.projectId,
+        technology: data.technology,
         keywords: data.keywords,
         countryCode: data.countryCode,
         maxRank: data.maxRank,
@@ -119,4 +124,21 @@ export const setLeadStatus = createServerFn({ method: "POST" })
   .validator(setLeadStatusSchema)
   .handler(async ({ data, context }) =>
     LeadOutreachService.setStatus(context.projectId, data.leadIds, data.status),
+  );
+
+export const runLeadSearchNow = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(leadSearchIdSchema)
+  .handler(async ({ data, context }) =>
+    LeadScanService.runNow(context.projectId, data.searchId, context),
+  );
+
+export const setLeadSchedule = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(setLeadScheduleSchema)
+  .handler(async ({ data, context }) =>
+    LeadScanService.setSchedule(context.projectId, data.searchId, {
+      autoRun: data.autoRun,
+      runSize: data.runSize,
+    }),
   );

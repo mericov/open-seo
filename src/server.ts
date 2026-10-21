@@ -195,6 +195,8 @@ export { SamChatAgent } from "./server/features/sam/SamChatAgent";
 
 // Daily OAuth KV garbage collection; must match a trigger in wrangler.jsonc.
 const MCP_OAUTH_PURGE_CRON = "17 3 * * *";
+// Lead Finder auto-runs and background site reading; must match wrangler.jsonc.
+const LEAD_SCAN_CRON = "3-59/10 * * * *";
 
 export default {
   fetch,
@@ -203,6 +205,14 @@ export default {
     env: Env,
     _ctx: ExecutionContext,
   ) {
+    if (controller.cron === LEAD_SCAN_CRON) {
+      await withPgClient(async () => {
+        const { runScheduledLeadScans } =
+          await import("@/server/features/leads/services/LeadScanService");
+        await runScheduledLeadScans();
+      });
+      return;
+    }
     if (controller.cron === MCP_OAUTH_PURGE_CRON) {
       // Only hosted mode runs the OAuth provider (and has OAUTH_KV bound).
       if (isHostedAuthMode(getAuthMode(env.AUTH_MODE))) {

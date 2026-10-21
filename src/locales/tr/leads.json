@@ -46,13 +46,14 @@
     "deleted": "Lead araması silindi",
     "filterAll": "Tümü",
     "noLeads": "Bu filtreye uyan lead yok.",
-    "storeScope": "Shopify mağazaları · {{keywords}} · {{country}}",
+    "storeScope": "{{platform}} · {{keywords}} · {{country}}",
     "domainList": "yapıştırılan liste",
     "hiddenStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gizlendi (kapanmış, şifreli, Shopify'dan ayrılmış ya da okunamamış).",
     "shownStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gösteriliyor.",
     "showAll": "Göster",
     "hideUnverified": "Gizle",
-    "deleteTracked": "Bu aramadaki {{count}} lead'in takip durumu var. Arama silinirse bu leadler ve durumları da silinir."
+    "deleteTracked": "Bu aramadaki {{count}} lead'in takip durumu var. Arama silinirse bu leadler ve durumları da silinir.",
+    "allKeywords": "tüm nişler"
   },
   "reachability": {
     "ready": "Mail atılabilir",
@@ -95,7 +96,7 @@
   },
   "sources": {
     "local": "Yerel işletmeler",
-    "shopify": "Shopify mağazaları"
+    "shopify": "Online mağazalar"
   },
   "stores": {
     "discover": "Nişe göre bul",
@@ -126,7 +127,8 @@
       "CA": "Kanada",
       "AU": "Avustralya",
       "AE": "Birleşik Arap Emirlikleri"
-    }
+    },
+    "platform": "Platform"
   },
   "views": {
     "searches": "Aramalar",
@@ -184,5 +186,39 @@
     "contactedOn": "mail {{when}}",
     "selectAll": "Bu sayfadakilerin hepsini seç",
     "selectLead": "{{name}} seç"
+  },
+  "scan": {
+    "byCategory": "Tek kategori",
+    "byGroup": "Sektör grubu",
+    "group": "Sektör grubu",
+    "need": "İhtiyaç",
+    "groups": {
+      "all": "Tüm sektörler",
+      "health": "Sağlık ve klinikler",
+      "legal_finance": "Hukuk ve finans",
+      "beauty": "Güzellik ve spa",
+      "home_services": "Ev hizmetleri ve tadilat",
+      "real_estate": "Emlak ve tasarım",
+      "food": "Yeme içme",
+      "fitness": "Spor ve fitness",
+      "auto": "Otomotiv",
+      "events": "Düğün ve etkinlik",
+      "education": "Eğitim ve kurslar",
+      "retail": "Perakende mağazalar"
+    },
+    "needs": {
+      "any": "Hepsi",
+      "no_website": "Web sitesi yok",
+      "unclaimed": "Google profili sahiplenilmemiş",
+      "few_reviews": "10'dan az yorum"
+    },
+    "autoTitle": "Otomatik tarama",
+    "autoHint": "Açarsan her hafta, bir önceki çalışmanın kaldığı yerden devam ederek yeni leadler getirir.",
+    "nextRun": "Sonraki çalışma {{when}}",
+    "lastRun": "son çalışma {{when}}",
+    "weekly": "Haftalık",
+    "perRun": "Her seferinde",
+    "runNow": "Şimdi çalıştır ({{count}})",
+    "ranNow": "{{count}} yeni lead eklendi"
   }
 }

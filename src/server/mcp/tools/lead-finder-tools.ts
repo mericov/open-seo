@@ -16,6 +16,11 @@ import {
 import { withMcpProjectAuth } from "@/server/mcp/project-auth";
 import { projectIdSchema } from "@/server/mcp/schemas";
 import { formatMcpTable, type McpTableColumn } from "@/server/mcp/table";
+import {
+  LEAD_CATEGORY_GROUP_KEYS,
+  LEAD_NEED_FILTERS,
+  LEAD_STORE_PLATFORMS,
+} from "@/shared/leadScan";
 import { LEAD_SEARCH_MAX_LIMIT } from "@/types/schemas/leads";
 
 const leadsPath = (projectId: string, searchId?: string) =>
@@ -32,8 +37,21 @@ const findLeadsInputSchema = {
   category: z
     .string()
     .regex(/^[a-z0-9_]+$/)
+    .optional()
     .describe(
-      "Google Business category slug, e.g. 'home_staging_service' or 'florist'. Find valid slugs with list_business_categories.",
+      "Google Business category slug, e.g. 'home_staging_service' or 'florist'. Find valid slugs with list_business_categories. Pass this or categoryGroup.",
+    ),
+  categoryGroup: z
+    .enum(LEAD_CATEGORY_GROUP_KEYS)
+    .optional()
+    .describe(
+      "A preset sector group searched at once instead of one category: health, legal_finance, beauty, home_services, real_estate, food, fitness, auto, events, education, retail, or all.",
+    ),
+  needFilter: z
+    .enum(LEAD_NEED_FILTERS)
+    .optional()
+    .describe(
+      "Only businesses showing a need: no_website, unclaimed (Google profile not claimed), or few_reviews (under 10).",
     ),
   location: z
     .string()
@@ -76,7 +94,7 @@ export const findLeadsTool = {
   config: {
     title: "Find leads",
     description:
-      "Starts a lead list: pulls local businesses in one Google Business category around a place and saves them to the project's Lead Finder, skipping businesses already found in earlier searches. Contact details are not read yet; call enrich_leads with the returned searchId until remaining is 0. Charges credits for the business listings lookup.",
+      "Starts a lead list: pulls local businesses in one Google Business category or a sector group around a place, optionally only those without a website, with an unclaimed profile or with few reviews, and saves them to the project's Lead Finder, skipping businesses already found in earlier searches. Contact details are not read yet; call enrich_leads with the returned searchId until remaining is 0. Charges credits for the business listings lookup.",
     inputSchema: findLeadsInputSchema,
     outputSchema: z.looseObject({
       searchId: z.string(),
@@ -100,6 +118,9 @@ export const findLeadsTool = {
         {
           projectId: args.projectId,
           category: args.category,
+          categoryGroup:
+            args.categoryGroup ?? (args.category ? undefined : "all"),
+          needFilter: args.needFilter,
           location: args.location,
           radiusKm: args.radiusKm ?? 25,
           limit: args.limit ?? 30,
@@ -127,6 +148,10 @@ export const findLeadsTool = {
 
 const findStoresInputSchema = {
   projectId: projectIdSchema,
+  platform: z
+    .enum(LEAD_STORE_PLATFORMS)
+    .optional()
+    .describe("Store platform to find. Defaults to Shopify."),
   keywords: z
     .array(z.string().min(1).max(60))
     .max(10)
@@ -199,6 +224,7 @@ export const findShopifyStoresTool = {
         : await StoreFinderService.startStoreSearch(
             {
               projectId: args.projectId,
+              technology: args.platform ?? "Shopify",
               keywords: args.keywords ?? [],
               countryCode: args.countryCode,
               maxRank: args.maxRank,

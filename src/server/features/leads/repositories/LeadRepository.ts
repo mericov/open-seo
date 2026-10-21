@@ -1,7 +1,13 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "@/db";
 import { executeInBatches, runBatch } from "@/db/runBatch";
-import { leadEmails, leadFindings, leads, leadSearches } from "@/db/schema";
+import {
+  leadEmails,
+  leadFindings,
+  leads,
+  leadSearches,
+  projects,
+} from "@/db/schema";
 import type { LeadFindingCode } from "@/shared/leadFindings";
 
 type SearchInsert = Omit<
@@ -200,12 +206,10 @@ async function saveEnrichment(
       .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId))),
     tx.delete(leadFindings).where(eq(leadFindings.leadId, leadId)),
     ...findings.map((code) =>
-      tx.insert(leadFindings).values({
-        id: crypto.randomUUID(),
-        leadId,
-        code,
-        createdAt: now,
-      }),
+      tx
+        .insert(leadFindings)
+        .values({ id: crypto.randomUUID(), leadId, code, createdAt: now })
+        .onConflictDoNothing(),
     ),
     ...emails.map((email) =>
       tx
@@ -224,11 +228,72 @@ async function saveEnrichment(
   ]);
 }
 
+async function updateSearch(
+  projectId: string,
+  id: string,
+  values: Partial<SearchInsert>,
+) {
+  await db
+    .update(leadSearches)
+    .set({ ...values, updatedAt: new Date().toISOString() })
+    .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)));
+}
+
 async function touchSearch(projectId: string, id: string) {
   await db
     .update(leadSearches)
     .set({ updatedAt: new Date().toISOString() })
     .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)));
+}
+
+async function listDueSearches(now: string, limit: number) {
+  return db
+    .select({ search: leadSearches, organizationId: projects.organizationId })
+    .from(leadSearches)
+    .innerJoin(projects, eq(projects.id, leadSearches.projectId))
+    .where(
+      and(
+        eq(leadSearches.autoRun, true),
+        lte(leadSearches.nextRunAt, now),
+        isNull(projects.archivedAt),
+      ),
+    )
+    .orderBy(asc(leadSearches.nextRunAt))
+    .limit(limit);
+}
+
+async function claimDueSearch(
+  id: string,
+  observedNextRunAt: string,
+  nextRunAt: string,
+) {
+  const rows = await db
+    .update(leadSearches)
+    .set({ nextRunAt })
+    .where(
+      and(
+        eq(leadSearches.id, id),
+        eq(leadSearches.nextRunAt, observedNextRunAt),
+      ),
+    )
+    .returning({ id: leadSearches.id });
+  return rows.length > 0;
+}
+
+async function findAutoRunSearchWithPending() {
+  const [row] = await db
+    .select({ projectId: leads.projectId, searchId: leads.searchId })
+    .from(leads)
+    .innerJoin(leadSearches, eq(leadSearches.id, leads.searchId))
+    .where(
+      and(
+        eq(leadSearches.autoRun, true),
+        eq(leads.enrichmentStatus, "pending"),
+      ),
+    )
+    .orderBy(asc(leads.createdAt))
+    .limit(1);
+  return row ?? null;
 }
 
 export const LeadRepository = {
@@ -246,4 +311,8 @@ export const LeadRepository = {
   listPendingLeads,
   saveEnrichment,
   touchSearch,
+  updateSearch,
+  listDueSearches,
+  claimDueSearch,
+  findAutoRunSearchWithPending,
 };
