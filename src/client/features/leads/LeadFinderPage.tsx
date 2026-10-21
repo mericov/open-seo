@@ -24,6 +24,10 @@ import {
 } from "@/client/features/leads/leadQueries";
 import { formatRelativeTime } from "@/client/lib/relative-time";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
+import {
+  LeadLocationField,
+  useLocationPicker,
+} from "@/client/features/leads/LeadLocationField";
 import { startLeadSearch } from "@/serverFunctions/leads";
 import { LEAD_SEARCH_MAX_LIMIT } from "@/types/schemas/leads";
 
@@ -42,7 +46,7 @@ function NewSearchForm({ projectId }: { projectId: string }) {
   const navigate = useNavigate();
   const [categoryInput, setCategoryInput] = useState("");
   const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
+  const picker = useLocationPicker(projectId);
   const [radiusKm, setRadiusKm] = useState(25);
   const [limit, setLimit] = useState(30);
   const [minRating, setMinRating] = useState("");
@@ -54,12 +58,17 @@ function NewSearchForm({ projectId }: { projectId: string }) {
   );
 
   const startMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (place: {
+      label: string;
+      latitude: number;
+      longitude: number;
+    }) =>
       startLeadSearch({
         data: {
           projectId,
           category,
-          location,
+          location: picker.query,
+          place,
           radiusKm,
           limit,
           nameQuery: nameQuery.trim() || undefined,
@@ -89,7 +98,12 @@ function NewSearchForm({ projectId }: { projectId: string }) {
       className="space-y-4 rounded-xl border border-border bg-card p-5"
       onSubmit={(event) => {
         event.preventDefault();
-        startMutation.mutate();
+        void picker
+          .resolve()
+          .then((place) => {
+            if (place) startMutation.mutate(place);
+          })
+          .catch(() => undefined);
       }}
     >
       <h2 className="font-semibold">{t("form.title")}</h2>
@@ -142,17 +156,7 @@ function NewSearchForm({ projectId }: { projectId: string }) {
             )
           ) : null}
         </Field>
-        <Field>
-          <FieldLabel htmlFor="lead-location">{t("form.location")}</FieldLabel>
-          <Input
-            id="lead-location"
-            autoComplete="off"
-            placeholder={t("form.locationPlaceholder")}
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            required
-          />
-        </Field>
+        <LeadLocationField picker={picker} />
         <Field>
           <FieldLabel htmlFor="lead-radius">{t("form.radius")}</FieldLabel>
           <Input
@@ -212,8 +216,8 @@ function NewSearchForm({ projectId }: { projectId: string }) {
       <div className="flex flex-wrap items-center gap-3">
         <Button
           type="submit"
-          pending={startMutation.isPending}
-          disabled={!category || location.trim().length < 2}
+          pending={startMutation.isPending || picker.lookup.isPending}
+          disabled={!category || picker.query.trim().length < 2}
         >
           {t("form.submit")}
         </Button>

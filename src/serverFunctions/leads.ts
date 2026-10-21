@@ -3,6 +3,7 @@ import { LeadFinderService } from "@/server/features/leads/services/LeadFinderSe
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   leadCategoryQuerySchema,
+  leadLocationQuerySchema,
   leadSearchIdSchema,
   listLeadSearchesSchema,
   startLeadSearchSchema,
@@ -14,6 +15,11 @@ export const listLeadCategories = createServerFn({ method: "POST" })
   .handler(async ({ data }) =>
     LeadFinderService.listCategories(data.query, 20),
   );
+
+export const findLeadLocations = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(leadLocationQuerySchema)
+  .handler(async ({ data }) => LeadFinderService.findLocations(data.query));
 
 export const listLeadSearches = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
@@ -32,6 +38,7 @@ export const startLeadSearch = createServerFn({ method: "POST" })
         category: data.category,
         nameQuery: data.nameQuery,
         location: data.location,
+        place: data.place,
         radiusKm: data.radiusKm,
         limit: data.limit,
         minRating: data.minRating,

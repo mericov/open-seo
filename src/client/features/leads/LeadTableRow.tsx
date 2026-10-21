@@ -30,6 +30,9 @@ export function LeadTableRow({ lead }: { lead: LeadRow }) {
       <TableCell className="min-w-56 align-top">
         <div className="space-y-1">
           <p className="font-medium leading-snug">{lead.name}</p>
+          {lead.category ? (
+            <p className="text-xs text-muted-foreground">{lead.category}</p>
+          ) : null}
           <Badge
             variant={REACHABILITY_VARIANT[lead.reachability]}
             title={t(`reachabilityHint.${lead.reachability}`)}
@@ -48,6 +51,14 @@ export function LeadTableRow({ lead }: { lead: LeadRow }) {
                 {t("table.noWebsite")}
               </span>
             )}
+            {lead.enrichmentStatus === "failed" ? (
+              <span
+                className="text-muted-foreground"
+                title={t("table.siteUnreadableHint")}
+              >
+                {t("table.siteUnreadable")}
+              </span>
+            ) : null}
             {lead.mapsUrl ? (
               <SafeExternalLink
                 url={lead.mapsUrl}

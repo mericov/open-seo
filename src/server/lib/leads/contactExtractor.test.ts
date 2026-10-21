@@ -77,6 +77,29 @@ describe("findSiteContacts", () => {
     expect(result.whatsappUrl).toBe("https://wa.me/905321112233");
   });
 
+  it("reads contact pages before about pages and keeps Facebook profile ids", async () => {
+    routes["https://staging.test/"] = {
+      body: `<a href="about-1.html">About</a>
+        <a href="/team">More about us</a>
+        <a href="contact-us.html">Contact us</a>
+        <a href="https://www.facebook.com/profile.php?id=100044057606415&mibextid=x">fb</a>`,
+    };
+    routes["https://staging.test/contact-us.html"] = {
+      body: `<p>Email:<br>Staging@Staging.test<br>Send us your questions</p>`,
+    };
+
+    const result = await findSiteContacts("https://staging.test/");
+
+    expect(result.emails).toEqual(["staging@staging.test"]);
+    expect(result.facebookUrl).toBe(
+      "https://www.facebook.com/profile.php?id=100044057606415",
+    );
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      "https://staging.test/about-1.html",
+      expect.anything(),
+    );
+  });
+
   it("respects a robots.txt that disallows the site", async () => {
     routes["https://private.test/"] = {
       body: `<a href="mailto:owner@private.test">mail</a>`,

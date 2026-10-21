@@ -12,12 +12,13 @@ import {
 
 const USER_AGENT = "Mozilla/5.0 (compatible; MericSEO-LeadFinder/1.0)";
 const PAGE_TIMEOUT_MS = 8_000;
-const MAX_REDIRECT_HOPS = 4;
+const MAX_REDIRECT_HOPS = 6;
 const MAX_HTML_CHARS = 1_500_000;
-const MAX_CONTACT_PAGES = 2;
+const MAX_CONTACT_PAGES = 3;
 
 const CONTACT_LINK_PATTERN =
-  /contact|iletisim|iletişim|bize-?ulas|bize ulaş|hakkimizda|hakkımızda|about|kontakt|impressum/i;
+  /contact|iletisim|iletişim|bize-?ulas|bize ulaş|kontakt|impressum/i;
+const ABOUT_LINK_PATTERN = /about|hakkimizda|hakkımızda/i;
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]{1,64}@[a-z0-9.-]{1,253}\.[a-z]{2,24}/gi;
 const OBFUSCATED_EMAIL_PATTERN =
@@ -291,9 +292,16 @@ export function emailIsOnDomain(email: string, siteDomain: string): boolean {
 
 function contactPageCandidates(page: ParsedPage, baseUrl: string): string[] {
   const base = new URL(baseUrl);
-  const found: string[] = [];
+  const contact: string[] = [];
+  const about: string[] = [];
   for (const anchor of page.anchors) {
-    if (!CONTACT_LINK_PATTERN.test(`${anchor.href} ${anchor.text}`)) continue;
+    const label = `${anchor.href} ${anchor.text}`;
+    const bucket = CONTACT_LINK_PATTERN.test(label)
+      ? contact
+      : ABOUT_LINK_PATTERN.test(label)
+        ? about
+        : null;
+    if (!bucket) continue;
     let url: URL;
     try {
       url = new URL(anchor.href, base);
@@ -303,15 +311,14 @@ function contactPageCandidates(page: ParsedPage, baseUrl: string): string[] {
     url.hash = "";
     const href = url.toString();
     if (url.origin !== base.origin || !isCrawlableUrl(href)) continue;
-    if (href !== base.toString() && !found.includes(href)) found.push(href);
+    if (href === base.toString() || contact.includes(href)) continue;
+    if (!about.includes(href)) bucket.push(href);
   }
-  // Contact links usually sit in the nav; when a page has none, fall back to
-  // the conventional path for the page's language.
-  if (found.length === 0) {
+  if (contact.length === 0) {
     const path = page.lang?.startsWith("tr") ? "/iletisim" : "/contact";
-    found.push(new URL(path, base).toString());
+    contact.push(new URL(path, base).toString());
   }
-  return found;
+  return [...contact, ...about];
 }
 
 function firstSocial(
@@ -326,12 +333,21 @@ function firstSocial(
       continue;
     }
     if (matches(url)) {
-      url.search = url.hostname.includes("whatsapp") ? url.search : "";
+      url.search = socialQuery(url);
       url.hash = "";
       return url.toString();
     }
   }
   return null;
+}
+
+function socialQuery(url: URL): string {
+  if (url.hostname.includes("whatsapp")) return url.search;
+  const profileId = url.searchParams.get("id");
+  if (url.pathname === "/profile.php" && profileId) {
+    return `?id=${encodeURIComponent(profileId)}`;
+  }
+  return "";
 }
 
 const SOCIAL_SKIP_PATHS =

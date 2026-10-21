@@ -10,6 +10,10 @@
     "noCategories": "No matching categories. Try a shorter word.",
     "location": "Location",
     "locationPlaceholder": "Austin, TX or Kadıköy, İstanbul",
+    "findLocation": "Find",
+    "locationHint": "Small typos are fine. If the name matches several places, you pick one.",
+    "pickLocation": "Several places match. Pick the one you mean:",
+    "noLocations": "No place found. Check the spelling or add the city or country.",
     "radius": "Radius (km)",
     "limit": "Businesses to pull",
     "minRating": "Minimum rating",
@@ -71,7 +75,9 @@
     "reviews": "{{count}} reviews",
     "website": "Website",
     "maps": "Maps",
-    "noWebsite": "No website"
+    "noWebsite": "No website",
+    "siteUnreadable": "Site couldn't be read",
+    "siteUnreadableHint": "The site blocked automated reading, timed out, or only renders with JavaScript. Check it by hand."
   },
   "export": {
     "filename": "leads-{{label}}"

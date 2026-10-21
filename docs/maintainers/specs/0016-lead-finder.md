@@ -4,7 +4,7 @@ The lead finder builds outreach lists of local businesses. A user picks a Google
 
 ## Searches and leads
 
-A search records its category, an optional name filter, the place the user typed with its resolved coordinate, the radius and the number of businesses requested. Places are resolved with OpenStreetMap Nominatim, so a user types "Austin, TX" or "Kadıköy, İstanbul" instead of coordinates. Listings come from the provider's business listings search, ordered by review count so established businesses come first.
+A search records its category, an optional name filter, the place the user typed with its resolved coordinate, the radius and the number of businesses requested. Places are resolved with Photon, a free OpenStreetMap geocoder, so a user types "Austin, TX" or "Kadıköy, İstanbul" instead of coordinates. Photon tolerates typos, and the app shows up to five matching places when a name is ambiguous so the user picks one instead of searching around a silent wrong match. The MCP tool takes the best match. Listings come from the provider's business listings search, ordered by review count so established businesses come first.
 
 Each listing becomes a lead in the project. A business is identified by its Google CID, then place id, then domain, then name and address. A business already present in any earlier search of the project is skipped, and the search records how many were skipped. Running the same search again therefore returns only businesses that are new since the last run, which makes a repeated search a way to pick up newly listed businesses.
 
@@ -12,11 +12,13 @@ Emails are stored as their own rows, one per address found on a lead's site, eac
 
 ## Reading websites
 
-Enrichment reads one small batch of pending leads per call. For each lead it opens the home page and, only when the home page shows no email on the site's own domain, up to two contact pages. Contact pages are found from links whose address or text suggests a contact or about page, in English and Turkish; when a page links to none, the conventional path for the page's language is tried once. The site's robots.txt is honored.
+Enrichment reads one small batch of pending leads per call. For each lead it opens the home page and, only when the home page shows no email on the site's own domain, up to three contact pages. Contact pages are found from links whose address or text suggests a contact or about page, in English and Turkish; contact links are read before about links, and when a page links to no contact page, the conventional path for the page's language is tried once. The site's robots.txt is honored.
 
 Every fetched address is screened for SSRF. The site's start address and each redirect hop are validated as untrusted start URLs; discovered contact links must be same-origin and crawlable. Redirects are followed by hand.
 
-From each page the reader collects mailto links, plain-text addresses, addresses obfuscated with "[at]" and "[dot]", and addresses hidden by Cloudflare's email protection. It discards asset names, tracking ids, template placeholders and no-reply inboxes. It also records the first Instagram profile, Facebook page, LinkedIn page and WhatsApp link it sees.
+From each page the reader collects mailto links, plain-text addresses, addresses obfuscated with "[at]" and "[dot]", and addresses hidden by Cloudflare's email protection. It discards asset names, tracking ids, template placeholders and no-reply inboxes. It also records the first Instagram profile, Facebook page, LinkedIn page and WhatsApp link it sees. Facebook profiles without a username keep their profile id.
+
+A site that cannot be read (blocked, timed out, or rendered only by JavaScript) is marked as such on the lead, so the user knows to check it by hand rather than assuming it publishes no email.
 
 The app drives enrichment from the browser, one batch per request, while the search is open, and the user can pause it. The MCP surface exposes the same batch as its own tool, which an agent calls until nothing is pending. Small batches keep each request within the platform's per-request subrequest budget.
 

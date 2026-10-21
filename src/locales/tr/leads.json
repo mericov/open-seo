@@ -10,6 +10,10 @@
     "noCategories": "Eşleşen kategori yok. Daha kısa bir kelime dene.",
     "location": "Konum",
     "locationPlaceholder": "Kadıköy, İstanbul veya Austin, TX",
+    "findLocation": "Bul",
+    "locationHint": "Küçük yazım hataları sorun değil. Ad birden fazla yere uyarsa seçmeniz istenir.",
+    "pickLocation": "Birden fazla yer eşleşti. Kastettiğinizi seçin:",
+    "noLocations": "Yer bulunamadı. Yazımı kontrol edin ya da şehir veya ülke ekleyin.",
     "radius": "Yarıçap (km)",
     "limit": "Çekilecek işletme sayısı",
     "minRating": "Minimum puan",
@@ -71,7 +75,9 @@
     "reviews": "{{count}} yorum",
     "website": "Web sitesi",
     "maps": "Haritalar",
-    "noWebsite": "Web sitesi yok"
+    "noWebsite": "Web sitesi yok",
+    "siteUnreadable": "Site okunamadı",
+    "siteUnreadableHint": "Site otomatik okumayı engelledi, zaman aşımına uğradı ya da yalnızca JavaScript ile açılıyor. Elle kontrol edin."
   },
   "export": {
     "filename": "leadler-{{label}}"

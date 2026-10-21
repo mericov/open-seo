@@ -6,7 +6,7 @@ import { isRecord } from "@/server/lib/dataforseo/envelope";
 import { AppError } from "@/server/lib/errors";
 import { findSiteContacts } from "@/server/lib/leads/contactExtractor";
 import { checkEmails, pickPrimaryEmail } from "@/server/lib/leads/emailChecks";
-import { geocodePlace } from "@/server/lib/leads/geocode";
+import { findPlaces } from "@/server/lib/leads/geocode";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
 import {
   LEAD_REACHABILITY_ORDER,
@@ -24,6 +24,7 @@ type StartLeadSearchInput = {
   category: string;
   nameQuery?: string;
   location: string;
+  place?: { label: string; latitude: number; longitude: number };
   radiusKm: number;
   limit: number;
   minRating?: number;
@@ -42,7 +43,8 @@ async function startSearch(
   input: StartLeadSearchInput,
   billing: BillingCustomerContext,
 ) {
-  const place = await geocodePlace(input.location);
+  const place = input.place ?? (await findPlaces(input.location))[0];
+  if (!place) throw new AppError("LEAD_LOCATION_NOT_FOUND");
   const radiusKm = Math.max(1, Math.round(input.radiusKm));
   const client = createDataforseoClient(billing);
   const rows = await client.business.businessListings({
@@ -306,6 +308,7 @@ function shortPlace(location: string) {
 
 export const LeadFinderService = {
   listCategories,
+  findLocations: findPlaces,
   startSearch,
   enrichNextBatch,
   listSearches,

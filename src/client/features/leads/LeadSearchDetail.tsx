@@ -109,6 +109,7 @@ export function LeadSearchDetail({
     const headers = [
       "status",
       "name",
+      "category",
       "email",
       "other_emails",
       "phone",
@@ -125,6 +126,7 @@ export function LeadSearchDetail({
     const rows = visible.map((lead) => [
       t(`reachability.${lead.reachability}`),
       lead.name,
+      lead.category,
       lead.primaryEmail,
       lead.emails
         .filter((email) => email.email !== lead.primaryEmail)
