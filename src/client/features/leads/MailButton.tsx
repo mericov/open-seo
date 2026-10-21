@@ -5,7 +5,10 @@ import { reportUrlFor } from "@/client/features/leads/ReportButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/client/components/ui/dropdown-menu";
 import type {
@@ -38,10 +41,11 @@ export function MailButton({
   if (!email) return null;
 
   const saved: MailTemplate[] = templates.length ? templates : SAMPLE_TEMPLATES;
-  const sameLanguage = saved.filter(
-    (template) => template.language === lead.language,
-  );
-  const choices = sameLanguage.length ? sameLanguage : saved;
+  const groups = [
+    saved.filter((template) => template.language === lead.language),
+    saved.filter((template) => template.language !== lead.language),
+  ].filter((group) => group.length > 0);
+  const choices = groups.flat();
 
   const open = (template: MailTemplate) => {
     const values = leadTemplateValues(
@@ -91,14 +95,26 @@ export function MailButton({
         {t("templates.send")}
         <ChevronDown data-icon="inline-end" className="opacity-60" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        {choices.map((template) => (
-          <DropdownMenuItem
-            key={template.id ?? template.name}
-            onClick={() => open(template)}
-          >
-            {template.name}
-          </DropdownMenuItem>
+      <DropdownMenuContent align="end" className="w-72">
+        {groups.map((group, index) => (
+          <DropdownMenuGroup key={group[0].language}>
+            {index > 0 ? <DropdownMenuSeparator /> : null}
+            <DropdownMenuLabel>
+              {t("templates.language")}: {group[0].language.toUpperCase()}
+            </DropdownMenuLabel>
+            {group.map((template) => (
+              <DropdownMenuItem
+                key={template.id ?? template.name}
+                onClick={() => open(template)}
+                className="flex-col items-start gap-0.5"
+              >
+                <span>{template.name}</span>
+                <span className="line-clamp-1 text-xs text-muted-foreground">
+                  {template.subject}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
