@@ -72,6 +72,14 @@ From the outreach list, the user can ask the app to write the first line of a co
 
 Templates filled from the gaps would cost nothing, but they read the same across hundreds of emails. A model call per batch keeps the cost to a fraction of a cent per lead.
 
+## Email templates
+
+A project keeps its own email templates, each with a language (Turkish or English), a subject and a body. Templates use a few fields filled from the lead: its name, first line (or a general opener when it has none), website and its biggest gap phrased for the email's language. Two sample templates can be added and edited; they leave a placeholder for the sender's postal address, which US commercial email law requires.
+
+The email button on a lead with a reachable address picks the templates in the lead's language (Turkish for Turkish businesses), renders one and opens a ready-to-send draft, either in Gmail on the web or through a `mailto:` link in the viewer's mail app. The choice is a per-browser preference. The app never sends email itself, so messages go out from the user's own mailbox, and opening a draft marks a new lead as emailed.
+
+Sending directly through a mail provider's API would allow tracking and bulk sends, but it needs OAuth scopes to read and send mail, and bulk cold email from a primary domain hurts deliverability. Drafts keep the user in control of every message; bulk sending is better left to a dedicated tool fed by the export.
+
 ## Alternatives
 
 Scraping Google Maps directly would avoid the listings provider, but Maps blocks automated access, needs rotating proxies and breaks whenever the page changes. The licensed listings data is stable and already used by the local SEO tools.

@@ -2,6 +2,7 @@ import {
   LeadListRepository,
   type LeadListFilters,
 } from "@/server/features/leads/repositories/LeadListRepository";
+import { leadEmailLanguage } from "@/shared/leadEmail";
 import {
   LEAD_OUTREACH_STATUSES,
   sortFindingsByWeight,
@@ -33,8 +34,9 @@ async function listLeads(
   ) as Record<LeadOutreachStatus, number>;
 
   return {
-    leads: rows.map((row) => ({
+    leads: rows.map(({ locationLabel, ...row }) => ({
       ...row,
+      language: leadEmailLanguage({ ...row, locationLabel }),
       findings: sortFindingsByWeight(
         findings
           .filter((finding) => finding.leadId === row.id)

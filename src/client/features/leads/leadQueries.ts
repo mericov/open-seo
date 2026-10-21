@@ -3,6 +3,7 @@ import {
   getLeadSearch,
   listLeadCategories,
   listLeadSearches,
+  listLeadTemplates,
   listProjectLeads,
 } from "@/serverFunctions/leads";
 
@@ -30,6 +31,17 @@ export function leadCategoriesOptions(projectId: string, query: string) {
     staleTime: 60 * 60 * 1000,
   });
 }
+
+export function leadTemplatesOptions(projectId: string) {
+  return queryOptions({
+    queryKey: [...leadsQueryKey(projectId), "templates"],
+    queryFn: () => listLeadTemplates({ data: { projectId } }),
+  });
+}
+
+export type LeadTemplate = Awaited<
+  ReturnType<typeof listLeadTemplates>
+>[number];
 
 export type ProjectLeadFilters = Omit<
   Parameters<typeof listProjectLeads>[0]["data"],

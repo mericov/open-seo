@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users } from "lucide-react";
+import { Mail, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/client/components/EmptyState";
@@ -11,30 +11,28 @@ import { Button } from "@/client/components/ui/button";
 import { Checkbox } from "@/client/components/ui/checkbox";
 import { Switch } from "@/client/components/ui/switch";
 import { AllLeadsRow } from "@/client/features/leads/AllLeadsRow";
+import { LeadTemplatesSheet } from "@/client/features/leads/LeadTemplatesSheet";
+import { MailButton } from "@/client/features/leads/MailButton";
+import { useMailClient } from "@/client/features/leads/useMailClient";
 import {
   BulkBar,
   FilterSelect,
 } from "@/client/features/leads/AllLeadsControls";
 import {
   leadsQueryKey,
+  leadTemplatesOptions,
   projectLeadsOptions,
   type ProjectLeadFilters,
 } from "@/client/features/leads/leadQueries";
-import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
+import { exportAllLeads } from "@/client/features/leads/leadExport";
+import type { ExportFormat } from "@/client/lib/exportRows";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
-import {
-  generateLeadFirstLines,
-  listProjectLeads,
-  setLeadStatus,
-} from "@/serverFunctions/leads";
+import { generateLeadFirstLines, setLeadStatus } from "@/serverFunctions/leads";
 import {
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
 } from "@/shared/leadFindings";
-import {
-  LEAD_FIRST_LINE_MAX_IDS,
-  LEAD_LIST_MAX_PAGE_SIZE,
-} from "@/types/schemas/leads";
+import { LEAD_FIRST_LINE_MAX_IDS } from "@/types/schemas/leads";
 import { cn } from "cn";
 
 const PAGE_SIZE = 50;
@@ -61,6 +59,9 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     pageSize: PAGE_SIZE,
   };
   const leadsQuery = useQuery(projectLeadsOptions(projectId, filters));
+  const templatesQuery = useQuery(leadTemplatesOptions(projectId));
+  const [mailClient, setMailClient] = useMailClient();
+  const [templatesOpen, setTemplatesOpen] = useState(false);
 
   const resetPaging = () => {
     setPage(1);
@@ -91,61 +92,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     onError: (error) => toast.error(getStandardErrorMessage(error)),
   });
 
-  const onExport = async (format: ExportFormat) => {
-    const all = await listProjectLeads({
-      data: {
-        projectId,
-        ...filters,
-        page: 1,
-        pageSize: LEAD_LIST_MAX_PAGE_SIZE,
-      },
-    });
-    await exportRows({
-      format,
-      feature: "lead_finder",
-      headers: [
-        "name",
-        "first_line",
-        "score",
-        "gaps",
-        "email",
-        "phone",
-        "website",
-        "instagram",
-        "facebook",
-        "linkedin",
-        "whatsapp",
-        "status",
-        "emailed_at",
-        "search",
-        "country",
-        "products",
-        "rating",
-        "reviews",
-      ],
-      rows: all.leads.map((lead) => [
-        lead.name,
-        lead.firstLine,
-        lead.opportunityScore,
-        lead.findings.map((code) => t(`findings.${code}`)).join(", "),
-        lead.primaryEmail,
-        lead.phone,
-        lead.website,
-        lead.instagramUrl,
-        lead.facebookUrl,
-        lead.linkedinUrl,
-        lead.whatsappUrl,
-        t(`outreach.${lead.outreachStatus}`),
-        lead.contactedAt?.slice(0, 10) ?? null,
-        lead.searchLabel,
-        lead.countryCode,
-        lead.productCount,
-        lead.rating,
-        lead.reviewsCount,
-      ]),
-      filename: "leads-all",
-    });
-  };
+  const onExport = (format: ExportFormat) =>
+    exportAllLeads(projectId, filters, format, t);
 
   const data = leadsQuery.data;
   const pageIds = data?.leads.map((lead) => lead.id) ?? [];
@@ -220,6 +168,14 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
             />
             {t("all.hasEmail")}
           </label>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setTemplatesOpen(true)}
+          >
+            <Mail data-icon="inline-start" />
+            {t("templates.title")}
+          </Button>
           <ExportMenu
             actions={["csv", "sheets", "copy-json"]}
             onExport={(format) => void onExport(format)}
@@ -291,6 +247,21 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
                         return next;
                       })
                     }
+                    mail={
+                      <MailButton
+                        lead={lead}
+                        templates={templatesQuery.data ?? []}
+                        mailClient={mailClient}
+                        onOpened={() => {
+                          if (lead.outreachStatus === "new") {
+                            statusMutation.mutate({
+                              leadIds: [lead.id],
+                              status: "contacted",
+                            });
+                          }
+                        }}
+                      />
+                    }
                     onStatus={(next) =>
                       statusMutation.mutate({
                         leadIds: [lead.id],
@@ -359,6 +330,13 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
           onClear={() => setSelected(new Set())}
         />
       ) : null}
+      <LeadTemplatesSheet
+        projectId={projectId}
+        open={templatesOpen}
+        onOpenChange={setTemplatesOpen}
+        mailClient={mailClient}
+        onMailClientChange={setMailClient}
+      />
     </div>
   );
 }

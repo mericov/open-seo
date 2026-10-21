@@ -158,3 +158,20 @@ export const leadFindings = pgTable(
     uniqueIndex("lead_findings_lead_code_unique").on(table.leadId, table.code),
   ],
 );
+
+export const leadEmailTemplates = pgTable(
+  "lead_email_templates",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    language: text("language", { enum: ["tr", "en"] }).notNull(),
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    createdAt: text("created_at").notNull().default(isoNow),
+    updatedAt: text("updated_at").notNull().default(isoNow),
+  },
+  (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
+);

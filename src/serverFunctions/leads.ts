@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
 import { LeadFirstLineService } from "@/server/features/leads/services/LeadFirstLineService";
 import { LeadScanService } from "@/server/features/leads/services/LeadScanService";
+import { LeadTemplateRepository } from "@/server/features/leads/repositories/LeadTemplateRepository";
 import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
@@ -12,6 +13,8 @@ import {
   importStoresSchema,
   updateFirstLineSchema,
   leadSearchIdSchema,
+  leadTemplateIdSchema,
+  saveLeadTemplateSchema,
   listProjectLeadsSchema,
   setLeadScheduleSchema,
   setLeadStatusSchema,
@@ -165,4 +168,41 @@ export const retryFailedLeads = createServerFn({ method: "POST" })
   .validator(leadSearchIdSchema)
   .handler(async ({ data, context }) =>
     LeadFinderService.retryFailed(context.projectId, data.searchId),
+  );
+
+export const listLeadTemplates = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(listLeadSearchesSchema)
+  .handler(async ({ context }) =>
+    LeadTemplateRepository.list(context.projectId),
+  );
+
+export const saveLeadTemplate = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(saveLeadTemplateSchema)
+  .handler(async ({ data, context }) => {
+    const input = {
+      name: data.name,
+      language: data.language,
+      subject: data.subject,
+      body: data.body,
+    };
+    if (data.templateId) {
+      await LeadTemplateRepository.update(
+        context.projectId,
+        data.templateId,
+        input,
+      );
+      return { id: data.templateId };
+    }
+    return {
+      id: await LeadTemplateRepository.create(context.projectId, input),
+    };
+  });
+
+export const deleteLeadTemplate = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(leadTemplateIdSchema)
+  .handler(async ({ data, context }) =>
+    LeadTemplateRepository.remove(context.projectId, data.templateId),
   );

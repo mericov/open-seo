@@ -288,6 +288,13 @@
       "when": 1792589345458,
       "tag": "0040_lead_first_line",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1792594910899,
+      "tag": "0041_lead_email_templates",
+      "breakpoints": true
     }
   ]
 }

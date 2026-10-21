@@ -13,13 +13,14 @@ import {
   isHostedServerAuthMode,
 } from "@/server/lib/runtime-env";
 import { AppError } from "@/server/lib/errors";
+import { leadEmailLanguage } from "@/shared/leadEmail";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 import {
   sortFindingsByWeight,
   type LeadFindingCode,
 } from "@/shared/leadFindings";
 
-const LEADS_PER_CALL = 25;
+const LEADS_PER_CALL = 10;
 const MAX_LINE_CHARS = 320;
 
 const FINDING_FACTS: Record<LeadFindingCode, string> = {
@@ -75,16 +76,22 @@ async function generate(
   const findings = await LeadListRepository.listFindings(
     rows.map((row) => row.id),
   );
-  const apiKey = await getRequiredEnvValue("OPENROUTER_API_KEY");
+  const apiKey = await getRequiredEnvValue("OPENROUTER_API_KEY").catch(() => {
+    throw new AppError(
+      "VALIDATION_ERROR",
+      "OpenRouter isn't set up on this server, so first lines can't be written.",
+    );
+  });
   const modelId = await getOptionalEnvValue("OPENROUTER_MODEL");
 
   let written = 0;
+  let lastError: unknown = null;
   for (let start = 0; start < rows.length; start += LEADS_PER_CALL) {
     const batch = rows.slice(start, start + LEADS_PER_CALL);
     const result = await generateText({
       model: buildChatAgentModel(apiKey, modelId, "low"),
       output: Output.object({ schema: outputSchema }),
-      maxOutputTokens: 4000,
+      maxOutputTokens: 16_000,
       abortSignal: AbortSignal.timeout(90_000),
       system: SYSTEM_PROMPT,
       prompt: JSON.stringify(
@@ -99,7 +106,7 @@ async function generate(
           rating: row.rating,
           reviews: row.reviewsCount,
           products: row.productCount,
-          language: isTurkish(row) ? "tr" : "en",
+          language: leadEmailLanguage(row),
           facts: sortFindingsByWeight(
             findings
               .filter((finding) => finding.leadId === row.id)
@@ -117,9 +124,15 @@ async function generate(
           },
         ]);
       },
+    }).catch((error: unknown) => {
+      lastError = error;
+      console.error("[lead-first-lines] generation failed", error);
+      return null;
     });
+    const parsed = outputSchema.safeParse(result?.output);
+    if (!parsed.success) continue;
     const ids = new Set(batch.map((row) => row.id));
-    for (const { id, line } of outputSchema.parse(result.output).lines) {
+    for (const { id, line } of parsed.data.lines) {
       if (!ids.has(id)) continue;
       await LeadListRepository.setFirstLine(
         projectId,
@@ -128,6 +141,14 @@ async function generate(
       );
       written++;
     }
+  }
+  if (written === 0 && rows.length > 0) {
+    throw new AppError(
+      "UPSTREAM_UNAVAILABLE",
+      lastError instanceof Error
+        ? `The AI model couldn't write first lines: ${lastError.message.slice(0, 200)}`
+        : "The AI model returned no first lines. Try again with fewer leads.",
+    );
   }
   return { written };
 }
@@ -138,18 +159,6 @@ async function update(projectId: string, leadId: string, line: string) {
     projectId,
     leadId,
     text ? text.slice(0, MAX_LINE_CHARS) : null,
-  );
-}
-
-function isTurkish(row: {
-  countryCode: string | null;
-  domain: string | null;
-  locationLabel: string;
-}) {
-  return (
-    row.countryCode === "TR" ||
-    Boolean(row.domain?.endsWith(".tr")) ||
-    /türkiye|turkey/i.test(row.locationLabel)
   );
 }
 

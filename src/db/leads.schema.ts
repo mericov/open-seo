@@ -174,3 +174,24 @@ export const leadFindings = sqliteTable(
     uniqueIndex("lead_findings_lead_code_unique").on(table.leadId, table.code),
   ],
 );
+
+export const leadEmailTemplates = sqliteTable(
+  "lead_email_templates",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    language: text("language", { enum: ["tr", "en"] }).notNull(),
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
+);

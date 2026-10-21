@@ -81,6 +81,7 @@ async function listLeads(
         searchId: leads.searchId,
         searchLabel: leadSearches.label,
         source: leadSearches.source,
+        locationLabel: leadSearches.locationLabel,
         primaryEmail: leadEmails.email,
       })
       .from(leads)

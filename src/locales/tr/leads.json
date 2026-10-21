@@ -228,5 +228,33 @@
     "written": "{{count}} ilk cümle yazıldı",
     "edit": "İlk cümleyi düzenle",
     "tooMany": "Tek seferde en fazla {{max}} lead seçebilirsin."
+  },
+  "templates": {
+    "title": "Mail şablonları",
+    "description": "Şablonlar her lead'in adını, ilk cümlesini, sitesini ve en büyük eksiğini doldurur. Mail, uygulamanda gönderilmeye hazır açılır.",
+    "openWith": "Mailler şurada açılsın",
+    "clients": {
+      "gmail": "Gmail (web)",
+      "mailto": "Mail uygulamam (Apple Mail, Outlook)"
+    },
+    "empty": "Henüz şablon yok. Türkçe ve İngilizce iki örnekle başla, kendi üslubuna göre düzenle. Yazan yere şirket adresini ekle; ABD'de soğuk mailde adres zorunlu.",
+    "addSamples": "Örnek şablonları ekle",
+    "new": "Yeni şablon",
+    "delete": "Şablonu sil",
+    "saved": "Şablon kaydedildi",
+    "name": "Ad",
+    "language": "Dil",
+    "subject": "Konu",
+    "body": "Mail",
+    "variables": "Eklemek için tıkla:",
+    "variableHints": {
+      "name": "İşletme adı",
+      "first_line": "Lead'in ilk cümlesi; yoksa genel bir giriş",
+      "website": "Site adresi",
+      "top_gap": "En büyük eksik, sade bir dille"
+    },
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "send": "Mail"
   }
 }

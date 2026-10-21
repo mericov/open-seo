@@ -138,4 +138,5 @@ export const {
   leads,
   leadEmails,
   leadFindings,
+  leadEmailTemplates,
 } = schema;

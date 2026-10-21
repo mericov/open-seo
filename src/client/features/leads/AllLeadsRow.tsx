@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Instagram, MessageCircle, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SafeExternalLink } from "@/client/components/SafeExternalLink";
@@ -20,6 +21,7 @@ export function AllLeadsRow({
   onSelect,
   onStatus,
   statusPending,
+  mail,
 }: {
   projectId: string;
   lead: ProjectLeadRow;
@@ -27,6 +29,7 @@ export function AllLeadsRow({
   onSelect: (selected: boolean) => void;
   onStatus: (status: LeadOutreachStatus) => void;
   statusPending: boolean;
+  mail: ReactNode;
 }) {
   const { t } = useTranslation("leads");
   return (
@@ -80,11 +83,14 @@ export function AllLeadsRow({
         )}
       </td>
       <td className="py-3.5 pr-4 text-right align-top">
-        <OutreachStatusMenu
-          status={lead.outreachStatus}
-          onChange={onStatus}
-          disabled={statusPending}
-        />
+        <div className="flex items-center justify-end gap-2">
+          {mail}
+          <OutreachStatusMenu
+            status={lead.outreachStatus}
+            onChange={onStatus}
+            disabled={statusPending}
+          />
+        </div>
         {lead.contactedAt ? (
           <p className="mt-1 text-[11px] text-muted-foreground">
             {t("all.contactedOn", {

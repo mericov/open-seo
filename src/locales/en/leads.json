@@ -228,5 +228,33 @@
     "written": "{{count}} first lines written",
     "edit": "Edit first line",
     "tooMany": "Select up to {{max}} leads at a time."
+  },
+  "templates": {
+    "title": "Email templates",
+    "description": "Templates fill in each lead's name, first line, website and biggest gap. The email opens ready to send in your mail app.",
+    "openWith": "Open emails in",
+    "clients": {
+      "gmail": "Gmail (web)",
+      "mailto": "My mail app (Apple Mail, Outlook)"
+    },
+    "empty": "No templates yet. Start from the two samples (Turkish and English) and edit them to your voice. Add your business address where it says so; US law requires it in cold email.",
+    "addSamples": "Add sample templates",
+    "new": "New template",
+    "delete": "Delete template",
+    "saved": "Template saved",
+    "name": "Name",
+    "language": "Language",
+    "subject": "Subject",
+    "body": "Email",
+    "variables": "Click to insert a field:",
+    "variableHints": {
+      "name": "Business name",
+      "first_line": "The lead's first line, or a general opener when it has none",
+      "website": "Website domain",
+      "top_gap": "The biggest gap in plain words"
+    },
+    "save": "Save",
+    "cancel": "Cancel",
+    "send": "Email"
   }
 }

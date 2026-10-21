@@ -102,6 +102,20 @@ export const updateFirstLineSchema = z.object({
   firstLine: z.string().max(400),
 });
 
+export const saveLeadTemplateSchema = z.object({
+  ...projectIdShape,
+  templateId: z.string().min(1).optional(),
+  name: z.string().trim().min(1).max(80),
+  language: z.enum(["tr", "en"]),
+  subject: z.string().trim().min(1).max(200),
+  body: z.string().trim().min(1).max(5000),
+});
+
+export const leadTemplateIdSchema = z.object({
+  ...projectIdShape,
+  templateId: z.string().min(1),
+});
+
 export const setLeadScheduleSchema = z.object({
   ...projectIdShape,
   searchId: z.string().min(1),
