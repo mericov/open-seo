@@ -1,6 +1,6 @@
 {
   "title": "Lead Finder",
-  "description": "Find local businesses in a category, read their websites for contact details, and keep the ones you can actually reach.",
+  "description": "Find local businesses or Shopify stores, read their websites for contact details, and keep the ones you can actually reach.",
   "form": {
     "title": "New lead search",
     "category": "Business category",
@@ -45,7 +45,13 @@
     "deleteDescription": "The search and all of its leads will be removed. Businesses in it can be found again by a new search.",
     "deleted": "Lead search deleted",
     "filterAll": "All",
-    "noLeads": "No leads match this filter."
+    "noLeads": "No leads match this filter.",
+    "storeScope": "Shopify stores · {{keywords}} · {{country}}",
+    "domainList": "pasted list",
+    "hiddenStores": "{{count}} sites are hidden because they couldn't be confirmed as live Shopify stores (closed, password protected, moved off Shopify, or unreadable).",
+    "shownStores": "Showing {{count}} sites that couldn't be confirmed as live Shopify stores.",
+    "showAll": "Show them",
+    "hideUnverified": "Hide them"
   },
   "reachability": {
     "ready": "Ready to email",
@@ -77,9 +83,48 @@
     "maps": "Maps",
     "noWebsite": "No website",
     "siteUnreadable": "Site couldn't be read",
-    "siteUnreadableHint": "The site blocked automated reading, timed out, or only renders with JavaScript. Check it by hand."
+    "siteUnreadableHint": "The site blocked automated reading, timed out, or only renders with JavaScript. Check it by hand.",
+    "store": "Store",
+    "products": "{{count}} products",
+    "newestProduct": "newest {{when}}",
+    "notVerified": "Not confirmed"
   },
   "export": {
     "filename": "leads-{{label}}"
+  },
+  "sources": {
+    "local": "Local businesses",
+    "shopify": "Shopify stores"
+  },
+  "stores": {
+    "discover": "Find by niche",
+    "import": "Paste a domain list",
+    "keywords": "Niche keywords",
+    "keywordsPlaceholder": "candle, jewelry, çiçek",
+    "keywordsHint": "Comma separated. Matched against store titles and descriptions.",
+    "country": "Country",
+    "maxRank": "Maximum site strength",
+    "anyRank": "Any",
+    "maxRankHint": "0–1000 backlink rank. A lower limit leaves out big brands, e.g. 300.",
+    "limit": "Stores to pull",
+    "domains": "Store domains",
+    "domainsHint": "One per line or comma separated, up to 200. Duplicates and stores from earlier searches are skipped.",
+    "submit": "Find stores",
+    "submitImport": "Add stores",
+    "costNote": "About ${{cost}} of DataForSEO for the lookup. Reading stores and checking emails is free.",
+    "importCostNote": "Free: no lookup runs, only the stores' own pages are read.",
+    "started": "Found {{found}} stores, added {{added}} new leads.",
+    "countries": {
+      "any": "Any country",
+      "TR": "Türkiye",
+      "US": "United States",
+      "GB": "United Kingdom",
+      "DE": "Germany",
+      "NL": "Netherlands",
+      "FR": "France",
+      "CA": "Canada",
+      "AU": "Australia",
+      "AE": "United Arab Emirates"
+    }
   }
 }

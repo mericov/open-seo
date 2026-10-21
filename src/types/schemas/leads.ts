@@ -36,6 +36,23 @@ export const startLeadSearchSchema = z.object({
   minRating: z.number().min(1).max(5).optional(),
 });
 
+export const startStoreSearchSchema = z.object({
+  ...projectIdShape,
+  keywords: z.array(z.string().trim().min(1).max(60)).max(10),
+  countryCode: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/)
+    .optional(),
+  maxRank: z.number().int().min(0).max(1000).optional(),
+  limit: z.number().int().min(1).max(LEAD_SEARCH_MAX_LIMIT),
+});
+
+export const importStoresSchema = z.object({
+  ...projectIdShape,
+  domains: z.string().trim().min(3).max(20_000),
+});
+
 export const leadSearchIdSchema = z.object({
   ...projectIdShape,
   searchId: z.string().min(1),

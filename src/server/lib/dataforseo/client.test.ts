@@ -421,6 +421,10 @@ describe("mapDataforseoPathToCreditFeature", () => {
     ["v3/business_data/business_listings/search/live", "local_seo"],
     ["v3/serp/google/local_finder/live/advanced", "local_seo"],
     ["v3/serp/google/maps/live/advanced", "local_seo"],
+    [
+      "v3/domain_analytics/technologies/domains_by_technology/live",
+      "domain_overview",
+    ],
   ])("maps %s to %s", (path, feature) => {
     expect(mapDataforseoPathToCreditFeature(path.split("/"))).toBe(feature);
   });

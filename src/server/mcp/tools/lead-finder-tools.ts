@@ -3,6 +3,10 @@ import {
   LEAD_ENRICH_BATCH_SIZE,
   LeadFinderService,
 } from "@/server/features/leads/services/LeadFinderService";
+import {
+  STORE_IMPORT_MAX_DOMAINS,
+  StoreFinderService,
+} from "@/server/features/leads/services/StoreFinderService";
 import { buildProjectMeta } from "@/server/mcp/context";
 import { mcpResponse } from "@/server/mcp/formatters";
 import {
@@ -118,6 +122,104 @@ export const findLeadsTool = {
 };
 
 // ---------------------------------------------------------------------------
+// find_shopify_stores
+// ---------------------------------------------------------------------------
+
+const findStoresInputSchema = {
+  projectId: projectIdSchema,
+  keywords: z
+    .array(z.string().min(1).max(60))
+    .max(10)
+    .optional()
+    .describe(
+      "Niche words matched against store titles and descriptions, e.g. ['candle'] or ['çiçek', 'flower']. Ignored when domains is set.",
+    ),
+  countryCode: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .optional()
+    .describe("Two-letter country code of the stores, e.g. 'TR' or 'US'."),
+  maxRank: z
+    .number()
+    .int()
+    .min(0)
+    .max(1000)
+    .optional()
+    .describe(
+      "Only stores whose backlink rank (0-1000) is at most this; lower ranks are smaller stores.",
+    ),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(LEAD_SEARCH_MAX_LIMIT)
+    .optional()
+    .describe(
+      `Maximum stores to pull (1-${LEAD_SEARCH_MAX_LIMIT}). Defaults to 30.`,
+    ),
+  domains: z
+    .array(z.string().min(3).max(253))
+    .max(STORE_IMPORT_MAX_DOMAINS)
+    .optional()
+    .describe(
+      "Store domains you already have. When set, no lookup runs and no credits are used; the stores are saved for enrich_leads.",
+    ),
+} as const;
+
+export const findShopifyStoresTool = {
+  name: "find_shopify_stores",
+  config: {
+    title: "Find Shopify stores",
+    description:
+      "Starts a lead list of Shopify stores, either found by niche keywords, country and size, or from domains you pass. Stores already found in earlier searches are skipped. Then call enrich_leads with the returned searchId until remaining is 0: it reads each store for emails and social links, confirms it runs on Shopify, and records its product count and newest product date. A keyword lookup charges credits; passing domains is free.",
+    inputSchema: findStoresInputSchema,
+    outputSchema: z.looseObject({
+      searchId: z.string(),
+      found: z.number(),
+      added: z.number(),
+      skippedDuplicates: z.number(),
+      ...optionalMetaOutputSchema,
+    }),
+    annotations: {
+      readOnlyHint: false,
+      openWorldHint: true,
+      destructiveHint: false,
+    },
+  },
+  handler: withMcpProjectAuth(
+    async (
+      args: z.infer<z.ZodObject<typeof findStoresInputSchema>>,
+      context,
+    ) => {
+      const result = args.domains?.length
+        ? await StoreFinderService.importStores(
+            args.projectId,
+            args.domains.join("\n"),
+          )
+        : await StoreFinderService.startStoreSearch(
+            {
+              projectId: args.projectId,
+              keywords: args.keywords ?? [],
+              countryCode: args.countryCode,
+              maxRank: args.maxRank,
+              limit: args.limit ?? 30,
+            },
+            context.billing,
+          );
+      return mcpResponse({
+        text: `Found ${result.found} stores; added ${result.added} new leads (${result.skippedDuplicates} already in earlier searches). Next: call enrich_leads with searchId ${result.searchId}.`,
+        meta: buildProjectMeta(
+          context,
+          args.projectId,
+          leadsPath(args.projectId, result.searchId),
+        ),
+        structuredContent: result,
+      });
+    },
+  ),
+};
+
+// ---------------------------------------------------------------------------
 // enrich_leads
 // ---------------------------------------------------------------------------
 
@@ -197,6 +299,24 @@ const LEAD_COLUMNS: McpTableColumn<LeadRow>[] = [
   { header: "reviews", value: (row) => row.reviewsCount },
 ];
 
+const STORE_COLUMNS: McpTableColumn<LeadRow>[] = [
+  { header: "status", value: (row) => row.reachability },
+  { header: "store", value: (row) => row.name },
+  { header: "email", value: (row) => row.primaryEmail },
+  { header: "website", value: (row) => row.website },
+  {
+    header: "shopify",
+    value: (row) => (row.productCount != null ? "yes" : "unverified"),
+  },
+  { header: "products", value: (row) => row.productCount },
+  {
+    header: "newest_product",
+    value: (row) => row.lastProductAt?.slice(0, 10) ?? null,
+  },
+  { header: "country", value: (row) => row.countryCode },
+  { header: "instagram", value: (row) => row.instagramUrl },
+];
+
 export const getLeadsTool = {
   name: "get_leads",
   config: {
@@ -251,7 +371,12 @@ export const getLeadsTool = {
         text:
           detail.leads.length === 0
             ? header
-            : `${header}\n${formatMcpTable(detail.leads, LEAD_COLUMNS)}`,
+            : `${header}\n${formatMcpTable(
+                detail.leads,
+                detail.search.source === "shopify"
+                  ? STORE_COLUMNS
+                  : LEAD_COLUMNS,
+              )}`,
         meta: buildProjectMeta(
           context,
           args.projectId,

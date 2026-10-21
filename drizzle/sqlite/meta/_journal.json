@@ -414,6 +414,13 @@
       "when": 1792569759808,
       "tag": "0058_lead_finder",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "6",
+      "when": 1792577689254,
+      "tag": "0059_lead_finder_stores",
+      "breakpoints": true
     }
   ]
 }

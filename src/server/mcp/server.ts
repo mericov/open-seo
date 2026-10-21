@@ -122,6 +122,7 @@ import { explorePromptTool } from "@/server/mcp/tools/explore-prompt";
 import {
   enrichLeadsTool,
   findLeadsTool,
+  findShopifyStoresTool,
   getLeadsTool,
 } from "@/server/mcp/tools/lead-finder-tools";
 
@@ -298,6 +299,7 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(findBlogImagesTool);
   register(saveBlogImagesTool);
   register(findLeadsTool);
+  register(findShopifyStoresTool);
   register(enrichLeadsTool);
   register(getLeadsTool);
 

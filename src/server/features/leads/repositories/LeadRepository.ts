@@ -10,7 +10,7 @@ type SearchInsert = Omit<
 type LeadInsert = Omit<
   typeof leads.$inferInsert,
   "id" | "projectId" | "searchId" | "createdAt" | "updatedAt"
->;
+> & { id?: string };
 type EmailInsert = Omit<
   typeof leadEmails.$inferInsert,
   "id" | "leadId" | "createdAt"
@@ -75,15 +75,33 @@ async function insertLeads(
     tx
       .insert(leads)
       .values({
-        id: crypto.randomUUID(),
+        ...row,
+        id: row.id ?? crypto.randomUUID(),
         projectId,
         searchId,
-        ...row,
         createdAt: now,
         updatedAt: now,
       })
       .onConflictDoNothing(),
   );
+}
+
+async function insertFoundEmails(rows: (EmailInsert & { leadId: string })[]) {
+  const now = new Date().toISOString();
+  await executeInBatches(rows, (tx, row) =>
+    tx
+      .insert(leadEmails)
+      .values({ ...row, id: crypto.randomUUID(), createdAt: now })
+      .onConflictDoNothing(),
+  );
+}
+
+async function listEmailsForLeads(leadIds: string[]) {
+  if (leadIds.length === 0) return [];
+  return db
+    .select({ leadId: leadEmails.leadId, email: leadEmails.email })
+    .from(leadEmails)
+    .where(inArray(leadEmails.leadId, leadIds));
 }
 
 async function listLeads(projectId: string, searchId: string) {
@@ -131,7 +149,12 @@ async function listPendingLeads(
   limit: number,
 ) {
   return db
-    .select({ id: leads.id, website: leads.website, domain: leads.domain })
+    .select({
+      id: leads.id,
+      name: leads.name,
+      website: leads.website,
+      domain: leads.domain,
+    })
     .from(leads)
     .where(
       and(
@@ -147,14 +170,21 @@ async function listPendingLeads(
 async function saveEnrichment(
   projectId: string,
   leadId: string,
-  values: Pick<
-    LeadInsert,
-    | "enrichmentStatus"
-    | "contactPageUrl"
-    | "instagramUrl"
-    | "facebookUrl"
-    | "linkedinUrl"
-    | "whatsappUrl"
+  values: Partial<
+    Pick<
+      LeadInsert,
+      | "enrichmentStatus"
+      | "contactPageUrl"
+      | "instagramUrl"
+      | "facebookUrl"
+      | "linkedinUrl"
+      | "whatsappUrl"
+      | "name"
+      | "countryCode"
+      | "productCount"
+      | "lastProductAt"
+      | "currency"
+    >
   >,
   emails: EmailInsert[],
 ) {
@@ -168,7 +198,15 @@ async function saveEnrichment(
       tx
         .insert(leadEmails)
         .values({ id: crypto.randomUUID(), leadId, ...email, createdAt: now })
-        .onConflictDoNothing(),
+        .onConflictDoUpdate({
+          target: [leadEmails.leadId, leadEmails.email],
+          set: {
+            checkStatus: email.checkStatus,
+            kind: email.kind,
+            onOwnDomain: email.onOwnDomain,
+            isPrimary: email.isPrimary,
+          },
+        }),
     ),
   ]);
 }
@@ -187,6 +225,8 @@ export const LeadRepository = {
   deleteSearch,
   existingBusinessKeys,
   insertLeads,
+  insertFoundEmails,
+  listEmailsForLeads,
   listLeads,
   listEmailsForSearch,
   listLeadCounts,

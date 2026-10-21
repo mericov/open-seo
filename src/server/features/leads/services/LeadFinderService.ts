@@ -15,8 +15,9 @@ import {
 } from "@/shared/leads";
 
 // Sites read per enrichment call. Each site costs several subrequests (DNS
-// checks, home page, robots.txt, up to two contact pages, MX lookups), so a
-// small batch keeps every call well inside the Workers subrequest budget.
+// checks, home page, robots.txt, up to three contact pages, store stats, MX
+// lookups), so a small batch keeps every call well inside the Workers
+// subrequest budget.
 export const LEAD_ENRICH_BATCH_SIZE = 3;
 
 type StartLeadSearchInput = {
@@ -93,12 +94,16 @@ async function startSearch(
 }
 
 async function enrichNextBatch(projectId: string, searchId: string) {
-  await requireSearch(projectId, searchId);
+  const search = await requireSearch(projectId, searchId);
   const pending = await LeadRepository.listPendingLeads(
     projectId,
     searchId,
     LEAD_ENRICH_BATCH_SIZE,
   );
+  const isStoreSearch = search.source === "shopify";
+  const knownEmails = isStoreSearch
+    ? await LeadRepository.listEmailsForLeads(pending.map((lead) => lead.id))
+    : [];
 
   await Promise.all(
     pending.map(async (lead) => {
@@ -111,10 +116,21 @@ async function enrichNextBatch(projectId: string, searchId: string) {
         );
         return;
       }
-      const contacts = await findSiteContacts(lead.website);
+      const contacts = await findSiteContacts(lead.website, {
+        shopify: isStoreSearch,
+      });
       const siteDomain = lead.domain?.replace(/^www\./, "") ?? null;
-      const checks = await checkEmails(contacts.emails, siteDomain);
+      const emails = [
+        ...new Set([
+          ...knownEmails
+            .filter((row) => row.leadId === lead.id)
+            .map((row) => row.email),
+          ...contacts.emails,
+        ]),
+      ];
+      const checks = await checkEmails(emails, siteDomain);
       const primary = pickPrimaryEmail(checks);
+      const store = contacts.shopify;
       await LeadRepository.saveEnrichment(
         projectId,
         lead.id,
@@ -125,6 +141,20 @@ async function enrichNextBatch(projectId: string, searchId: string) {
           facebookUrl: contacts.facebookUrl,
           linkedinUrl: contacts.linkedinUrl,
           whatsappUrl: contacts.whatsappUrl,
+          ...(store
+            ? {
+                name:
+                  lead.name === lead.domain && store.name
+                    ? store.name
+                    : lead.name,
+                productCount: store.productCount,
+                lastProductAt: store.lastProductAt,
+                currency: store.currency,
+                ...(store.countryCode
+                  ? { countryCode: store.countryCode }
+                  : {}),
+              }
+            : {}),
         },
         checks.map((check) => ({
           ...check,
@@ -153,6 +183,7 @@ async function listSearches(projectId: string) {
     return {
       id: search.id,
       label: search.label,
+      source: search.source,
       category: search.category,
       locationLabel: search.locationLabel,
       radiusKm: search.radiusKm,
@@ -201,6 +232,11 @@ async function getSearchDetail(projectId: string, searchId: string) {
       facebookUrl: lead.facebookUrl,
       linkedinUrl: lead.linkedinUrl,
       whatsappUrl: lead.whatsappUrl,
+      countryCode: lead.countryCode,
+      domainRank: lead.domainRank,
+      productCount: lead.productCount,
+      lastProductAt: lead.lastProductAt,
+      currency: lead.currency,
       primaryEmail,
       emails: emails.map(({ email, checkStatus, kind, onOwnDomain }) => ({
         email,
@@ -228,7 +264,10 @@ async function getSearchDetail(projectId: string, searchId: string) {
     search: {
       id: search.id,
       label: search.label,
+      source: search.source,
       category: search.category,
+      countryCode: search.countryCode,
+      keywordQuery: search.keywordQuery,
       nameQuery: search.nameQuery,
       locationLabel: search.locationLabel,
       radiusKm: search.radiusKm,

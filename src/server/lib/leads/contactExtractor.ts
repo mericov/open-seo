@@ -4,6 +4,11 @@ import {
   isCrawlableUrl,
   normalizeAndValidateStartUrl,
 } from "@/server/lib/audit/url-policy";
+import {
+  readShopifyStats,
+  type ShopifyStats,
+} from "@/server/lib/leads/shopifyStore";
+import { socialProfiles } from "@/server/lib/leads/socialLinks";
 
 // Reads a business website for the contact details it publishes: emails,
 // social profiles and a WhatsApp link. It visits the home page and, only when
@@ -63,7 +68,16 @@ type SiteContacts = {
   facebookUrl: string | null;
   linkedinUrl: string | null;
   whatsappUrl: string | null;
+  shopify: ShopifyStats | null;
 };
+
+type FindOptions = { shopify?: boolean };
+
+const SHOPIFY_CONTACT_PATHS = [
+  "/pages/contact",
+  "/pages/contact-us",
+  "/pages/iletisim",
+];
 
 type ParsedPage = {
   lang: string | null;
@@ -78,9 +92,13 @@ const EMPTY: Omit<SiteContacts, "status"> = {
   facebookUrl: null,
   linkedinUrl: null,
   whatsappUrl: null,
+  shopify: null,
 };
 
-export async function findSiteContacts(website: string): Promise<SiteContacts> {
+export async function findSiteContacts(
+  website: string,
+  options: FindOptions = {},
+): Promise<SiteContacts> {
   let start: string;
   try {
     start = await normalizeAndValidateStartUrl(website);
@@ -88,7 +106,7 @@ export async function findSiteContacts(website: string): Promise<SiteContacts> {
     return { status: "failed", ...EMPTY };
   }
 
-  const home = await fetchHtml(start);
+  const home = await fetchBody(start, "html");
   if (!home) return { status: "failed", ...EMPTY };
 
   const origin = new URL(home.finalUrl).origin;
@@ -97,17 +115,21 @@ export async function findSiteContacts(website: string): Promise<SiteContacts> {
     return { status: "failed", ...EMPTY };
   }
 
-  const pages = [parseHtml(home.html)];
+  const pages = [parseHtml(home.body)];
   const siteDomain = registrableHost(home.finalUrl);
   let contactPageUrl: string | null = null;
 
   if (!hasEmailOnDomain(pages[0].emails, siteDomain)) {
-    const candidates = contactPageCandidates(pages[0], home.finalUrl);
+    const candidates = contactPageCandidates(
+      pages[0],
+      home.finalUrl,
+      options.shopify ? SHOPIFY_CONTACT_PATHS : [],
+    );
     for (const url of candidates.slice(0, MAX_CONTACT_PAGES)) {
       if (!robots.isAllowed(url)) continue;
-      const page = await fetchHtml(url);
+      const page = await fetchBody(url, "html");
       if (!page) continue;
-      const parsed = parseHtml(page.html);
+      const parsed = parseHtml(page.body);
       pages.push(parsed);
       if (parsed.emails.size > 0 && !contactPageUrl) {
         contactPageUrl = page.finalUrl;
@@ -116,26 +138,41 @@ export async function findSiteContacts(website: string): Promise<SiteContacts> {
     }
   }
 
-  const anchors = pages.flatMap((page) => page.anchors);
+  const shopify = options.shopify
+    ? await readShopifyStats(async (path) => {
+        const url = new URL(path, origin).toString();
+        if (!robots.isAllowed(url)) return null;
+        const json = await fetchBody(url, "json");
+        if (!json) return null;
+        try {
+          return JSON.parse(json.body) as unknown;
+        } catch {
+          return null;
+        }
+      })
+    : null;
+
   return {
     status: "done",
     emails: [...new Set(pages.flatMap((page) => [...page.emails]))],
     contactPageUrl,
-    instagramUrl: firstSocial(anchors, isInstagramProfile),
-    facebookUrl: firstSocial(anchors, isFacebookPage),
-    linkedinUrl: firstSocial(anchors, isLinkedinProfile),
-    whatsappUrl: firstSocial(anchors, isWhatsappLink),
+    ...socialProfiles(pages.flatMap((page) => page.anchors)),
+    shopify,
   };
 }
 
-async function fetchHtml(
+async function fetchBody(
   url: string,
-): Promise<{ html: string; finalUrl: string } | null> {
+  type: "html" | "json",
+): Promise<{ body: string; finalUrl: string } | null> {
   let current = url;
   try {
     for (let hop = 0; hop <= MAX_REDIRECT_HOPS; hop++) {
       const response = await fetch(current, {
-        headers: { "User-Agent": USER_AGENT, Accept: "text/html" },
+        headers: {
+          "User-Agent": USER_AGENT,
+          Accept: type === "html" ? "text/html" : "application/json",
+        },
         redirect: "manual",
         signal: AbortSignal.timeout(PAGE_TIMEOUT_MS),
       });
@@ -149,12 +186,12 @@ async function fetchHtml(
         continue;
       }
       const contentType = response.headers.get("content-type") ?? "";
-      if (!response.ok || !contentType.toLowerCase().includes("html")) {
+      if (!response.ok || !contentType.toLowerCase().includes(type)) {
         await response.body?.cancel();
         return null;
       }
-      const html = (await response.text()).slice(0, MAX_HTML_CHARS);
-      return { html, finalUrl: current };
+      const body = (await response.text()).slice(0, MAX_HTML_CHARS);
+      return { body, finalUrl: current };
     }
   } catch {
     return null;
@@ -290,7 +327,11 @@ export function emailIsOnDomain(email: string, siteDomain: string): boolean {
   );
 }
 
-function contactPageCandidates(page: ParsedPage, baseUrl: string): string[] {
+function contactPageCandidates(
+  page: ParsedPage,
+  baseUrl: string,
+  extraPaths: string[],
+): string[] {
   const base = new URL(baseUrl);
   const contact: string[] = [];
   const about: string[] = [];
@@ -314,72 +355,13 @@ function contactPageCandidates(page: ParsedPage, baseUrl: string): string[] {
     if (href === base.toString() || contact.includes(href)) continue;
     if (!about.includes(href)) bucket.push(href);
   }
+  for (const path of extraPaths) {
+    const href = new URL(path, base).toString();
+    if (!contact.includes(href)) contact.push(href);
+  }
   if (contact.length === 0) {
     const path = page.lang?.startsWith("tr") ? "/iletisim" : "/contact";
     contact.push(new URL(path, base).toString());
   }
   return [...contact, ...about];
-}
-
-function firstSocial(
-  anchors: { href: string }[],
-  matches: (url: URL) => boolean,
-): string | null {
-  for (const { href } of anchors) {
-    let url: URL;
-    try {
-      url = new URL(href);
-    } catch {
-      continue;
-    }
-    if (matches(url)) {
-      url.search = socialQuery(url);
-      url.hash = "";
-      return url.toString();
-    }
-  }
-  return null;
-}
-
-function socialQuery(url: URL): string {
-  if (url.hostname.includes("whatsapp")) return url.search;
-  const profileId = url.searchParams.get("id");
-  if (url.pathname === "/profile.php" && profileId) {
-    return `?id=${encodeURIComponent(profileId)}`;
-  }
-  return "";
-}
-
-const SOCIAL_SKIP_PATHS =
-  /^\/(p|reel|reels|explore|stories|share|sharer|plugins|tr|dialog|hashtag)(\/|$)/i;
-
-function isInstagramProfile(url: URL) {
-  return (
-    /(^|\.)instagram\.com$/i.test(url.hostname) &&
-    /^\/[^/]+\/?$/.test(url.pathname) &&
-    !SOCIAL_SKIP_PATHS.test(url.pathname)
-  );
-}
-
-function isFacebookPage(url: URL) {
-  return (
-    /(^|\.)facebook\.com$/i.test(url.hostname) &&
-    url.pathname.length > 1 &&
-    !SOCIAL_SKIP_PATHS.test(url.pathname)
-  );
-}
-
-function isLinkedinProfile(url: URL) {
-  return (
-    /(^|\.)linkedin\.com$/i.test(url.hostname) &&
-    /^\/(company|in)\/[^/]+/i.test(url.pathname)
-  );
-}
-
-function isWhatsappLink(url: URL) {
-  return (
-    /^wa\.me$/i.test(url.hostname) ||
-    (/(^|\.)whatsapp\.com$/i.test(url.hostname) &&
-      url.pathname.startsWith("/send"))
-  );
 }

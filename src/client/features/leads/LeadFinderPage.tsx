@@ -17,6 +17,7 @@ import {
   FieldLabel,
 } from "@/client/components/ui/field";
 import { Input } from "@/client/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/client/components/ui/tabs";
 import {
   leadCategoriesOptions,
   leadSearchesOptions,
@@ -28,6 +29,7 @@ import {
   LeadLocationField,
   useLocationPicker,
 } from "@/client/features/leads/LeadLocationField";
+import { StoreSearchForm } from "@/client/features/leads/StoreSearchForm";
 import { startLeadSearch } from "@/serverFunctions/leads";
 import { LEAD_SEARCH_MAX_LIMIT } from "@/types/schemas/leads";
 
@@ -232,12 +234,28 @@ function NewSearchForm({ projectId }: { projectId: string }) {
 export function LeadFinderPage({ projectId }: { projectId: string }) {
   const { t } = useTranslation("leads");
   const searchesQuery = useQuery(leadSearchesOptions(projectId));
+  const [source, setSource] = useState<"local" | "shopify">("local");
 
   return (
     <div className="overflow-auto px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto max-w-5xl space-y-6">
         <PageHeader title={t("title")} description={t("description")} />
-        <NewSearchForm projectId={projectId} />
+        <div className="space-y-3">
+          <Tabs
+            value={source}
+            onValueChange={(value) => setSource(value as "local" | "shopify")}
+          >
+            <TabsList>
+              <TabsTrigger value="local">{t("sources.local")}</TabsTrigger>
+              <TabsTrigger value="shopify">{t("sources.shopify")}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          {source === "local" ? (
+            <NewSearchForm projectId={projectId} />
+          ) : (
+            <StoreSearchForm projectId={projectId} />
+          )}
+        </div>
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground">
             {t("list.title")}

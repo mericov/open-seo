@@ -1,6 +1,6 @@
 # Lead finder
 
-The lead finder builds outreach lists of local businesses. A user picks a Google Business category and a place; the app pulls matching business listings, reads each business's website for the contact details it publishes, and sorts the results by how reachable each business is.
+The lead finder builds outreach lists of local businesses and of Shopify stores. For local businesses a user picks a Google Business category and a place; for stores the user either searches by niche keywords, country and size, or pastes a list of store domains. The app saves the matches, reads each website for the contact details it publishes, and sorts the results by how reachable each lead is.
 
 ## Searches and leads
 
@@ -9,6 +9,14 @@ A search records its category, an optional name filter, the place the user typed
 Each listing becomes a lead in the project. A business is identified by its Google CID, then place id, then domain, then name and address. A business already present in any earlier search of the project is skipped, and the search records how many were skipped. Running the same search again therefore returns only businesses that are new since the last run, which makes a repeated search a way to pick up newly listed businesses.
 
 Emails are stored as their own rows, one per address found on a lead's site, each with its own check result. One of them is marked as the primary address to write to first.
+
+## Shopify stores
+
+A store search asks the provider's technology index for domains running Shopify, filtered by country and an optional ceiling on backlink rank so large brands can be left out, and matched against niche keywords in the site's title and description. Results are ordered by rank. The index records emails and phone numbers it saw on each site; those emails are saved with the lead and checked alongside the ones the app reads itself. A pasted list skips the lookup entirely and costs nothing.
+
+Stores are identified by domain, so a store already found in any earlier search of the project, local or store, is skipped.
+
+While reading a store, the app also requests the storefront's public `meta.json` and the newest few entries of `products.json`. A valid `meta.json` confirms the site is a live Shopify store and gives its published product count, country and currency; the product entries give the date of the newest product, a simple sign of whether the store is still active. Sites that do not answer as a Shopify store (closed, password protected, moved to another platform, or unreadable) stay in the search but are hidden by default, since the technology index can lag behind such changes. Shopify's default robots.txt disallows `/policies/`, so policy pages are not read; the common contact page paths are tried instead.
 
 ## Reading websites
 
@@ -39,6 +47,8 @@ Every lead is placed in one group: ready to email, reachable only by phone or so
 Scraping Google Maps directly would avoid the listings provider, but Maps blocks automated access, needs rotating proxies and breaks whenever the page changes. The licensed listings data is stable and already used by the local SEO tools.
 
 A paid verification provider would add mailbox-level checks and catch-all detection. The free checks catch dead domains and typos, which are the most common failures in addresses read from small business sites, without another account or per-address cost. A provider can be added later as an optional step after the free checks.
+
+Finding stores by searching Google for "powered by Shopify" footprints would avoid the technology index, but it bills per results page, returns many non-store pages and gives no country or size filter.
 
 Running enrichment in a background workflow would let large searches finish while no one watches. Browser-driven batches need no new infrastructure, show progress directly, and fit the list sizes this feature targets. Scheduled background runs can be evaluated separately.
 

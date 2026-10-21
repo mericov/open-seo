@@ -1,6 +1,6 @@
 {
   "title": "Lead Bulucu",
-  "description": "Bir kategorideki yerel işletmeleri bul, web sitelerinden iletişim bilgilerini çek ve gerçekten ulaşabileceklerini ayır.",
+  "description": "Yerel işletmeleri veya Shopify mağazalarını bul, sitelerindeki iletişim bilgilerini oku ve gerçekten ulaşabileceklerini ayır.",
   "form": {
     "title": "Yeni lead araması",
     "category": "İşletme kategorisi",
@@ -45,7 +45,13 @@
     "deleteDescription": "Arama ve içindeki tüm lead'ler silinecek. Bu işletmeler yeni bir aramayla tekrar bulunabilir.",
     "deleted": "Lead araması silindi",
     "filterAll": "Tümü",
-    "noLeads": "Bu filtreye uyan lead yok."
+    "noLeads": "Bu filtreye uyan lead yok.",
+    "storeScope": "Shopify mağazaları · {{keywords}} · {{country}}",
+    "domainList": "yapıştırılan liste",
+    "hiddenStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gizlendi (kapanmış, şifreli, Shopify'dan ayrılmış ya da okunamamış).",
+    "shownStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gösteriliyor.",
+    "showAll": "Göster",
+    "hideUnverified": "Gizle"
   },
   "reachability": {
     "ready": "Mail atılabilir",
@@ -77,9 +83,48 @@
     "maps": "Haritalar",
     "noWebsite": "Web sitesi yok",
     "siteUnreadable": "Site okunamadı",
-    "siteUnreadableHint": "Site otomatik okumayı engelledi, zaman aşımına uğradı ya da yalnızca JavaScript ile açılıyor. Elle kontrol edin."
+    "siteUnreadableHint": "Site otomatik okumayı engelledi, zaman aşımına uğradı ya da yalnızca JavaScript ile açılıyor. Elle kontrol edin.",
+    "store": "Mağaza",
+    "products": "{{count}} ürün",
+    "newestProduct": "en yeni {{when}}",
+    "notVerified": "Doğrulanamadı"
   },
   "export": {
     "filename": "leadler-{{label}}"
+  },
+  "sources": {
+    "local": "Yerel işletmeler",
+    "shopify": "Shopify mağazaları"
+  },
+  "stores": {
+    "discover": "Nişe göre bul",
+    "import": "Domain listesi yapıştır",
+    "keywords": "Niş anahtar kelimeler",
+    "keywordsPlaceholder": "çiçek, mum, takı",
+    "keywordsHint": "Virgülle ayırın. Mağaza başlığı ve açıklamasında aranır.",
+    "country": "Ülke",
+    "maxRank": "En fazla site gücü",
+    "anyRank": "Fark etmez",
+    "maxRankHint": "0–1000 arası backlink gücü. Düşük bir sınır büyük markaları dışarıda bırakır, örneğin 300.",
+    "limit": "Çekilecek mağaza",
+    "domains": "Mağaza domainleri",
+    "domainsHint": "Her satıra bir tane ya da virgülle, en fazla 200. Tekrarlar ve önceki aramalarda bulunan mağazalar atlanır.",
+    "submit": "Mağazaları bul",
+    "submitImport": "Mağazaları ekle",
+    "costNote": "Arama için yaklaşık ${{cost}} DataForSEO harcanır. Mağazaları okumak ve e-postaları kontrol etmek ücretsiz.",
+    "importCostNote": "Ücretsiz: arama yapılmaz, sadece mağazaların kendi sayfaları okunur.",
+    "started": "{{found}} mağaza bulundu, {{added}} yeni lead eklendi.",
+    "countries": {
+      "any": "Tüm ülkeler",
+      "TR": "Türkiye",
+      "US": "ABD",
+      "GB": "Birleşik Krallık",
+      "DE": "Almanya",
+      "NL": "Hollanda",
+      "FR": "Fransa",
+      "CA": "Kanada",
+      "AU": "Avustralya",
+      "AE": "Birleşik Arap Emirlikleri"
+    }
   }
 }

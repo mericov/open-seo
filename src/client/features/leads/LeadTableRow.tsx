@@ -5,6 +5,7 @@ import { SafeExternalLink } from "@/client/components/SafeExternalLink";
 import { Badge } from "@/client/components/ui/badge";
 import { TableCell, TableRow } from "@/client/components/ui/table";
 import type { LeadRow } from "@/client/features/leads/leadQueries";
+import { formatRelativeTime } from "@/client/lib/relative-time";
 import type { LeadReachability } from "@/shared/leads";
 import { safeHttpUrl } from "@/shared/safe-url";
 
@@ -19,7 +20,13 @@ const REACHABILITY_VARIANT: Record<
   pending: "warning",
 };
 
-export function LeadTableRow({ lead }: { lead: LeadRow }) {
+export function LeadTableRow({
+  lead,
+  isStore,
+}: {
+  lead: LeadRow;
+  isStore: boolean;
+}) {
   const { t } = useTranslation("leads");
   const primary = lead.emails.find(
     (email) => email.email === lead.primaryEmail,
@@ -111,7 +118,9 @@ export function LeadTableRow({ lead }: { lead: LeadRow }) {
         </div>
       </TableCell>
       <TableCell className="text-right align-top text-xs tabular-nums">
-        {lead.rating != null ? (
+        {isStore ? (
+          <StoreStats lead={lead} />
+        ) : lead.rating != null ? (
           <div>
             <p>★ {lead.rating.toFixed(1)}</p>
             {lead.reviewsCount != null ? (
@@ -125,6 +134,34 @@ export function LeadTableRow({ lead }: { lead: LeadRow }) {
         )}
       </TableCell>
     </TableRow>
+  );
+}
+
+function StoreStats({ lead }: { lead: LeadRow }) {
+  const { t } = useTranslation("leads");
+  if (lead.productCount == null) {
+    return (
+      <span className="text-muted-foreground">
+        {lead.enrichmentStatus === "pending" ? "—" : t("table.notVerified")}
+      </span>
+    );
+  }
+  return (
+    <div>
+      <p>{t("table.products", { count: lead.productCount })}</p>
+      {lead.lastProductAt ? (
+        <p className="text-muted-foreground">
+          {t("table.newestProduct", {
+            when: formatRelativeTime(lead.lastProductAt),
+          })}
+        </p>
+      ) : null}
+      {lead.countryCode || lead.currency ? (
+        <p className="text-muted-foreground">
+          {[lead.countryCode, lead.currency].filter(Boolean).join(" · ")}
+        </p>
+      ) : null}
+    </div>
   );
 }
 

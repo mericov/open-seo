@@ -100,6 +100,47 @@ describe("findSiteContacts", () => {
     );
   });
 
+  it("reads a Shopify store's contact page and catalog stats", async () => {
+    routes["https://shop.test/"] = {
+      body: `<a href="/collections/all">Shop</a>`,
+    };
+    routes["https://shop.test/pages/contact"] = {
+      body: `<p>Write to hello@shop.test</p>`,
+    };
+    routes["https://shop.test/meta.json"] = {
+      body: JSON.stringify({
+        name: "Shop",
+        country: "tr",
+        currency: "TRY",
+        myshopify_domain: "shop.myshopify.com",
+        published_products_count: 42,
+      }),
+      type: "application/json",
+    };
+    routes["https://shop.test/products.json?limit=5"] = {
+      body: JSON.stringify({
+        products: [
+          { published_at: "2026-09-01T10:00:00Z" },
+          { published_at: "2026-10-01T10:00:00Z" },
+        ],
+      }),
+      type: "application/json",
+    };
+
+    const result = await findSiteContacts("https://shop.test/", {
+      shopify: true,
+    });
+
+    expect(result.emails).toEqual(["hello@shop.test"]);
+    expect(result.shopify).toEqual({
+      name: "Shop",
+      countryCode: "TR",
+      currency: "TRY",
+      productCount: 42,
+      lastProductAt: "2026-10-01T10:00:00.000Z",
+    });
+  });
+
   it("respects a robots.txt that disallows the site", async () => {
     routes["https://private.test/"] = {
       body: `<a href="mailto:owner@private.test">mail</a>`,

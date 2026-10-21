@@ -23,7 +23,9 @@ import {
 import {
   leadSearchOptions,
   leadsQueryKey,
+  type LeadRow,
 } from "@/client/features/leads/leadQueries";
+import { buildLeadExport } from "@/client/features/leads/leadExport";
 import { LeadTableRow } from "@/client/features/leads/LeadTableRow";
 import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
@@ -45,6 +47,7 @@ export function LeadSearchDetail({
   const searchQuery = useQuery(leadSearchOptions(projectId, searchId));
   const [paused, setPaused] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
+  const [verifiedOnly, setVerifiedOnly] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const enrichMutation = useMutation({
@@ -97,8 +100,22 @@ export function LeadSearchDetail({
     );
   }
 
-  const { search, summary, leads } = searchQuery.data;
-  const total = leads.length;
+  const { search } = searchQuery.data;
+  const isStoreSearch = search.source === "shopify";
+  const isHiddenStore = (lead: LeadRow) =>
+    isStoreSearch &&
+    lead.enrichmentStatus !== "pending" &&
+    lead.productCount == null;
+  const hiddenStores = searchQuery.data.leads.filter(isHiddenStore).length;
+  const leads =
+    isStoreSearch && verifiedOnly
+      ? searchQuery.data.leads.filter((lead) => !isHiddenStore(lead))
+      : searchQuery.data.leads;
+  const total = searchQuery.data.leads.length;
+  const counts = new Map<Filter, number>([["all", leads.length]]);
+  for (const lead of leads) {
+    counts.set(lead.reachability, (counts.get(lead.reachability) ?? 0) + 1);
+  }
   const done = total - pending;
   const visible =
     filter === "all"
@@ -106,43 +123,7 @@ export function LeadSearchDetail({
       : leads.filter((lead) => lead.reachability === filter);
 
   const onExport = (format: ExportFormat) => {
-    const headers = [
-      "status",
-      "name",
-      "category",
-      "email",
-      "other_emails",
-      "phone",
-      "website",
-      "instagram",
-      "facebook",
-      "linkedin",
-      "whatsapp",
-      "rating",
-      "reviews",
-      "address",
-      "maps",
-    ];
-    const rows = visible.map((lead) => [
-      t(`reachability.${lead.reachability}`),
-      lead.name,
-      lead.category,
-      lead.primaryEmail,
-      lead.emails
-        .filter((email) => email.email !== lead.primaryEmail)
-        .map((email) => email.email)
-        .join(" "),
-      lead.phone,
-      lead.website,
-      lead.instagramUrl,
-      lead.facebookUrl,
-      lead.linkedinUrl,
-      lead.whatsappUrl,
-      lead.rating,
-      lead.reviewsCount,
-      lead.address,
-      lead.mapsUrl,
-    ]);
+    const { headers, rows } = buildLeadExport(visible, search.source, t);
     void exportRows({
       format,
       feature: "lead_finder",
@@ -172,10 +153,15 @@ export function LeadSearchDetail({
               {search.label}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {t("detail.radius", {
-                radius: search.radiusKm,
-                location: search.locationLabel,
-              })}
+              {isStoreSearch
+                ? t("detail.storeScope", {
+                    keywords: search.keywordQuery ?? t("detail.domainList"),
+                    country: search.countryCode ?? t("stores.countries.any"),
+                  })
+                : t("detail.radius", {
+                    radius: search.radiusKm,
+                    location: search.locationLabel,
+                  })}
             </p>
           </div>
           <Button
@@ -187,6 +173,23 @@ export function LeadSearchDetail({
             {t("detail.delete")}
           </Button>
         </div>
+
+        {isStoreSearch && hiddenStores > 0 ? (
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>
+              {verifiedOnly
+                ? t("detail.hiddenStores", { count: hiddenStores })
+                : t("detail.shownStores", { count: hiddenStores })}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setVerifiedOnly((value) => !value)}
+            >
+              {verifiedOnly ? t("detail.showAll") : t("detail.hideUnverified")}
+            </Button>
+          </div>
+        ) : null}
 
         {search.skippedDuplicates > 0 ? (
           <p className="text-xs text-muted-foreground">
@@ -233,7 +236,7 @@ export function LeadSearchDetail({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-1.5" role="group">
             {(["all", ...LEAD_REACHABILITY_ORDER] as Filter[])
-              .filter((key) => key === "all" || summary[key] > 0)
+              .filter((key) => (counts.get(key) ?? 0) > 0 || key === "all")
               .map((key) => (
                 <Button
                   key={key}
@@ -246,7 +249,7 @@ export function LeadSearchDetail({
                     ? t("detail.filterAll")
                     : t(`reachability.${key}`)}
                   <span className="tabular-nums opacity-70">
-                    {key === "all" ? total : summary[key]}
+                    {counts.get(key) ?? 0}
                   </span>
                 </Button>
               ))}
@@ -265,7 +268,7 @@ export function LeadSearchDetail({
                 <TableHead>{t("table.email")}</TableHead>
                 <TableHead>{t("table.contact")}</TableHead>
                 <TableHead className="text-right">
-                  {t("table.rating")}
+                  {isStoreSearch ? t("table.store") : t("table.rating")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -281,7 +284,11 @@ export function LeadSearchDetail({
                 </TableRow>
               ) : (
                 visible.map((lead) => (
-                  <LeadTableRow key={lead.id} lead={lead} />
+                  <LeadTableRow
+                    key={lead.id}
+                    lead={lead}
+                    isStore={isStoreSearch}
+                  />
                 ))
               )}
             </TableBody>

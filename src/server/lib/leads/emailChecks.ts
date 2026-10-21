@@ -97,14 +97,7 @@ export async function checkEmails(
   return Promise.all(
     emails.map(async (email): Promise<EmailCheck> => {
       const [local = "", domain = ""] = email.split("@");
-      const kind = FREE_PROVIDER_DOMAINS.has(domain)
-        ? "free_provider"
-        : ROLE_LOCAL_PARTS.has(local)
-          ? "role"
-          : "personal";
-      const onOwnDomain = siteDomain
-        ? emailIsOnDomain(email, siteDomain)
-        : false;
+      const { kind, onOwnDomain } = classifyEmail(email, siteDomain);
       if (!local || !domain) {
         return { email, checkStatus: "invalid", kind, onOwnDomain };
       }
@@ -118,6 +111,20 @@ export async function checkEmails(
       };
     }),
   );
+}
+
+export function classifyEmail(
+  email: string,
+  siteDomain: string | null,
+): Pick<EmailCheck, "kind" | "onOwnDomain"> {
+  const [local = "", domain = ""] = email.split("@");
+  const kind = FREE_PROVIDER_DOMAINS.has(domain)
+    ? "free_provider"
+    : ROLE_LOCAL_PARTS.has(local)
+      ? "role"
+      : "personal";
+  const onOwnDomain = siteDomain ? emailIsOnDomain(email, siteDomain) : false;
+  return { kind, onOwnDomain };
 }
 
 /** The address to write to first: reachable, on the site's domain, a person. */

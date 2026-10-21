@@ -56,6 +56,8 @@ export function mapDataforseoPathToCreditFeature(
       return "ai_prompt_responses";
     case "business_data":
       return "local_seo";
+    case "domain_analytics":
+      return "domain_overview";
     case "keywords_data":
       return "keyword_research";
     case "dataforseo_labs": {

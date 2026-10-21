@@ -1,12 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
+import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   leadCategoryQuerySchema,
   leadLocationQuerySchema,
+  importStoresSchema,
   leadSearchIdSchema,
   listLeadSearchesSchema,
   startLeadSearchSchema,
+  startStoreSearchSchema,
 } from "@/types/schemas/leads";
 
 export const listLeadCategories = createServerFn({ method: "POST" })
@@ -45,6 +48,29 @@ export const startLeadSearch = createServerFn({ method: "POST" })
       },
       context,
     ),
+  );
+
+export const startStoreSearch = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(startStoreSearchSchema)
+  .handler(async ({ data, context }) =>
+    StoreFinderService.startStoreSearch(
+      {
+        projectId: context.projectId,
+        keywords: data.keywords,
+        countryCode: data.countryCode,
+        maxRank: data.maxRank,
+        limit: data.limit,
+      },
+      context,
+    ),
+  );
+
+export const importStores = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(importStoresSchema)
+  .handler(async ({ data, context }) =>
+    StoreFinderService.importStores(context.projectId, data.domains),
   );
 
 export const enrichLeadBatch = createServerFn({ method: "POST" })

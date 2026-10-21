@@ -5,6 +5,7 @@ import {
   postGoogleReviewsTask,
   postMyBusinessUpdatesTask,
 } from "@/server/lib/dataforseo/business";
+import { fetchDomainsByTechnology } from "@/server/lib/dataforseo/technologies";
 import {
   BACKLINKS_DEFAULT_LIMIT,
   fetchBacklinksHistory,
@@ -94,6 +95,8 @@ const BACKLINKS_ROW_USD = 0.000036;
 // Business Data (dataforseo.com/pricing/business-data/*). Task-queue posts
 // run at priority 2 (business.ts TASK_PRIORITY_HIGH), which doubles the
 // standard-queue rates quoted on the pricing pages.
+const DOMAINS_BY_TECHNOLOGY_TASK_USD = 0.012;
+const DOMAINS_BY_TECHNOLOGY_ROW_USD = 0.0012;
 const BUSINESS_LISTINGS_TASK_USD = 0.012;
 const BUSINESS_LISTINGS_ROW_USD = 0.00036;
 const MY_BUSINESS_INFO_LIVE_USD = 0.0054;
@@ -186,6 +189,14 @@ function daysInclusive(from: string, to: string) {
 
 /** One raw-USD upper-bound estimator per entry in createDataforseoClient. */
 export const dataforseoPricing = {
+  domainAnalytics: {
+    domainsByTechnology: priced(
+      fetchDomainsByTechnology,
+      (input) =>
+        DOMAINS_BY_TECHNOLOGY_TASK_USD +
+        input.limit * DOMAINS_BY_TECHNOLOGY_ROW_USD,
+    ),
+  },
   business: {
     businessListings: priced(
       fetchBusinessListingsSearch,

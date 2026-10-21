@@ -51,6 +51,7 @@ import {
   postLocalSerpTasks,
   postRankCheckTasks,
 } from "@/server/lib/dataforseo/serp";
+import { fetchDomainsByTechnology } from "@/server/lib/dataforseo/technologies";
 import { fetchLighthouseResult } from "@/server/lib/dataforseo/lighthouse";
 import {
   fetchLlmAggregatedMetrics,
@@ -99,6 +100,14 @@ function meter<I, T>(
 
 export function createDataforseoClient(customer: BillingCustomerContext) {
   return {
+    domainAnalytics: {
+      domainsByTechnology: meter(
+        customer,
+        fetchDomainsByTechnology,
+        dataforseoPricing.domainAnalytics.domainsByTechnology,
+        "domain_overview",
+      ),
+    },
     business: {
       businessListings: meter(
         customer,

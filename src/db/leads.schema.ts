@@ -24,6 +24,9 @@ export const leadSearches = sqliteTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     label: text("label").notNull(),
+    source: text("source", { enum: ["local", "shopify"] })
+      .notNull()
+      .default("local"),
     category: text("category").notNull(),
     nameQuery: text("name_query"),
     locationLabel: text("location_label").notNull(),
@@ -32,6 +35,8 @@ export const leadSearches = sqliteTable(
     radiusKm: integer("radius_km").notNull(),
     requestedLimit: integer("requested_limit").notNull(),
     skippedDuplicates: integer("skipped_duplicates").notNull().default(0),
+    countryCode: text("country_code"),
+    keywordQuery: text("keyword_query"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -77,6 +82,11 @@ export const leads = sqliteTable(
     facebookUrl: text("facebook_url"),
     linkedinUrl: text("linkedin_url"),
     whatsappUrl: text("whatsapp_url"),
+    countryCode: text("country_code"),
+    domainRank: integer("domain_rank"),
+    productCount: integer("product_count"),
+    lastProductAt: text("last_product_at"),
+    currency: text("currency"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
