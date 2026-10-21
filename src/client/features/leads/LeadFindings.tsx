@@ -36,6 +36,7 @@ const DETAIL_FORMATS = new Set([
   "weak_title",
   "low_rating",
   "stale_blog",
+  "irregular_blog",
   "stale_products",
   "out_of_stock",
   "missing_alt",

@@ -174,6 +174,7 @@
     "no_llms_txt": "llms.txt yok",
     "no_blog": "Blog yok",
     "stale_blog": "Blog güncel değil",
+    "irregular_blog": "Blog düzensiz",
     "myshopify_domain": "myshopify.com adresi",
     "vintage_theme": "Eski Shopify teması",
     "stock_theme": "Hazır tema",
@@ -381,8 +382,9 @@
     "no_faq": "SSS bölümleri insanların yapay zekaya sorduğu soruları yanıtlar ve alıntılanır.",
     "no_review_schema": "Puan işaretlemesi olmadan Google'da sitenin yanında yıldızlar görünmez.",
     "no_llms_txt": "Yapay zeka asistanlarına sitenin özetini veren küçük ve yeni bir standart. Olsa iyi olur.",
-    "no_blog": "Yazı olmaması bilgi aramalarından ve yapay zeka cevaplarından trafik gelmemesi demek.",
-    "stale_blog": "Aylardır güncellenmeyen blog terk edilmiş görünür ve yeni arama trafiği getirmez.",
+    "no_blog": "Düzenli SEO blogu yok. Yazılar bilgi aramalarından trafik almanın ve yapay zekâ cevaplarında kaynak gösterilmenin ana yolu, bu yüzden kritik.",
+    "stale_blog": "Aylardır güncellenmeyen blog terk edilmiş görünür ve yeni trafik getirmez. Düzenli yayın SEO ve yapay zekâ görünürlüğü için kritik.",
+    "irregular_blog": "Son 3 ayda 2'den az yazı var. Düzenli SEO yazıları Google ve yapay zekâ görünürlüğü için kritik; düzensiz yayın büyümeyi durdurur.",
     "myshopify_domain": "Varsayılan adreste çalışmak güveni ve marka hatırlanırlığını düşürür; özel alan adı hızlı bir kazanç.",
     "vintage_theme": "Eski temalarda Online Store 2.0 yok: her sayfada bölüm yok, uygulama blokları kısıtlı, daha yavaş.",
     "stock_theme": "Ücretsiz varsayılan tema mağazayı binlercesine benzetir. Özel tasarım teklifi için iyi giriş.",
@@ -458,6 +460,7 @@
     "low_rating": "{{value}} ★",
     "stale_blog": "son yazı {{value}}",
     "stale_products": "son ürün {{value}}",
+    "irregular_blog": "3 ayda {{value}} yazı",
     "out_of_stock": "{{value}} tükenmiş",
     "missing_alt": "{{value}} alt metinsiz"
   }

@@ -127,14 +127,20 @@ function marketOf(
   };
 }
 
-function latestDate(html: string): string | null {
+function blogDates(html: string) {
   const today = new Date().toISOString().slice(0, 10);
+  const since = new Date(Date.now() - 90 * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
   const dates = [...html.matchAll(DATE_PATTERN)]
     .map((match) => match[1])
     .filter((date) => date <= today && date >= "2000-01-01");
-  return dates.length
-    ? dates.reduce((latest, date) => (date > latest ? date : latest))
-    : null;
+  return {
+    latest: dates.length
+      ? dates.reduce((latest, date) => (date > latest ? date : latest))
+      : null,
+    recent: new Set(dates.filter((date) => date >= since)).size,
+  };
 }
 
 async function hasSitemap(origin: string, listed: boolean) {
@@ -243,12 +249,13 @@ export async function auditSite(input: {
   if (sitemap === false) findings.push({ code: "no_sitemap" });
   if (llms === false) findings.push({ code: "no_llms_txt" });
   if (https === false) findings.push({ code: "http_not_redirected" });
-  const lastPost = blog ? latestDate(blog.body) : null;
-  if (
-    lastPost &&
-    Date.now() - Date.parse(lastPost) > STALE_BLOG_DAYS * 86_400_000
-  ) {
-    findings.push({ code: "stale_blog", detail: lastPost });
+  const posts = blog ? blogDates(blog.body) : null;
+  if (posts?.latest) {
+    if (Date.now() - Date.parse(posts.latest) > STALE_BLOG_DAYS * 86_400_000) {
+      findings.push({ code: "stale_blog", detail: posts.latest });
+    } else if (posts.recent < 2) {
+      findings.push({ code: "irregular_blog", detail: String(posts.recent) });
+    }
   }
   if (mail && !mail.spf) findings.push({ code: "no_spf" });
   if (mail && !mail.dmarc) findings.push({ code: "no_dmarc" });

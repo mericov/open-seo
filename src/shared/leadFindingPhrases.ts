@@ -38,8 +38,11 @@ const EN: Phrases = {
   no_faq: "I couldn't see an FAQ section that AI assistants could quote",
   no_review_schema: "your star ratings aren't shown in Google results",
   no_llms_txt: "your site has no llms.txt guide for AI assistants",
-  no_blog: "your site has no articles bringing in search traffic",
+  no_blog:
+    "your site has no regular blog, which is the main way to win search and AI traffic",
   stale_blog: "your blog hasn't had a new post in a while (last: {detail})",
+  irregular_blog:
+    "your blog isn't updated regularly ({detail} posts in the last 3 months)",
   myshopify_domain: "your store still runs on a myshopify.com address",
   vintage_theme:
     "your store runs on an old Shopify theme ({detail}) that misses newer features",
@@ -124,8 +127,10 @@ const TR: Phrases = {
     "yapay zeka asistanlarının alıntılayabileceği bir SSS bölümü göremedim",
   no_review_schema: "yıldız puanlarınız Google sonuçlarında görünmüyor",
   no_llms_txt: "sitenizde yapay zeka asistanları için llms.txt rehberi yok",
-  no_blog: "sitenizde aramadan trafik getirecek yazılar yok",
+  no_blog:
+    "sitenizde arama ve yapay zekâ trafiği getirecek düzenli bir blog yok",
   stale_blog: "blogunuza bir süredir yeni yazı eklenmemiş (son: {detail})",
+  irregular_blog: "blogunuz düzenli güncellenmiyor (son 3 ayda {detail} yazı)",
   myshopify_domain: "mağazanız hâlâ myshopify.com adresinde çalışıyor",
   vintage_theme:
     "mağazanız yeni özellikleri olmayan eski bir Shopify temasında ({detail})",
