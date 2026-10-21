@@ -87,3 +87,38 @@ export const emailAccessGate = (options: {
       policies: [allow.policyId],
     });
   });
+
+/**
+ * Lets everyone through Access on one path of the gated app, for pages that
+ * are meant to be public (lead reports sent to prospects). A path-scoped
+ * application is more specific than the host-wide gate, so it wins there.
+ */
+export const publicPathBypass = (options: {
+  policyId: string;
+  applicationId: string;
+  name: string;
+  domains: string[];
+  path: string;
+}) =>
+  Effect.gen(function* () {
+    const bypass = yield* Cloudflare.Access.Policy(options.policyId, {
+      name: `${options.name} bypass`,
+      decision: "bypass",
+      include: [{ everyone: {} }],
+    });
+    const [primary, ...rest] = options.domains;
+    return yield* Cloudflare.Access.Application(options.applicationId, {
+      type: "self_hosted",
+      name: options.name,
+      domain: `${primary}/${options.path}`,
+      ...(rest.length
+        ? {
+            destinations: options.domains.map((domain) => ({
+              type: "public" as const,
+              uri: `${domain}/${options.path}`,
+            })),
+          }
+        : {}),
+      policies: [bypass.policyId],
+    });
+  });

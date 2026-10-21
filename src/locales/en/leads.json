@@ -251,7 +251,9 @@
       "name": "Business name",
       "first_line": "The lead's first line, or a general opener when it has none",
       "website": "Website domain",
-      "top_gap": "The biggest gap in plain words"
+      "top_gap": "The biggest gap in plain words",
+      "report_offer": "The report sentence: the link when a report exists, otherwise an offer to send one",
+      "report_link": "Just the report link"
     },
     "save": "Save",
     "cancel": "Cancel",
@@ -279,5 +281,15 @@
       "purple": "Purple",
       "gray": "Gray"
     }
+  },
+  "report": {
+    "create": "Report",
+    "refresh": "Refresh",
+    "open": "Open report",
+    "ready": "Report ready. Its link is added to emails as {{report_offer}}.",
+    "timeout": "The report took too long. Try again.",
+    "failed": "Couldn't create the report.",
+    "hint": "Opens the site in the background and builds the client report with the SEO & GEO extension.",
+    "needsExtension": "Install or update the SEO & GEO extension (4.1+) to create reports."
   }
 }

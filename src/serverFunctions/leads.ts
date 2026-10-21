@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
 import { LeadFirstLineService } from "@/server/features/leads/services/LeadFirstLineService";
+import { LeadReportService } from "@/server/features/leads/services/LeadReportService";
 import { LeadScanService } from "@/server/features/leads/services/LeadScanService";
 import { LeadTemplateRepository } from "@/server/features/leads/repositories/LeadTemplateRepository";
 import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
@@ -14,6 +15,7 @@ import {
   updateFirstLineSchema,
   leadSearchIdSchema,
   leadTemplateIdSchema,
+  saveLeadReportSchema,
   saveLeadTemplateSchema,
   listProjectLeadsSchema,
   setLeadHiddenSchema,
@@ -227,4 +229,11 @@ export const setLeadNote = createServerFn({ method: "POST" })
       text: data.text,
       remindAt: data.remindAt,
     }),
+  );
+
+export const saveLeadReport = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(saveLeadReportSchema)
+  .handler(async ({ data, context }) =>
+    LeadReportService.save(context.projectId, data.leadId, data.html),
   );

@@ -30,6 +30,7 @@ import { Route as AuthenticatedSubscribeRouteImport } from './routes/_authentica
 import { Route as AuthenticatedYcRouteImport } from './routes/_authenticated.yc'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as LrTokenRouteImport } from './routes/lr/$token'
 import { Route as RReportIdRouteImport } from './routes/r/$reportId'
 import { Route as AppBillingFixPaymentRouteImport } from './routes/_app/billing_.fix-payment'
 import { Route as AppHelpDataforseoApiKeyRouteImport } from './routes/_app/help/dataforseo-api-key'
@@ -177,6 +178,11 @@ const AcceptInvitationIdRoute = AcceptInvitationIdRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LrTokenRoute = LrTokenRouteImport.update({
+  id: '/lr/$token',
+  path: '/lr/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RReportIdRoute = RReportIdRouteImport.update({
@@ -438,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/p/$projectId': typeof AppPProjectIdRouteRouteWithChildren
   '/billing/fix-payment': typeof AppBillingFixPaymentRoute
@@ -501,6 +508,7 @@ export interface FileRoutesByTo {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/billing/fix-payment': typeof AppBillingFixPaymentRoute
   '/help/dataforseo-api-key': typeof AppHelpDataforseoApiKeyRoute
@@ -564,6 +572,7 @@ export interface FileRoutesById {
   '/_authenticated/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/_app/': typeof AppIndexRoute
   '/_app/p/$projectId': typeof AppPProjectIdRouteRouteWithChildren
@@ -631,6 +640,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/lr/$token'
     | '/r/$reportId'
     | '/p/$projectId'
     | '/billing/fix-payment'
@@ -694,6 +704,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/lr/$token'
     | '/r/$reportId'
     | '/billing/fix-payment'
     | '/help/dataforseo-api-key'
@@ -756,6 +767,7 @@ export interface FileRouteTypes {
     | '/_authenticated/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/lr/$token'
     | '/r/$reportId'
     | '/_app/'
     | '/_app/p/$projectId'
@@ -814,6 +826,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OpenaiAppsChallengeRoute: typeof Char91DotwellKnownChar93OpenaiAppsChallengeRoute
   AcceptInvitationIdRoute: typeof AcceptInvitationIdRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  LrTokenRoute: typeof LrTokenRoute
   RReportIdRoute: typeof RReportIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAutumnSplatRoute: typeof ApiAutumnSplatRoute
@@ -971,6 +984,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lr/$token': {
+      id: '/lr/$token'
+      path: '/lr/$token'
+      fullPath: '/lr/$token'
+      preLoaderRoute: typeof LrTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/r/$reportId': {
@@ -1476,6 +1496,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OpenaiAppsChallengeRoute,
   AcceptInvitationIdRoute: AcceptInvitationIdRoute,
   ApiHealthRoute: ApiHealthRoute,
+  LrTokenRoute: LrTokenRoute,
   RReportIdRoute: RReportIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAutumnSplatRoute: ApiAutumnSplatRoute,

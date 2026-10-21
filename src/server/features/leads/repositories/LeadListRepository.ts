@@ -247,6 +247,35 @@ async function setNote(
     .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
 }
 
+async function getReportToken(projectId: string, leadId: string) {
+  const [row] = await db
+    .select({ reportToken: leads.reportToken })
+    .from(leads)
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+  return row ?? null;
+}
+
+async function setReportToken(
+  projectId: string,
+  leadId: string,
+  token: string,
+) {
+  const now = new Date().toISOString();
+  await db
+    .update(leads)
+    .set({ reportToken: token, reportCreatedAt: now, updatedAt: now })
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+}
+
+async function reportTokenExists(token: string) {
+  const [row] = await db
+    .select({ id: leads.id })
+    .from(leads)
+    .where(eq(leads.reportToken, token))
+    .limit(1);
+  return Boolean(row);
+}
+
 export const LeadListRepository = {
   listLeads,
   statusCounts,
@@ -257,4 +286,7 @@ export const LeadListRepository = {
   countDue,
   setHidden,
   setNote,
+  getReportToken,
+  setReportToken,
+  reportTokenExists,
 };

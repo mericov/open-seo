@@ -8,7 +8,29 @@ export const LEAD_TEMPLATE_VARIABLES = [
   "first_line",
   "website",
   "top_gap",
+  "report_offer",
+  "report_link",
 ] as const;
+
+export const LEAD_REPORT_PATH = "/lr/";
+
+const REPORT_OFFER: Record<
+  LeadEmailLanguage,
+  { ready: (link: string) => string; later: string }
+> = {
+  en: {
+    ready: (link) =>
+      `I put together a short audit of your site, free and with no call needed: ${link}`,
+    later:
+      "If you'd like, I can send you a short report this week showing what you could improve. It's free and there's no call needed.",
+  },
+  tr: {
+    ready: (link) =>
+      `Siteniz için kısa bir ön denetim raporu hazırladım, ücretsiz ve görüşme gerektirmiyor: ${link}`,
+    later:
+      "İsterseniz neleri iyileştirebileceğinizi gösteren kısa raporu bu hafta gönderebilirim. Ücretsiz ve görüşme gerektirmiyor.",
+  },
+};
 
 export type LeadMailClient = "gmail" | "mailto";
 
@@ -63,7 +85,9 @@ export const SAMPLE_TEMPLATES: {
       "",
       "{{first_line}}",
       "",
-      "Ben Meriç; işletmelerin Google'da ve ChatGPT gibi yapay zeka asistanlarında daha kolay bulunmasına yardımcı oluyorum. İsterseniz neleri iyileştirebileceğinizi gösteren kısa raporu bu hafta gönderebilirim. Ücretsiz ve görüşme gerektirmiyor.",
+      "Ben Meriç; işletmelerin Google'da ve ChatGPT gibi yapay zeka asistanlarında daha kolay bulunmasına yardımcı oluyorum.",
+      "",
+      "{{report_offer}}",
       "",
       "Sevgiler,",
       "Meriç",
@@ -82,7 +106,9 @@ export const SAMPLE_TEMPLATES: {
       "",
       "{{first_line}}",
       "",
-      "I'm Meriç, and I help businesses get found on Google and in AI assistants like ChatGPT. If you'd like, I can send you a short report this week showing what you could improve. It's free and there's no call needed.",
+      "I'm Meriç, and I help businesses get found on Google and in AI assistants like ChatGPT.",
+      "",
+      "{{report_offer}}",
       "",
       "Best,",
       "Meriç",
@@ -115,9 +141,14 @@ export function leadTemplateValues(
     findings: LeadFindingCode[];
   },
   language: LeadEmailLanguage,
+  reportUrl: string | null = null,
 ): Record<(typeof LEAD_TEMPLATE_VARIABLES)[number], string> {
   const topGap = lead.findings[0];
   return {
+    report_link: reportUrl ?? "",
+    report_offer: reportUrl
+      ? REPORT_OFFER[language].ready(reportUrl)
+      : REPORT_OFFER[language].later,
     name: lead.name,
     first_line: lead.firstLine ?? FALLBACK_FIRST_LINE[language],
     website: lead.domain ?? lead.website ?? "",

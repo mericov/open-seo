@@ -251,7 +251,9 @@
       "name": "İşletme adı",
       "first_line": "Lead'in ilk cümlesi; yoksa genel bir giriş",
       "website": "Site adresi",
-      "top_gap": "En büyük eksik, sade bir dille"
+      "top_gap": "En büyük eksik, sade bir dille",
+      "report_offer": "Rapor cümlesi: rapor varsa linki, yoksa rapor gönderme teklifi",
+      "report_link": "Sadece rapor linki"
     },
     "save": "Kaydet",
     "cancel": "Vazgeç",
@@ -279,5 +281,15 @@
       "purple": "Mor",
       "gray": "Gri"
     }
+  },
+  "report": {
+    "create": "Rapor",
+    "refresh": "Yenile",
+    "open": "Raporu aç",
+    "ready": "Rapor hazır. Linki maillere {{report_offer}} alanıyla eklenir.",
+    "timeout": "Rapor çok uzun sürdü. Tekrar dene.",
+    "failed": "Rapor oluşturulamadı.",
+    "hint": "Siteyi arka planda açar ve SEO & GEO eklentisiyle müşteri raporunu hazırlar.",
+    "needsExtension": "Rapor için SEO & GEO eklentisini kur veya güncelle (4.1+)."
   }
 }

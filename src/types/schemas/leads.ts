@@ -137,6 +137,12 @@ export const leadTemplateIdSchema = z.object({
   templateId: z.string().min(1),
 });
 
+export const saveLeadReportSchema = z.object({
+  ...projectIdShape,
+  leadId: z.string().min(1),
+  html: z.string().min(100).max(3_000_000),
+});
+
 export const setLeadScheduleSchema = z.object({
   ...projectIdShape,
   searchId: z.string().min(1),

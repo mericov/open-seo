@@ -29,3 +29,18 @@ it("fills a template from the lead and builds a ready-to-send Gmail draft", () =
   expect(url.searchParams.get("to")).toBe("info@karigran.com");
   expect(url.searchParams.get("body")).toBe(body);
 });
+
+it("links the report in the offer sentence once a report exists", () => {
+  const lead = {
+    name: "Kadıköy Diş",
+    firstLine: "x",
+    website: null,
+    domain: "kadikoydis.com.tr",
+    findings: [],
+  };
+
+  expect(leadTemplateValues(lead, "tr").report_offer).toMatch(/gönderebilirim/);
+  expect(
+    leadTemplateValues(lead, "tr", "https://seo.test/lr/abc").report_offer,
+  ).toContain("https://seo.test/lr/abc");
+});

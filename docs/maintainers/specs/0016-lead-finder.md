@@ -86,6 +86,14 @@ The email button on a lead with a reachable address picks the templates in the l
 
 Sending directly through a mail provider's API would allow tracking and bulk sends, but it needs OAuth scopes to read and send mail, and bulk cold email from a primary domain hurts deliverability. Drafts keep the user in control of every message; bulk sending is better left to a dedicated tool fed by the export.
 
+## Client reports
+
+A lead with a website can get a client report on demand, built by the maintainer's SEO & GEO Chrome extension rather than by the server: the extension already renders the rendered page's checks, and a Worker cannot run the page's scripts. The app page and the extension talk through `window.postMessage` and a content script the extension injects on the app's origin, which also marks the page with the extension's version so the button can tell whether it is installed. The extension opens the site in a background tab, runs its audit, renders its client report (issues and why they matter, no fixes), and returns the HTML; the app then saves it for that lead.
+
+Reports are stored in R2 under a random 32-character token, with scripts stripped, and served at `/lr/<token>` with a sandboxing Content-Security-Policy, `noindex` and no referrer. A token only resolves while its lead exists, so deleting the search revokes the link. Self-hosted deployments sit behind Cloudflare Access, so the deploy adds a path-scoped Access application that bypasses Access for `/lr` only; everything else stays gated.
+
+Email templates get a `{{report_offer}}` sentence that links the report when it exists and otherwise offers to send one, and a bare `{{report_link}}`. First lines no longer make an offer themselves, so the email does not offer twice.
+
 ## Alternatives
 
 Scraping Google Maps directly would avoid the listings provider, but Maps blocks automated access, needs rotating proxies and breaks whenever the page changes. The licensed listings data is stable and already used by the local SEO tools.

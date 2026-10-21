@@ -10,6 +10,7 @@ import { unstable_readConfig } from "wrangler";
 import { z } from "zod";
 import {
   emailAccessGate,
+  publicPathBypass,
   HOSTED_PROD_STAGE,
   readWorkersSubdomain,
   requireAllowedEmails,
@@ -260,6 +261,16 @@ const resolveSelfHostAccess = (
         emails: allowedEmails,
       });
       policyAud = application.aud;
+      yield* publicPathBypass({
+        policyId: "SelfHostLeadReportsBypass",
+        applicationId: "SelfHostLeadReports",
+        name: `open-seo ${stage} lead reports`,
+        domains: [
+          customDomain || `${workerName(stage)}.${subdomain}`,
+          ...(customDomain ? [`${workerName(stage)}.${subdomain}`] : []),
+        ],
+        path: "lr",
+      });
     }
 
     return { teamDomain, policyAud };

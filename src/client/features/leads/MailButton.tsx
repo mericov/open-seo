@@ -1,6 +1,7 @@
 import { ChevronDown, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
+import { reportUrlFor } from "@/client/features/leads/ReportButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +44,11 @@ export function MailButton({
   const choices = sameLanguage.length ? sameLanguage : saved;
 
   const open = (template: MailTemplate) => {
-    const values = leadTemplateValues(lead, template.language);
+    const values = leadTemplateValues(
+      lead,
+      template.language,
+      reportUrlFor(lead.reportToken),
+    );
     const url = composeUrl(mailClient, {
       to: email,
       subject: renderTemplate(template.subject, values),

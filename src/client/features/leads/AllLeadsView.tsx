@@ -14,6 +14,7 @@ import { AllLeadsRow } from "@/client/features/leads/AllLeadsRow";
 import { LeadTemplatesSheet } from "@/client/features/leads/LeadTemplatesSheet";
 import { localToday } from "@/client/features/leads/LeadNote";
 import { MailButton } from "@/client/features/leads/MailButton";
+import { ReportButton } from "@/client/features/leads/ReportButton";
 import { useLeadActions } from "@/client/features/leads/useLeadActions";
 import { useMailClient } from "@/client/features/leads/useMailClient";
 import {
@@ -245,19 +246,22 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
                       })
                     }
                     mail={
-                      <MailButton
-                        lead={lead}
-                        templates={templatesQuery.data ?? []}
-                        mailClient={mailClient}
-                        onOpened={() => {
-                          if (lead.outreachStatus === "new") {
-                            statusMutation.mutate({
-                              leadIds: [lead.id],
-                              status: "contacted",
-                            });
-                          }
-                        }}
-                      />
+                      <>
+                        <ReportButton projectId={projectId} lead={lead} />
+                        <MailButton
+                          lead={lead}
+                          templates={templatesQuery.data ?? []}
+                          mailClient={mailClient}
+                          onOpened={() => {
+                            if (lead.outreachStatus === "new") {
+                              statusMutation.mutate({
+                                leadIds: [lead.id],
+                                status: "contacted",
+                              });
+                            }
+                          }}
+                        />
+                      </>
                     }
                     onStatus={(next) =>
                       statusMutation.mutate({
