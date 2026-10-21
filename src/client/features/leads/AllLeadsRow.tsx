@@ -2,6 +2,7 @@ import { Instagram, MessageCircle, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SafeExternalLink } from "@/client/components/SafeExternalLink";
 import { Checkbox } from "@/client/components/ui/checkbox";
+import { FirstLineEditor } from "@/client/features/leads/FirstLineEditor";
 import {
   FindingChips,
   OutreachStatusMenu,
@@ -13,12 +14,14 @@ import type { LeadOutreachStatus } from "@/shared/leadFindings";
 import { safeHttpUrl } from "@/shared/safe-url";
 
 export function AllLeadsRow({
+  projectId,
   lead,
   selected,
   onSelect,
   onStatus,
   statusPending,
 }: {
+  projectId: string;
   lead: ProjectLeadRow;
   selected: boolean;
   onSelect: (selected: boolean) => void;
@@ -38,7 +41,7 @@ export function AllLeadsRow({
           aria-label={t("all.selectLead", { name: lead.name })}
         />
       </td>
-      <td className="max-w-72 py-3.5 pr-4 pl-3 align-top">
+      <td className="max-w-96 py-3.5 pr-4 pl-3 align-top">
         <p className="truncate font-medium leading-snug" title={lead.name}>
           {lead.name}
         </p>
@@ -55,6 +58,11 @@ export function AllLeadsRow({
           <span className="mx-1.5 opacity-40">·</span>
           <span title={lead.searchLabel}>{lead.searchLabel}</span>
         </p>
+        <FirstLineEditor
+          projectId={projectId}
+          leadId={lead.id}
+          firstLine={lead.firstLine}
+        />
       </td>
       <td className="py-3.5 pr-4 align-top">
         <ScoreBadge score={lead.opportunityScore} />

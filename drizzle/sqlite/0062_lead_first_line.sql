@@ -1,0 +1,1 @@
+ALTER TABLE `leads` ADD `first_line` text;

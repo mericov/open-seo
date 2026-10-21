@@ -281,6 +281,13 @@
       "when": 1792588088688,
       "tag": "0039_lead_scans",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1792589345458,
+      "tag": "0040_lead_first_line",
+      "breakpoints": true
     }
   ]
 }

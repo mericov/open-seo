@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
+import { LeadFirstLineService } from "@/server/features/leads/services/LeadFirstLineService";
 import { LeadScanService } from "@/server/features/leads/services/LeadScanService";
 import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
@@ -7,7 +8,9 @@ import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   leadCategoryQuerySchema,
   leadLocationQuerySchema,
+  generateFirstLinesSchema,
   importStoresSchema,
+  updateFirstLineSchema,
   leadSearchIdSchema,
   listProjectLeadsSchema,
   setLeadScheduleSchema,
@@ -141,4 +144,18 @@ export const setLeadSchedule = createServerFn({ method: "POST" })
       autoRun: data.autoRun,
       runSize: data.runSize,
     }),
+  );
+
+export const generateLeadFirstLines = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(generateFirstLinesSchema)
+  .handler(async ({ data, context }) =>
+    LeadFirstLineService.generate(context.projectId, data.leadIds, context),
+  );
+
+export const updateLeadFirstLine = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(updateFirstLineSchema)
+  .handler(async ({ data, context }) =>
+    LeadFirstLineService.update(context.projectId, data.leadId, data.firstLine),
   );

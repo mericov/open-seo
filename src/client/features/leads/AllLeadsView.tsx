@@ -21,12 +21,20 @@ import {
   type ProjectLeadFilters,
 } from "@/client/features/leads/leadQueries";
 import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
-import { listProjectLeads, setLeadStatus } from "@/serverFunctions/leads";
+import { getStandardErrorMessage } from "@/client/lib/error-messages";
+import {
+  generateLeadFirstLines,
+  listProjectLeads,
+  setLeadStatus,
+} from "@/serverFunctions/leads";
 import {
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
 } from "@/shared/leadFindings";
-import { LEAD_LIST_MAX_PAGE_SIZE } from "@/types/schemas/leads";
+import {
+  LEAD_FIRST_LINE_MAX_IDS,
+  LEAD_LIST_MAX_PAGE_SIZE,
+} from "@/types/schemas/leads";
 import { cn } from "cn";
 
 const PAGE_SIZE = 50;
@@ -71,6 +79,18 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     },
   });
 
+  const linesMutation = useMutation({
+    mutationFn: (leadIds: string[]) =>
+      generateLeadFirstLines({ data: { projectId, leadIds } }),
+    onSuccess: async (result) => {
+      toast.success(t("firstLine.written", { count: result.written }));
+      await queryClient.invalidateQueries({
+        queryKey: leadsQueryKey(projectId),
+      });
+    },
+    onError: (error) => toast.error(getStandardErrorMessage(error)),
+  });
+
   const onExport = async (format: ExportFormat) => {
     const all = await listProjectLeads({
       data: {
@@ -85,6 +105,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
       feature: "lead_finder",
       headers: [
         "name",
+        "first_line",
         "score",
         "gaps",
         "email",
@@ -104,6 +125,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
       ],
       rows: all.leads.map((lead) => [
         lead.name,
+        lead.firstLine,
         lead.opportunityScore,
         lead.findings.map((code) => t(`findings.${code}`)).join(", "),
         lead.primaryEmail,
@@ -258,6 +280,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
                 {data.leads.map((lead) => (
                   <AllLeadsRow
                     key={lead.id}
+                    projectId={projectId}
                     lead={lead}
                     selected={selected.has(lead.id)}
                     onSelect={(value) =>
@@ -320,6 +343,16 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
         <BulkBar
           count={selected.size}
           pending={statusMutation.isPending}
+          writingLines={linesMutation.isPending}
+          onWriteLines={() => {
+            if (selected.size > LEAD_FIRST_LINE_MAX_IDS) {
+              toast.error(
+                t("firstLine.tooMany", { max: LEAD_FIRST_LINE_MAX_IDS }),
+              );
+              return;
+            }
+            linesMutation.mutate([...selected]);
+          }}
           onStatus={(next) =>
             statusMutation.mutate({ leadIds: [...selected], status: next })
           }

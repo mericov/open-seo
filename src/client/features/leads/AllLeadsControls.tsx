@@ -1,4 +1,4 @@
-import { ChevronDown, Mail, X } from "lucide-react";
+import { ChevronDown, Mail, Sparkles, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
 import {
@@ -23,11 +23,15 @@ import {
 export function BulkBar({
   count,
   pending,
+  writingLines,
+  onWriteLines,
   onStatus,
   onClear,
 }: {
   count: number;
   pending: boolean;
+  writingLines: boolean;
+  onWriteLines: () => void;
   onStatus: (status: LeadOutreachStatus) => void;
   onClear: () => void;
 }) {
@@ -45,6 +49,16 @@ export function BulkBar({
       >
         <Mail data-icon="inline-start" />
         {t("all.markContacted")}
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="rounded-full"
+        pending={writingLines}
+        onClick={onWriteLines}
+      >
+        <Sparkles data-icon="inline-start" />
+        {t("firstLine.write")}
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger

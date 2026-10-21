@@ -108,6 +108,7 @@ export const leads = sqliteTable(
       .notNull()
       .default("new"),
     contactedAt: text("contacted_at"),
+    firstLine: text("first_line"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),

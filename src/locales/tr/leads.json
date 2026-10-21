@@ -220,5 +220,11 @@
     "perRun": "Her seferinde",
     "runNow": "Şimdi çalıştır ({{count}})",
     "ranNow": "{{count}} yeni lead eklendi"
+  },
+  "firstLine": {
+    "write": "İlk cümle yaz",
+    "written": "{{count}} ilk cümle yazıldı",
+    "edit": "İlk cümleyi düzenle",
+    "tooMany": "Tek seferde en fazla {{max}} lead seçebilirsin."
   }
 }

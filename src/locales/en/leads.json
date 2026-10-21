@@ -220,5 +220,11 @@
     "perRun": "Leads per run",
     "runNow": "Run now ({{count}})",
     "ranNow": "{{count}} new leads added"
+  },
+  "firstLine": {
+    "write": "Write first lines",
+    "written": "{{count}} first lines written",
+    "edit": "Edit first line",
+    "tooMany": "Select up to {{max}} leads at a time."
   }
 }

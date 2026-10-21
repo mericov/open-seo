@@ -76,6 +76,7 @@ async function listLeads(
         opportunityScore: leads.opportunityScore,
         outreachStatus: leads.outreachStatus,
         contactedAt: leads.contactedAt,
+        firstLine: leads.firstLine,
         createdAt: leads.createdAt,
         searchId: leads.searchId,
         searchLabel: leadSearches.label,
@@ -148,9 +149,47 @@ async function setOutreachStatus(
   }
 }
 
+async function listForFirstLines(projectId: string, leadIds: string[]) {
+  const groups = await Promise.all(
+    chunk(leadIds, ID_CHUNK).map((ids) =>
+      db
+        .select({
+          id: leads.id,
+          name: leads.name,
+          category: leads.category,
+          domain: leads.domain,
+          website: leads.website,
+          countryCode: leads.countryCode,
+          productCount: leads.productCount,
+          rating: leads.rating,
+          reviewsCount: leads.reviewsCount,
+          source: leadSearches.source,
+          locationLabel: leadSearches.locationLabel,
+        })
+        .from(leads)
+        .innerJoin(leadSearches, searchJoin)
+        .where(and(eq(leads.projectId, projectId), inArray(leads.id, ids))),
+    ),
+  );
+  return groups.flat();
+}
+
+async function setFirstLine(
+  projectId: string,
+  leadId: string,
+  firstLine: string | null,
+) {
+  await db
+    .update(leads)
+    .set({ firstLine, updatedAt: new Date().toISOString() })
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+}
+
 export const LeadListRepository = {
   listLeads,
   statusCounts,
   listFindings,
   setOutreachStatus,
+  listForFirstLines,
+  setFirstLine,
 };

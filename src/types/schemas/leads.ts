@@ -89,6 +89,19 @@ export const setLeadStatusSchema = z.object({
   status: z.enum(LEAD_OUTREACH_STATUSES),
 });
 
+export const LEAD_FIRST_LINE_MAX_IDS = 50;
+
+export const generateFirstLinesSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(LEAD_FIRST_LINE_MAX_IDS),
+});
+
+export const updateFirstLineSchema = z.object({
+  ...projectIdShape,
+  leadId: z.string().min(1),
+  firstLine: z.string().max(400),
+});
+
 export const setLeadScheduleSchema = z.object({
   ...projectIdShape,
   searchId: z.string().min(1),

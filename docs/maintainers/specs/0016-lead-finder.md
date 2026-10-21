@@ -64,6 +64,12 @@ The checks read only the HTML the server returns, so a tag injected later by a s
 
 Every lead in a project, across all of its searches, appears in one list sorted by opportunity score, with unscored leads last. Each lead carries an outreach status: new, emailed, replied, not interested or client. Marking a lead as emailed records when it was first emailed. Because leads are deduplicated per project, a lead that was emailed or turned the offer down is never added again by a later search. Deleting a search deletes its leads and their statuses, and the confirmation says how many tracked leads that affects.
 
+## First lines
+
+From the outreach list, the user can ask the app to write the first line of a cold email for up to fifty selected leads. Leads go to the project's configured OpenRouter model in batches of twenty-five, each with its name, kind of business, review count, product count and its gaps rewritten as plain facts. The line names one gap and what it costs the business, then offers a free short report of what could be improved; it avoids jargon, never asserts a gap as certain (the checks only see page code), and is written in Turkish for Turkish businesses and English otherwise. The model's spend is metered like other research. Lines are stored on the lead, editable in place, and included in exports.
+
+Templates filled from the gaps would cost nothing, but they read the same across hundreds of emails. A model call per batch keeps the cost to a fraction of a cent per lead.
+
 ## Alternatives
 
 Scraping Google Maps directly would avoid the listings provider, but Maps blocks automated access, needs rotating proxies and breaks whenever the page changes. The licensed listings data is stable and already used by the local SEO tools.

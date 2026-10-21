@@ -59,6 +59,7 @@ const COLUMNS: McpTableColumn<ListedLead>[] = [
   { header: "email", value: (row) => row.primaryEmail },
   { header: "website", value: (row) => row.website },
   { header: "status", value: (row) => row.outreachStatus },
+  { header: "first_line", value: (row) => row.firstLine },
 ];
 
 export const listLeadsTool = {
