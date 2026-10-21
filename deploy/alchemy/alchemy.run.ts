@@ -249,15 +249,14 @@ const resolveSelfHostAccess = (
       const allowedEmails = yield* requireAllowedEmails(
         "Set ACCESS_ALLOWED_EMAILS to the comma-separated emails allowed through Cloudflare Access — or set TEAM_DOMAIN and POLICY_AUD to manage the Access application yourself.",
       );
+      const workersDomain = `${workerName(stage)}.${subdomain}`;
       const application = yield* emailAccessGate({
         policyId: "SelfHostAllowUsers",
         applicationId: "SelfHostAccess",
         policyName: `open-seo ${stage} self-host users`,
         applicationName: `open-seo ${stage}`,
-        domain: customDomain || `${workerName(stage)}.${subdomain}`,
-        extraDomains: customDomain
-          ? [`${workerName(stage)}.${subdomain}`]
-          : undefined,
+        domain: customDomain || workersDomain,
+        extraDomains: customDomain ? [workersDomain] : undefined,
         emails: allowedEmails,
       });
       policyAud = application.aud;
@@ -265,10 +264,7 @@ const resolveSelfHostAccess = (
         policyId: "SelfHostLeadReportsBypass",
         applicationId: "SelfHostLeadReports",
         name: `open-seo ${stage} lead reports`,
-        domains: [
-          customDomain || `${workerName(stage)}.${subdomain}`,
-          ...(customDomain ? [`${workerName(stage)}.${subdomain}`] : []),
-        ],
+        domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
         path: "lr",
       });
     }

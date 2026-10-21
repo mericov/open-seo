@@ -91,7 +91,7 @@ it("writes first lines in each lead's language from its gaps and ignores ids it 
     expect.objectContaining({
       id: "tr-lead",
       language: "tr",
-      facts: [expect.stringContaining("no website")],
+      facts: [expect.stringContaining("don't have a website")],
     }),
     expect.objectContaining({
       id: "us-store",

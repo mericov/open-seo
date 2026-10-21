@@ -13,7 +13,11 @@ import {
 import { chunk } from "remeda";
 import { db } from "@/db";
 import { leadEmails, leadFindings, leads, leadSearches } from "@/db/schema";
-import type { LeadNoteColor, LeadOutreachStatus } from "@/shared/leadFindings";
+import type {
+  LeadFindingCode,
+  LeadNoteColor,
+  LeadOutreachStatus,
+} from "@/shared/leadFindings";
 
 const ID_CHUNK = 90;
 
@@ -24,6 +28,7 @@ export type LeadListFilters = {
   hasEmail?: boolean;
   minScore?: number;
   dueBy?: string;
+  finding?: LeadFindingCode;
 };
 
 function filterConditions(
@@ -34,6 +39,15 @@ function filterConditions(
     eq(leads.projectId, projectId),
     isNull(leads.hiddenAt),
     filters.dueBy ? lte(leads.remindAt, filters.dueBy) : undefined,
+    filters.finding
+      ? inArray(
+          leads.id,
+          db
+            .select({ id: leadFindings.leadId })
+            .from(leadFindings)
+            .where(eq(leadFindings.code, filters.finding)),
+        )
+      : undefined,
     filters.source ? eq(leadSearches.source, filters.source) : undefined,
     filters.searchId ? eq(leads.searchId, filters.searchId) : undefined,
     filters.hasEmail ? isNotNull(leadEmails.email) : undefined,
@@ -133,7 +147,11 @@ async function listFindings(leadIds: string[]) {
   const groups = await Promise.all(
     chunk(leadIds, ID_CHUNK).map((ids) =>
       db
-        .select({ leadId: leadFindings.leadId, code: leadFindings.code })
+        .select({
+          leadId: leadFindings.leadId,
+          code: leadFindings.code,
+          detail: leadFindings.detail,
+        })
         .from(leadFindings)
         .where(inArray(leadFindings.leadId, ids)),
     ),

@@ -5,7 +5,7 @@ import {
 import { leadEmailLanguage } from "@/shared/leadEmail";
 import {
   LEAD_OUTREACH_STATUSES,
-  sortFindingsByWeight,
+  findingsForLead,
   type LeadNoteColor,
   type LeadOutreachStatus,
 } from "@/shared/leadFindings";
@@ -40,11 +40,7 @@ async function listLeads(
     leads: rows.map(({ locationLabel, ...row }) => ({
       ...row,
       language: leadEmailLanguage({ ...row, locationLabel }),
-      findings: sortFindingsByWeight(
-        findings
-          .filter((finding) => finding.leadId === row.id)
-          .map((finding) => finding.code),
-      ),
+      ...findingsForLead(findings, row.id),
     })),
     total,
     page: page.page,

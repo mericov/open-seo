@@ -1,3 +1,4 @@
+import { findingBullets, findingPhrase } from "@/shared/leadFindingPhrases";
 import type { LeadFindingCode } from "@/shared/leadFindings";
 
 export const LEAD_EMAIL_LANGUAGES = ["tr", "en"] as const;
@@ -8,6 +9,7 @@ export const LEAD_TEMPLATE_VARIABLES = [
   "first_line",
   "website",
   "top_gap",
+  "top_issues",
   "report_offer",
   "report_link",
 ] as const;
@@ -33,37 +35,6 @@ const REPORT_OFFER: Record<
 };
 
 export type LeadMailClient = "gmail" | "mailto";
-
-const GAP_PHRASES: Record<
-  LeadEmailLanguage,
-  Record<LeadFindingCode, string>
-> = {
-  en: {
-    no_website: "you don't have a website on Google yet",
-    no_https: "your site isn't on a secure connection",
-    not_mobile_friendly: "your site looks hard to use on phones",
-    no_analytics: "I couldn't see analytics tracking on your site",
-    no_meta_pixel: "I couldn't see a Meta pixel for retargeting",
-    no_meta_description: "Google has no description to show for your site",
-    no_schema: "Google and AI assistants get little detail about your site",
-    no_blog: "your site has no articles bringing in search traffic",
-    heavy_page: "your home page is heavy and likely slow",
-    few_reviews: "you have only a few Google reviews",
-  },
-  tr: {
-    no_website: "Google'da henüz bir web siteniz görünmüyor",
-    no_https: "siteniz güvenli bağlantı kullanmıyor",
-    not_mobile_friendly: "siteniz telefonda zor kullanılıyor gibi görünüyor",
-    no_analytics: "sitenizde ziyaretçi takibi göremedim",
-    no_meta_pixel: "reklamlar için Meta pixel göremedim",
-    no_meta_description: "Google'ın sitenizi anlatacak bir açıklaması yok",
-    no_schema:
-      "Google ve yapay zeka asistanları siteniz hakkında az bilgi alıyor",
-    no_blog: "sitenizde aramadan trafik getirecek yazılar yok",
-    heavy_page: "ana sayfanız ağır ve muhtemelen yavaş açılıyor",
-    few_reviews: "Google'da az yorumunuz var",
-  },
-};
 
 const FALLBACK_FIRST_LINE: Record<LeadEmailLanguage, string> = {
   en: "I took a quick look at your site and noticed a few things that could bring you more customers from Google and AI assistants.",
@@ -139,6 +110,7 @@ export function leadTemplateValues(
     website: string | null;
     domain: string | null;
     findings: LeadFindingCode[];
+    findingDetails?: Partial<Record<LeadFindingCode, string>>;
   },
   language: LeadEmailLanguage,
   reportUrl: string | null = null,
@@ -152,7 +124,14 @@ export function leadTemplateValues(
     name: lead.name,
     first_line: lead.firstLine ?? FALLBACK_FIRST_LINE[language],
     website: lead.domain ?? lead.website ?? "",
-    top_gap: topGap ? GAP_PHRASES[language][topGap] : "",
+    top_gap: topGap
+      ? findingPhrase(topGap, language, lead.findingDetails?.[topGap])
+      : "",
+    top_issues: findingBullets(
+      lead.findings.slice(0, 3),
+      language,
+      lead.findingDetails,
+    ),
   };
 }
 

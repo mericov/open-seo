@@ -165,3 +165,13 @@ export function categoriesForSearch(search: {
   );
   return group ? [...LEAD_CATEGORY_GROUPS[group]] : undefined;
 }
+
+export function categoryGroupOf(
+  category: string,
+): LeadCategoryGroupName | null {
+  return (
+    LEAD_CATEGORY_GROUP_NAMES.find((name) =>
+      LEAD_CATEGORY_GROUPS[name].includes(category),
+    ) ?? null
+  );
+}

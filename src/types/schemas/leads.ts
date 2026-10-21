@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  LEAD_FINDING_CODES,
   LEAD_NOTE_COLORS,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
@@ -85,6 +86,7 @@ export const listProjectLeadsSchema = z.object({
   hasEmail: z.boolean().optional(),
   minScore: z.number().int().min(0).max(100).optional(),
   dueBy: isoDate.optional(),
+  finding: z.enum(LEAD_FINDING_CODES).optional(),
   today: isoDate.optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(LEAD_LIST_MAX_PAGE_SIZE).default(50),
@@ -94,6 +96,13 @@ export const setLeadHiddenSchema = z.object({
   ...projectIdShape,
   leadIds: z.array(z.string().min(1)).min(1).max(LEAD_STATUS_MAX_IDS),
   hidden: z.boolean(),
+});
+
+export const LEAD_RESCAN_MAX_IDS = 2;
+
+export const rescanLeadsSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(LEAD_RESCAN_MAX_IDS),
 });
 
 export const setLeadNoteSchema = z.object({

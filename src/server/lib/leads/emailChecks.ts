@@ -146,23 +146,43 @@ export function pickPrimaryEmail(checks: EmailCheck[]): string | null {
   return best?.email ?? null;
 }
 
-async function lookupMx(domain: string): Promise<boolean | null> {
+export async function dohQuery(
+  name: string,
+  type: "MX" | "TXT",
+): Promise<{
+  status: number;
+  answers: { type: number; data: string }[];
+} | null> {
   try {
     const response = await fetch(
-      `${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=MX`,
+      `${DOH_ENDPOINT}?name=${encodeURIComponent(name)}&type=${type}`,
       {
         headers: { Accept: "application/dns-json" },
         signal: AbortSignal.timeout(2_500),
       },
     );
     if (!response.ok) return null;
-    const body: { Status?: number; Answer?: { type?: number }[] } =
-      await response.json();
-    // NXDOMAIN: the domain does not exist at all.
-    if (body.Status === 3) return false;
-    if (body.Status !== 0) return null;
-    return (body.Answer ?? []).some((answer) => answer.type === MX_RECORD_TYPE);
+    const body: {
+      Status?: number;
+      Answer?: { type?: number; data?: string }[];
+    } = await response.json();
+    return {
+      status: body.Status ?? -1,
+      answers: (body.Answer ?? []).map((answer) => ({
+        type: answer.type ?? 0,
+        data: answer.data ?? "",
+      })),
+    };
   } catch {
     return null;
   }
+}
+
+export async function lookupMx(domain: string): Promise<boolean | null> {
+  const result = await dohQuery(domain, "MX");
+  if (!result) return null;
+  // NXDOMAIN: the domain does not exist at all.
+  if (result.status === 3) return false;
+  if (result.status !== 0) return null;
+  return result.answers.some((answer) => answer.type === MX_RECORD_TYPE);
 }

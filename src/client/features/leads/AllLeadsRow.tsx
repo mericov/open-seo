@@ -6,10 +6,10 @@ import { Checkbox } from "@/client/components/ui/checkbox";
 import { FirstLineEditor } from "@/client/features/leads/FirstLineEditor";
 import { LeadNote } from "@/client/features/leads/LeadNote";
 import {
-  FindingChips,
   OutreachStatusMenu,
   ScoreBadge,
 } from "@/client/features/leads/leadBadges";
+import { LeadFindings } from "@/client/features/leads/LeadFindings";
 import type { ProjectLeadRow } from "@/client/features/leads/leadQueries";
 import { formatRelativeTime } from "@/client/lib/relative-time";
 import type { LeadOutreachStatus } from "@/shared/leadFindings";
@@ -73,7 +73,7 @@ export function AllLeadsRow({
         <ScoreBadge score={lead.opportunityScore} />
       </td>
       <td className="max-w-64 py-3.5 pr-4 align-top">
-        <FindingChips findings={lead.findings} />
+        <LeadFindings lead={lead} />
       </td>
       <td className="py-3.5 pr-4 align-top">
         {lead.primaryEmail ? (

@@ -32,6 +32,7 @@ beforeAll(async () => {
       ...migration("0061_lead_scans.sql"),
       ...migration("0062_lead_first_line.sql"),
       ...migration("0064_lead_notes_reports.sql"),
+      ...migration("0065_lead_findings_detail.sql"),
       `INSERT INTO lead_searches (id, project_id, label, source, category, location_label, latitude, longitude, radius_km, requested_limit)
         VALUES ('s1', 'p1', 'Florists', 'local', 'florist', 'Austin', 0, 0, 10, 10),
                ('s2', 'p1', 'Stores', 'shopify', 'shopify', '', 0, 0, 0, 10),
@@ -66,7 +67,7 @@ it("lists a project's leads by score with unscored last, and tracks outreach", a
   expect(all.leads[0]).toMatchObject({
     primaryEmail: "hi@high.test",
     searchLabel: "Stores",
-    findings: ["no_analytics", "no_blog"],
+    findings: ["no_blog", "no_analytics"],
   });
 
   await LeadOutreachService.setStatus("p1", ["c", "x"], "contacted");

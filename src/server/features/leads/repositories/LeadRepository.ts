@@ -8,7 +8,7 @@ import {
   leadSearches,
   projects,
 } from "@/db/schema";
-import type { LeadFindingCode } from "@/shared/leadFindings";
+import type { LeadFinding } from "@/shared/leadFindings";
 
 type SearchInsert = Omit<
   typeof leadSearches.$inferInsert,
@@ -156,19 +156,27 @@ async function listLeadCounts(projectId: string) {
     .where(eq(leads.projectId, projectId));
 }
 
+const enrichFields = {
+  id: leads.id,
+  name: leads.name,
+  website: leads.website,
+  domain: leads.domain,
+  category: leads.category,
+  countryCode: leads.countryCode,
+  rating: leads.rating,
+  reviewsCount: leads.reviewsCount,
+  isClaimed: leads.isClaimed,
+  photosCount: leads.photosCount,
+  hoursListed: leads.hoursListed,
+};
+
 async function listPendingLeads(
   projectId: string,
   searchId: string,
   limit: number,
 ) {
   return db
-    .select({
-      id: leads.id,
-      name: leads.name,
-      website: leads.website,
-      domain: leads.domain,
-      reviewsCount: leads.reviewsCount,
-    })
+    .select(enrichFields)
     .from(leads)
     .where(
       and(
@@ -179,6 +187,14 @@ async function listPendingLeads(
     )
     .orderBy(asc(leads.createdAt))
     .limit(limit);
+}
+
+async function listLeadsToRescan(projectId: string, leadIds: string[]) {
+  return db
+    .select({ ...enrichFields, source: leadSearches.source })
+    .from(leads)
+    .innerJoin(leadSearches, eq(leadSearches.id, leads.searchId))
+    .where(and(eq(leads.projectId, projectId), inArray(leads.id, leadIds)));
 }
 
 async function saveEnrichment(
@@ -202,7 +218,7 @@ async function saveEnrichment(
     >
   >,
   emails: EmailInsert[],
-  findings: LeadFindingCode[] = [],
+  findings: LeadFinding[] = [],
 ) {
   const now = new Date().toISOString();
   await runBatch((tx) => [
@@ -211,10 +227,16 @@ async function saveEnrichment(
       .set({ ...values, updatedAt: now })
       .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId))),
     tx.delete(leadFindings).where(eq(leadFindings.leadId, leadId)),
-    ...findings.map((code) =>
+    ...findings.map(({ code, detail }) =>
       tx
         .insert(leadFindings)
-        .values({ id: crypto.randomUUID(), leadId, code, createdAt: now })
+        .values({
+          id: crypto.randomUUID(),
+          leadId,
+          code,
+          detail: detail ?? null,
+          createdAt: now,
+        })
         .onConflictDoNothing(),
     ),
     ...emails.map((email) =>
@@ -330,6 +352,7 @@ export const LeadRepository = {
   listEmailsForSearch,
   listLeadCounts,
   listPendingLeads,
+  listLeadsToRescan,
   saveEnrichment,
   touchSearch,
   updateSearch,

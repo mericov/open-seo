@@ -84,6 +84,9 @@ export const leads = pgTable(
     domain: text("domain"),
     rating: real("rating"),
     reviewsCount: integer("reviews_count"),
+    isClaimed: boolean("is_claimed"),
+    photosCount: integer("photos_count"),
+    hoursListed: boolean("hours_listed"),
     mapsUrl: text("maps_url"),
     enrichmentStatus: text("enrichment_status", {
       enum: ["pending", "done", "failed", "no_website"],
@@ -161,6 +164,7 @@ export const leadFindings = pgTable(
       .notNull()
       .references(() => leads.id, { onDelete: "cascade" }),
     code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    detail: text("detail"),
     createdAt: text("created_at").notNull().default(isoNow),
   },
   (table) => [

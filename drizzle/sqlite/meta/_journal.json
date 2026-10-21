@@ -456,6 +456,13 @@
       "when": 1792599680052,
       "tag": "0064_lead_notes_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "6",
+      "when": 1792603945801,
+      "tag": "0065_lead_findings_detail",
+      "breakpoints": true
     }
   ]
 }

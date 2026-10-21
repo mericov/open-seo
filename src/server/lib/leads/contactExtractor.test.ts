@@ -7,9 +7,15 @@ let routes: Record<string, Route> = {};
 const fetchMock = vi.fn(async (input: string | URL) => {
   const url = String(input);
   if (url.startsWith("https://cloudflare-dns.com/")) {
+    const type = new URL(url).searchParams.get("type");
     return Response.json({
       Status: 0,
-      Answer: [{ type: 1, data: "93.184.216.34" }],
+      Answer:
+        type === "MX"
+          ? [{ type: 15, data: "10 mx.mail.test." }]
+          : type === "TXT"
+            ? []
+            : [{ type: 1, data: "93.184.216.34" }],
     });
   }
   const route = routes[url];
@@ -117,7 +123,7 @@ describe("findSiteContacts", () => {
       }),
       type: "application/json",
     };
-    routes["https://shop.test/products.json?limit=5"] = {
+    routes["https://shop.test/products.json?limit=25"] = {
       body: JSON.stringify({
         products: [
           { published_at: "2026-09-01T10:00:00Z" },
@@ -150,13 +156,66 @@ describe("findSiteContacts", () => {
       </head><body><a href="mailto:hi@gaps.test">mail</a></body></html>`,
     };
 
-    const result = await findSiteContacts("https://gaps.test/");
+    const codes = (await findSiteContacts("https://gaps.test/")).findings.map(
+      (finding) => finding.code,
+    );
 
-    expect(result.findings).toEqual([
-      "no_meta_pixel",
-      "no_meta_description",
-      "no_blog",
-    ]);
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "no_meta_pixel",
+        "no_meta_description",
+        "no_blog",
+        "no_spf",
+        "no_dmarc",
+      ]),
+    );
+    expect(codes).not.toContain("no_analytics");
+    expect(codes).not.toContain("not_mobile_friendly");
+  });
+
+  it("reads a store's robots.txt, theme, catalog and product data", async () => {
+    routes["https://store.test/"] = {
+      body: `<script>Shopify.theme = {"name":"Dawn copy","schema_name":"Dawn"};</script>
+        <a href="https://cdn.shopify.com">x</a>`,
+    };
+    routes["https://store.test/robots.txt"] = {
+      body: "User-agent: *\nDisallow: /cart\n\nUser-agent: GPTBot\nUser-agent: ClaudeBot\nDisallow: /",
+      type: "text/plain",
+    };
+    routes["https://store.test/products.json?limit=25"] = {
+      body: JSON.stringify({
+        products: Array.from({ length: 5 }, (_, index) => ({
+          handle: `candle-${index}`,
+          body_html: index < 3 ? "" : "<p>A long, hand-poured soy candle.</p>",
+          published_at: "2026-09-01T10:00:00Z",
+          images: [{}, {}],
+          variants: [{ available: index > 1 }],
+        })),
+      }),
+      type: "application/json",
+    };
+    routes["https://store.test/products/candle-0"] = {
+      body: `<script type="application/ld+json">${JSON.stringify({
+        "@type": "Product",
+        name: "Candle",
+        image: "https://store.test/c.jpg",
+        offers: { "@type": "Offer", price: "20.00" },
+      })}</script>`,
+    };
+
+    const result = await findSiteContacts("https://store.test/", {
+      shopify: true,
+    });
+
+    expect(result.findings).toEqual(
+      expect.arrayContaining([
+        { code: "ai_bots_blocked", detail: "GPTBot, ClaudeBot" },
+        { code: "stock_theme", detail: "Dawn" },
+        { code: "out_of_stock", detail: "40%" },
+        { code: "empty_descriptions", detail: "3/5" },
+        { code: "product_schema_gaps", detail: "availability, brand, GTIN" },
+      ]),
+    );
   });
 
   it("respects a robots.txt that disallows the site", async () => {

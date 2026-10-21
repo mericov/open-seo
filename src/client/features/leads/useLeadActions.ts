@@ -3,12 +3,15 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { leadsQueryKey } from "@/client/features/leads/leadQueries";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
+import { chunk } from "remeda";
 import {
   generateLeadFirstLines,
+  rescanLeads,
   setLeadHidden,
   setLeadStatus,
 } from "@/serverFunctions/leads";
 import type { LeadOutreachStatus } from "@/shared/leadFindings";
+import { LEAD_RESCAN_MAX_IDS } from "@/types/schemas/leads";
 
 export function useLeadActions(projectId: string, onDone: () => void) {
   const { t } = useTranslation("leads");
@@ -53,5 +56,30 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     onError: (error) => toast.error(getStandardErrorMessage(error)),
   });
 
-  return { status, lines, hide };
+  const rescan = useMutation({
+    mutationFn: async (leadIds: string[]) => {
+      const toastId = toast.loading(
+        t("rescan.progress", { done: 0, total: leadIds.length }),
+      );
+      let done = 0;
+      try {
+        for (const ids of chunk(leadIds, LEAD_RESCAN_MAX_IDS)) {
+          await rescanLeads({ data: { projectId, leadIds: ids } });
+          done += ids.length;
+          toast.loading(t("rescan.progress", { done, total: leadIds.length }), {
+            id: toastId,
+          });
+        }
+        toast.success(t("rescan.done", { count: done }), { id: toastId });
+      } catch (error) {
+        toast.error(`${t("rescan.failed")} ${getStandardErrorMessage(error)}`, {
+          id: toastId,
+        });
+      }
+      await refresh();
+    },
+    onSuccess: onDone,
+  });
+
+  return { status, lines, hide, rescan };
 }

@@ -17,6 +17,8 @@ const productsSchema = z.object({
   ),
 });
 
+export const SHOPIFY_PRODUCTS_PATH = "/products.json?limit=25";
+
 export type ShopifyStats = {
   name: string | null;
   countryCode: string | null;
@@ -32,7 +34,7 @@ export async function readShopifyStats(
   if (!meta.success) return null;
 
   const products = productsSchema.safeParse(
-    await fetchJson("/products.json?limit=5"),
+    await fetchJson(SHOPIFY_PRODUCTS_PATH),
   );
   const timestamps = products.success
     ? products.data.products

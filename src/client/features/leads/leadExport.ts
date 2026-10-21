@@ -115,7 +115,12 @@ export async function exportAllLeads(
       lead.noteText,
       lead.remindAt,
       lead.opportunityScore,
-      lead.findings.map((code) => t(`findings.${code}`)).join(", "),
+      lead.findings
+        .map((code) => {
+          const detail = lead.findingDetails[code];
+          return `${t(`findings.${code}`)}${detail ? ` (${detail})` : ""}`;
+        })
+        .join(", "),
       lead.primaryEmail,
       lead.phone,
       lead.website,

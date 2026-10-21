@@ -5,13 +5,15 @@ import { AppError } from "@/server/lib/errors";
 import { findSiteContacts } from "@/server/lib/leads/contactExtractor";
 import { checkEmails, pickPrimaryEmail } from "@/server/lib/leads/emailChecks";
 import { findPlaces } from "@/server/lib/leads/geocode";
+import { listingFindings } from "@/server/lib/leads/listingSignals";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
+import { leadEmailLanguage } from "@/shared/leadEmail";
 import { fetchAndSaveLocal } from "@/server/features/leads/services/leadSources";
 import {
   opportunityScore,
-  sortFindingsByWeight,
-  type LeadFindingCode,
+  findingsForLead,
+  type LeadFinding,
 } from "@/shared/leadFindings";
 import {
   categoriesForSearch,
@@ -28,7 +30,7 @@ import {
 // checks, home page, robots.txt, up to three contact pages, store stats, MX
 // lookups), so a small batch keeps every call well inside the Workers
 // subrequest budget.
-export const LEAD_ENRICH_BATCH_SIZE = 3;
+export const LEAD_ENRICH_BATCH_SIZE = 2;
 
 type StartLeadSearchInput = {
   projectId: string;
@@ -105,6 +107,92 @@ async function startSearch(
   };
 }
 
+type EnrichLead = Awaited<
+  ReturnType<typeof LeadRepository.listPendingLeads>
+>[number];
+
+async function enrichLead(
+  projectId: string,
+  lead: EnrichLead,
+  isStore: boolean,
+  knownEmails: string[],
+) {
+  const listing = isStore ? [] : listingFindings(lead);
+  if (!lead.website) {
+    const findings: LeadFinding[] = [{ code: "no_website" }, ...listing];
+    await LeadRepository.saveEnrichment(
+      projectId,
+      lead.id,
+      {
+        enrichmentStatus: "no_website",
+        opportunityScore: opportunityScore(findings.map((f) => f.code)),
+      },
+      [],
+      findings,
+    );
+    return;
+  }
+  const contacts = await findSiteContacts(lead.website, {
+    shopify: isStore,
+    category: lead.category,
+    countryCode: lead.countryCode,
+  });
+  const siteDomain = lead.domain?.replace(/^www\./, "") ?? null;
+  const emails = [...new Set([...knownEmails, ...contacts.emails])];
+  const checks = await checkEmails(emails, siteDomain);
+  const primary = pickPrimaryEmail(checks);
+  const store = contacts.shopify;
+  const freeContact =
+    checks.length > 0 && !checks.some((check) => check.onOwnDomain)
+      ? checks.find((check) => check.kind === "free_provider")
+      : undefined;
+  const findings: LeadFinding[] =
+    contacts.status === "done"
+      ? [
+          ...contacts.findings,
+          ...listing,
+          ...(freeContact
+            ? [
+                {
+                  code: "free_email_contact" as const,
+                  detail: freeContact.email.split("@")[1] ?? null,
+                },
+              ]
+            : []),
+        ]
+      : [];
+  await LeadRepository.saveEnrichment(
+    projectId,
+    lead.id,
+    {
+      enrichmentStatus: contacts.status,
+      opportunityScore:
+        contacts.status === "done"
+          ? opportunityScore(findings.map((f) => f.code))
+          : null,
+      contactPageUrl: contacts.contactPageUrl,
+      instagramUrl: contacts.instagramUrl,
+      facebookUrl: contacts.facebookUrl,
+      linkedinUrl: contacts.linkedinUrl,
+      whatsappUrl: contacts.whatsappUrl,
+      ...(store
+        ? {
+            name: store.name ?? lead.name,
+            productCount: store.productCount,
+            lastProductAt: store.lastProductAt,
+            currency: store.currency,
+            ...(store.countryCode ? { countryCode: store.countryCode } : {}),
+          }
+        : {}),
+    },
+    checks.map((check) => ({
+      ...check,
+      isPrimary: check.email === primary,
+    })),
+    findings,
+  );
+}
+
 async function enrichNextBatch(projectId: string, searchId: string) {
   const search = await requireSearch(projectId, searchId);
   const pending = await LeadRepository.listPendingLeads(
@@ -118,75 +206,16 @@ async function enrichNextBatch(projectId: string, searchId: string) {
     : [];
 
   await Promise.all(
-    pending.map(async (lead) => {
-      const reviewFindings: LeadFindingCode[] =
-        !isStoreSearch && lead.reviewsCount != null && lead.reviewsCount < 10
-          ? ["few_reviews"]
-          : [];
-      if (!lead.website) {
-        const findings: LeadFindingCode[] = ["no_website", ...reviewFindings];
-        await LeadRepository.saveEnrichment(
-          projectId,
-          lead.id,
-          {
-            enrichmentStatus: "no_website",
-            opportunityScore: opportunityScore(findings),
-          },
-          [],
-          findings,
-        );
-        return;
-      }
-      const contacts = await findSiteContacts(lead.website, {
-        shopify: isStoreSearch,
-      });
-      const siteDomain = lead.domain?.replace(/^www\./, "") ?? null;
-      const emails = [
-        ...new Set([
-          ...knownEmails
-            .filter((row) => row.leadId === lead.id)
-            .map((row) => row.email),
-          ...contacts.emails,
-        ]),
-      ];
-      const checks = await checkEmails(emails, siteDomain);
-      const primary = pickPrimaryEmail(checks);
-      const store = contacts.shopify;
-      const findings =
-        contacts.status === "done"
-          ? [...contacts.findings, ...reviewFindings]
-          : [];
-      await LeadRepository.saveEnrichment(
+    pending.map((lead) =>
+      enrichLead(
         projectId,
-        lead.id,
-        {
-          enrichmentStatus: contacts.status,
-          opportunityScore:
-            contacts.status === "done" ? opportunityScore(findings) : null,
-          contactPageUrl: contacts.contactPageUrl,
-          instagramUrl: contacts.instagramUrl,
-          facebookUrl: contacts.facebookUrl,
-          linkedinUrl: contacts.linkedinUrl,
-          whatsappUrl: contacts.whatsappUrl,
-          ...(store
-            ? {
-                name: store.name ?? lead.name,
-                productCount: store.productCount,
-                lastProductAt: store.lastProductAt,
-                currency: store.currency,
-                ...(store.countryCode
-                  ? { countryCode: store.countryCode }
-                  : {}),
-              }
-            : {}),
-        },
-        checks.map((check) => ({
-          ...check,
-          isPrimary: check.email === primary,
-        })),
-        findings,
-      );
-    }),
+        lead,
+        isStoreSearch,
+        knownEmails
+          .filter((row) => row.leadId === lead.id)
+          .map((row) => row.email),
+      ),
+    ),
   );
 
   if (pending.length > 0) await LeadRepository.touchSearch(projectId, searchId);
@@ -196,6 +225,29 @@ async function enrichNextBatch(projectId: string, searchId: string) {
     1000,
   );
   return { processed: pending.length, remaining: remaining.length };
+}
+
+async function rescanLeads(projectId: string, leadIds: string[]) {
+  const rows = await LeadRepository.listLeadsToRescan(
+    projectId,
+    leadIds.slice(0, LEAD_ENRICH_BATCH_SIZE),
+  );
+  const knownEmails = await LeadRepository.listEmailsForLeads(
+    rows.map((lead) => lead.id),
+  );
+  await Promise.all(
+    rows.map(({ source, ...lead }) =>
+      enrichLead(
+        projectId,
+        lead,
+        source === "shopify",
+        knownEmails
+          .filter((row) => row.leadId === lead.id)
+          .map((row) => row.email),
+      ),
+    ),
+  );
+  return { rescanned: rows.length };
 }
 
 async function listSearches(projectId: string) {
@@ -267,11 +319,12 @@ async function getSearchDetail(projectId: string, searchId: string) {
       currency: lead.currency,
       opportunityScore: lead.opportunityScore,
       outreachStatus: lead.outreachStatus,
-      findings: sortFindingsByWeight(
-        findingRows
-          .filter((row) => row.leadId === lead.id)
-          .map((row) => row.code),
-      ),
+      ...findingsForLead(findingRows, lead.id),
+      language: leadEmailLanguage({
+        countryCode: lead.countryCode,
+        domain: lead.domain,
+        locationLabel: search.locationLabel,
+      }),
       primaryEmail,
       emails: emails.map(({ email, checkStatus, kind, onOwnDomain }) => ({
         email,
@@ -356,4 +409,5 @@ export const LeadFinderService = {
   getSearchDetail,
   deleteSearch,
   retryFailed,
+  rescanLeads,
 };

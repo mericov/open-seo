@@ -18,6 +18,7 @@ import {
   saveLeadReportSchema,
   saveLeadTemplateSchema,
   listProjectLeadsSchema,
+  rescanLeadsSchema,
   setLeadHiddenSchema,
   setLeadNoteSchema,
   setLeadScheduleSchema,
@@ -125,6 +126,7 @@ export const listProjectLeads = createServerFn({ method: "POST" })
         hasEmail: data.hasEmail,
         minScore: data.minScore,
         dueBy: data.dueBy,
+        finding: data.finding,
         today: data.today,
       },
       { page: data.page, pageSize: data.pageSize },
@@ -218,6 +220,13 @@ export const setLeadHidden = createServerFn({ method: "POST" })
   .validator(setLeadHiddenSchema)
   .handler(async ({ data, context }) =>
     LeadOutreachService.setHidden(context.projectId, data.leadIds, data.hidden),
+  );
+
+export const rescanLeads = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(rescanLeadsSchema)
+  .handler(async ({ data, context }) =>
+    LeadFinderService.rescanLeads(context.projectId, data.leadIds),
   );
 
 export const setLeadNote = createServerFn({ method: "POST" })

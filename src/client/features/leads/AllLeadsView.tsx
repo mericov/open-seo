@@ -29,6 +29,7 @@ import {
 import { exportAllLeads } from "@/client/features/leads/leadExport";
 import type { ExportFormat } from "@/client/lib/exportRows";
 import {
+  LEAD_FINDING_CODES,
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
 } from "@/shared/leadFindings";
@@ -39,6 +40,8 @@ const PAGE_SIZE = 50;
 const SOURCES = ["any", "local", "shopify"] as const;
 const MIN_SCORES = ["any", "30", "50", "70"] as const;
 type StatusTab = LeadOutreachStatus | "all";
+const FINDING_FILTERS = ["any", ...LEAD_FINDING_CODES] as const;
+type FindingFilter = (typeof FINDING_FILTERS)[number];
 
 export function AllLeadsView({ projectId }: { projectId: string }) {
   const { t } = useTranslation("leads");
@@ -47,6 +50,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
   const [minScore, setMinScore] = useState<(typeof MIN_SCORES)[number]>("any");
   const [hasEmail, setHasEmail] = useState(false);
   const [dueOnly, setDueOnly] = useState(false);
+  const [finding, setFinding] = useState<FindingFilter>("any");
   const today = localToday();
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -57,6 +61,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     minScore: minScore === "any" ? undefined : Number(minScore),
     hasEmail: hasEmail || undefined,
     dueBy: dueOnly ? today : undefined,
+    finding: finding === "any" ? undefined : finding,
     today,
     page,
     pageSize: PAGE_SIZE,
@@ -138,6 +143,17 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
             }
             onChange={(value) => {
               setMinScore(value);
+              resetPaging();
+            }}
+          />
+          <FilterSelect
+            value={finding}
+            options={FINDING_FILTERS}
+            label={(value) =>
+              value === "any" ? t("all.findingAll") : t(`findings.${value}`)
+            }
+            onChange={(value) => {
+              setFinding(value);
               resetPaging();
             }}
           />
@@ -313,6 +329,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
 
       {selected.size > 0 ? (
         <BulkBar
+          rescanning={actions.rescan.isPending}
+          onRescan={() => actions.rescan.mutate([...selected])}
           hiding={actions.hide.isPending}
           onHide={() =>
             actions.hide.mutate({ leadIds: [...selected], hidden: true })

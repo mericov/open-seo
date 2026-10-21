@@ -88,6 +88,9 @@ export const leads = sqliteTable(
     domain: text("domain"),
     rating: real("rating"),
     reviewsCount: integer("reviews_count"),
+    isClaimed: integer("is_claimed", { mode: "boolean" }),
+    photosCount: integer("photos_count"),
+    hoursListed: integer("hours_listed", { mode: "boolean" }),
     mapsUrl: text("maps_url"),
     enrichmentStatus: text("enrichment_status", {
       enum: ["pending", "done", "failed", "no_website"],
@@ -175,6 +178,7 @@ export const leadFindings = sqliteTable(
       .notNull()
       .references(() => leads.id, { onDelete: "cascade" }),
     code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    detail: text("detail"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),

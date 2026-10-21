@@ -233,6 +233,14 @@ function toListing(row: Record<string, unknown>) {
     domain,
     rating: numberField(rating.value),
     reviewsCount: numberField(rating.votes_count),
+    isClaimed: typeof row.is_claimed === "boolean" ? row.is_claimed : null,
+    photosCount: numberField(row.total_photos),
+    hoursListed:
+      "work_time" in row
+        ? isRecord(row.work_time) &&
+          isRecord(row.work_time.work_hours) &&
+          isRecord(row.work_time.work_hours.timetable)
+        : null,
     mapsUrl:
       stringField(row.check_url) ??
       (cid ? `https://www.google.com/maps?cid=${cid}` : null),
