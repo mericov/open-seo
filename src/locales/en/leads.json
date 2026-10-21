@@ -256,5 +256,28 @@
     "save": "Save",
     "cancel": "Cancel",
     "send": "Email"
+  },
+  "hide": {
+    "action": "Hide",
+    "done": "{{count}} leads hidden. Searches won't add them again.",
+    "undo": "Undo"
+  },
+  "notes": {
+    "add": "Add note",
+    "title": "Note · {{name}}",
+    "placeholder": "Write a note…",
+    "remind": "Remind me on",
+    "clear": "Clear",
+    "save": "Save",
+    "due": "Reminders ({{count}})",
+    "colors": {
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue",
+      "purple": "Purple",
+      "gray": "Gray"
+    }
   }
 }

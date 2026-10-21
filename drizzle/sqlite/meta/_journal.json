@@ -449,6 +449,13 @@
       "when": 1792594909410,
       "tag": "0063_lead_email_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "6",
+      "when": 1792599680052,
+      "tag": "0064_lead_notes_reports",
+      "breakpoints": true
     }
   ]
 }

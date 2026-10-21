@@ -1,4 +1,4 @@
-import { ChevronDown, Mail, Sparkles, X } from "lucide-react";
+import { ChevronDown, EyeOff, Mail, Sparkles, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
 import {
@@ -25,6 +25,8 @@ export function BulkBar({
   pending,
   writingLines,
   onWriteLines,
+  hiding,
+  onHide,
   onStatus,
   onClear,
 }: {
@@ -32,6 +34,8 @@ export function BulkBar({
   pending: boolean;
   writingLines: boolean;
   onWriteLines: () => void;
+  hiding: boolean;
+  onHide: () => void;
   onStatus: (status: LeadOutreachStatus) => void;
   onClear: () => void;
 }) {
@@ -77,6 +81,16 @@ export function BulkBar({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+      <Button
+        size="sm"
+        variant="ghost"
+        className="rounded-full"
+        pending={hiding}
+        onClick={onHide}
+      >
+        <EyeOff data-icon="inline-start" />
+        {t("hide.action")}
+      </Button>
       <Button
         size="icon-sm"
         variant="ghost"

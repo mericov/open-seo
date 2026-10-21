@@ -31,6 +31,7 @@ beforeAll(async () => {
       ...migration("0060_lead_outreach.sql"),
       ...migration("0061_lead_scans.sql"),
       ...migration("0062_lead_first_line.sql"),
+      ...migration("0064_lead_notes_reports.sql"),
       `INSERT INTO lead_searches (id, project_id, label, source, category, location_label, latitude, longitude, radius_km, requested_limit)
         VALUES ('s1', 'p1', 'Florists', 'local', 'florist', 'Austin', 0, 0, 10, 10),
                ('s2', 'p1', 'Stores', 'shopify', 'shopify', '', 0, 0, 0, 10),
@@ -81,4 +82,28 @@ it("lists a project's leads by score with unscored last, and tracks outreach", a
 
   const other = await LeadOutreachService.listLeads("p2", {}, page);
   expect(other.leads[0].outreachStatus).toBe("new");
+});
+
+it("leaves hidden leads out and finds leads with a reminder due", async () => {
+  await LeadOutreachService.setNote("p1", "b", {
+    color: "red",
+    text: "Call back",
+    remindAt: "2026-10-01",
+  });
+  await LeadOutreachService.setHidden("p1", ["a"], true);
+
+  const due = await LeadOutreachService.listLeads(
+    "p1",
+    { dueBy: "2026-10-21", today: "2026-10-21" },
+    page,
+  );
+  expect(due.leads.map((lead) => lead.id)).toEqual(["b"]);
+  expect(due.leads[0]).toMatchObject({
+    noteColor: "red",
+    noteText: "Call back",
+  });
+  expect(due.counts.due).toBe(1);
+
+  const all = await LeadOutreachService.listLeads("p1", {}, page);
+  expect(all.leads.map((lead) => lead.id)).not.toContain("a");
 });

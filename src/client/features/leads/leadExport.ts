@@ -90,6 +90,8 @@ export async function exportAllLeads(
     headers: [
       "name",
       "first_line",
+      "note",
+      "reminder",
       "score",
       "gaps",
       "email",
@@ -110,6 +112,8 @@ export async function exportAllLeads(
     rows: all.leads.map((lead) => [
       lead.name,
       lead.firstLine,
+      lead.noteText,
+      lead.remindAt,
       lead.opportunityScore,
       lead.findings.map((code) => t(`findings.${code}`)).join(", "),
       lead.primaryEmail,

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { SafeExternalLink } from "@/client/components/SafeExternalLink";
 import { Checkbox } from "@/client/components/ui/checkbox";
 import { FirstLineEditor } from "@/client/features/leads/FirstLineEditor";
+import { LeadNote } from "@/client/features/leads/LeadNote";
 import {
   FindingChips,
   OutreachStatusMenu,
@@ -66,6 +67,7 @@ export function AllLeadsRow({
           leadId={lead.id}
           firstLine={lead.firstLine}
         />
+        <LeadNote projectId={projectId} lead={lead} />
       </td>
       <td className="py-3.5 pr-4 align-top">
         <ScoreBadge score={lead.opportunityScore} />

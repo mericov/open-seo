@@ -66,6 +66,12 @@ The checks read only the HTML the server returns, so a tag injected later by a s
 
 Every lead in a project, across all of its searches, appears in one list sorted by opportunity score, with unscored leads last. Each lead carries an outreach status: new, emailed, replied, not interested or client. Marking a lead as emailed records when it was first emailed. Because leads are deduplicated per project, a lead that was emailed or turned the offer down is never added again by a later search. Deleting a search deletes its leads and their statuses, and the confirmation says how many tracked leads that affects.
 
+## Hiding, notes and reminders
+
+Leads can be hidden from the outreach list in bulk. Hiding keeps the row, so the per-project deduplication still sees the business and no later search adds it again; it can be undone right after. Hidden leads are left out of the outreach list and of the search detail.
+
+Each lead can carry one note: a color dot, free text and an optional reminder date. The note shows under the lead's name in the list. Reminder dates are compared with the viewer's local date, and a reminders filter shows the leads whose date has come.
+
 ## First lines
 
 From the outreach list, the user can ask the app to write the first line of a cold email for up to fifty selected leads. Leads go to the project's configured OpenRouter model in batches of twenty-five, each with its name, kind of business, review count, product count and its gaps rewritten as plain facts. The line names one gap and what it costs the business, then offers a free short report of what could be improved; it avoids jargon, never asserts a gap as certain (the checks only see page code), and is written in Turkish for Turkish businesses and English otherwise. The model's spend is metered like other research. Lines are stored on the lead, editable in place, and included in exports.
@@ -76,7 +82,7 @@ Templates filled from the gaps would cost nothing, but they read the same across
 
 A project keeps its own email templates, each with a language (Turkish or English), a subject and a body. Templates use a few fields filled from the lead: its name, first line (or a general opener when it has none), website and its biggest gap phrased for the email's language. Two sample templates can be added and edited; they leave a placeholder for the sender's postal address, which US commercial email law requires.
 
-The email button on a lead with a reachable address picks the templates in the lead's language (Turkish for Turkish businesses), renders one and opens a ready-to-send draft, either in Gmail on the web or through a `mailto:` link in the viewer's mail app. The choice is a per-browser preference. The app never sends email itself, so messages go out from the user's own mailbox, and opening a draft marks a new lead as emailed.
+The email button on a lead with a reachable address picks the templates in the lead's language (Turkish for Turkish businesses), renders one and opens a ready-to-send draft, either in Gmail on the web, in one reusable popup window beside the list, or through a `mailto:` link in the viewer's mail app. The choice is a per-browser preference. The app never sends email itself, so messages go out from the user's own mailbox, and opening a draft marks a new lead as emailed.
 
 Sending directly through a mail provider's API would allow tracking and bulk sends, but it needs OAuth scopes to read and send mail, and bulk cold email from a primary domain hurts deliverability. Drafts keep the user in control of every message; bulk sending is better left to a dedicated tool fed by the export.
 

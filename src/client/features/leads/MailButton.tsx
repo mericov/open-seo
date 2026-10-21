@@ -50,7 +50,14 @@ export function MailButton({
       body: renderTemplate(template.body, values),
     });
     if (mailClient === "gmail") {
-      window.open(url, "_blank", "noopener");
+      const width = Math.min(760, window.screen.availWidth - 40);
+      const height = Math.min(860, window.screen.availHeight - 60);
+      const left = window.screenX + window.outerWidth - width - 20;
+      window.open(
+        url,
+        "mericseo-mail",
+        `popup,width=${width},height=${height},left=${Math.max(0, left)},top=${window.screenY + 40}`,
+      );
     } else {
       window.location.href = url;
     }

@@ -6,12 +6,14 @@ import {
   gte,
   inArray,
   isNotNull,
+  isNull,
+  lte,
   sql,
 } from "drizzle-orm";
 import { chunk } from "remeda";
 import { db } from "@/db";
 import { leadEmails, leadFindings, leads, leadSearches } from "@/db/schema";
-import type { LeadOutreachStatus } from "@/shared/leadFindings";
+import type { LeadNoteColor, LeadOutreachStatus } from "@/shared/leadFindings";
 
 const ID_CHUNK = 90;
 
@@ -21,6 +23,7 @@ export type LeadListFilters = {
   searchId?: string;
   hasEmail?: boolean;
   minScore?: number;
+  dueBy?: string;
 };
 
 function filterConditions(
@@ -29,6 +32,8 @@ function filterConditions(
 ) {
   return [
     eq(leads.projectId, projectId),
+    isNull(leads.hiddenAt),
+    filters.dueBy ? lte(leads.remindAt, filters.dueBy) : undefined,
     filters.source ? eq(leadSearches.source, filters.source) : undefined,
     filters.searchId ? eq(leads.searchId, filters.searchId) : undefined,
     filters.hasEmail ? isNotNull(leadEmails.email) : undefined,
@@ -77,6 +82,12 @@ async function listLeads(
         outreachStatus: leads.outreachStatus,
         contactedAt: leads.contactedAt,
         firstLine: leads.firstLine,
+        noteColor: leads.noteColor,
+        noteText: leads.noteText,
+        noteUpdatedAt: leads.noteUpdatedAt,
+        remindAt: leads.remindAt,
+        reportToken: leads.reportToken,
+        reportCreatedAt: leads.reportCreatedAt,
         createdAt: leads.createdAt,
         searchId: leads.searchId,
         searchLabel: leadSearches.label,
@@ -186,6 +197,56 @@ async function setFirstLine(
     .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
 }
 
+async function countDue(projectId: string, dueBy: string) {
+  const [row] = await db
+    .select({ total: count() })
+    .from(leads)
+    .where(
+      and(
+        eq(leads.projectId, projectId),
+        isNull(leads.hiddenAt),
+        lte(leads.remindAt, dueBy),
+      ),
+    );
+  return row?.total ?? 0;
+}
+
+async function setHidden(
+  projectId: string,
+  leadIds: string[],
+  hidden: boolean,
+) {
+  const now = new Date().toISOString();
+  for (const ids of chunk(leadIds, ID_CHUNK)) {
+    await db
+      .update(leads)
+      .set({ hiddenAt: hidden ? now : null, updatedAt: now })
+      .where(and(eq(leads.projectId, projectId), inArray(leads.id, ids)));
+  }
+}
+
+async function setNote(
+  projectId: string,
+  leadId: string,
+  note: {
+    color: LeadNoteColor | null;
+    text: string | null;
+    remindAt: string | null;
+  },
+) {
+  const now = new Date().toISOString();
+  await db
+    .update(leads)
+    .set({
+      noteColor: note.color,
+      noteText: note.text,
+      remindAt: note.remindAt,
+      noteUpdatedAt: note.color || note.text || note.remindAt ? now : null,
+      updatedAt: now,
+    })
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+}
+
 export const LeadListRepository = {
   listLeads,
   statusCounts,
@@ -193,4 +254,7 @@ export const LeadListRepository = {
   setOutreachStatus,
   listForFirstLines,
   setFirstLine,
+  countDue,
+  setHidden,
+  setNote,
 };

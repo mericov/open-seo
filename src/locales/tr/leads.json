@@ -256,5 +256,28 @@
     "save": "Kaydet",
     "cancel": "Vazgeç",
     "send": "Mail"
+  },
+  "hide": {
+    "action": "Gizle",
+    "done": "{{count}} lead gizlendi. Aramalar bunları bir daha eklemez.",
+    "undo": "Geri al"
+  },
+  "notes": {
+    "add": "Not ekle",
+    "title": "Not · {{name}}",
+    "placeholder": "Not yaz…",
+    "remind": "Hatırlatma tarihi",
+    "clear": "Temizle",
+    "save": "Kaydet",
+    "due": "Hatırlatmalar ({{count}})",
+    "colors": {
+      "red": "Kırmızı",
+      "orange": "Turuncu",
+      "yellow": "Sarı",
+      "green": "Yeşil",
+      "blue": "Mavi",
+      "purple": "Mor",
+      "gray": "Gri"
+    }
   }
 }

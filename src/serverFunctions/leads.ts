@@ -16,6 +16,8 @@ import {
   leadTemplateIdSchema,
   saveLeadTemplateSchema,
   listProjectLeadsSchema,
+  setLeadHiddenSchema,
+  setLeadNoteSchema,
   setLeadScheduleSchema,
   setLeadStatusSchema,
   listLeadSearchesSchema,
@@ -120,6 +122,8 @@ export const listProjectLeads = createServerFn({ method: "POST" })
         searchId: data.searchId,
         hasEmail: data.hasEmail,
         minScore: data.minScore,
+        dueBy: data.dueBy,
+        today: data.today,
       },
       { page: data.page, pageSize: data.pageSize },
     ),
@@ -205,4 +209,22 @@ export const deleteLeadTemplate = createServerFn({ method: "POST" })
   .validator(leadTemplateIdSchema)
   .handler(async ({ data, context }) =>
     LeadTemplateRepository.remove(context.projectId, data.templateId),
+  );
+
+export const setLeadHidden = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(setLeadHiddenSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.setHidden(context.projectId, data.leadIds, data.hidden),
+  );
+
+export const setLeadNote = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(setLeadNoteSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.setNote(context.projectId, data.leadId, {
+      color: data.color,
+      text: data.text,
+      remindAt: data.remindAt,
+    }),
   );

@@ -295,6 +295,13 @@
       "when": 1792594910899,
       "tag": "0041_lead_email_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1792599681562,
+      "tag": "0042_lead_notes_reports",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, Mail, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/client/components/EmptyState";
@@ -12,22 +12,21 @@ import { Checkbox } from "@/client/components/ui/checkbox";
 import { Switch } from "@/client/components/ui/switch";
 import { AllLeadsRow } from "@/client/features/leads/AllLeadsRow";
 import { LeadTemplatesSheet } from "@/client/features/leads/LeadTemplatesSheet";
+import { localToday } from "@/client/features/leads/LeadNote";
 import { MailButton } from "@/client/features/leads/MailButton";
+import { useLeadActions } from "@/client/features/leads/useLeadActions";
 import { useMailClient } from "@/client/features/leads/useMailClient";
 import {
   BulkBar,
   FilterSelect,
 } from "@/client/features/leads/AllLeadsControls";
 import {
-  leadsQueryKey,
   leadTemplatesOptions,
   projectLeadsOptions,
   type ProjectLeadFilters,
 } from "@/client/features/leads/leadQueries";
 import { exportAllLeads } from "@/client/features/leads/leadExport";
 import type { ExportFormat } from "@/client/lib/exportRows";
-import { getStandardErrorMessage } from "@/client/lib/error-messages";
-import { generateLeadFirstLines, setLeadStatus } from "@/serverFunctions/leads";
 import {
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
@@ -42,11 +41,12 @@ type StatusTab = LeadOutreachStatus | "all";
 
 export function AllLeadsView({ projectId }: { projectId: string }) {
   const { t } = useTranslation("leads");
-  const queryClient = useQueryClient();
   const [status, setStatus] = useState<StatusTab>("all");
   const [source, setSource] = useState<(typeof SOURCES)[number]>("any");
   const [minScore, setMinScore] = useState<(typeof MIN_SCORES)[number]>("any");
   const [hasEmail, setHasEmail] = useState(false);
+  const [dueOnly, setDueOnly] = useState(false);
+  const today = localToday();
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -55,6 +55,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     source: source === "any" ? undefined : source,
     minScore: minScore === "any" ? undefined : Number(minScore),
     hasEmail: hasEmail || undefined,
+    dueBy: dueOnly ? today : undefined,
+    today,
     page,
     pageSize: PAGE_SIZE,
   };
@@ -68,29 +70,9 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     setSelected(new Set());
   };
 
-  const statusMutation = useMutation({
-    mutationFn: (input: { leadIds: string[]; status: LeadOutreachStatus }) =>
-      setLeadStatus({ data: { projectId, ...input } }),
-    onSuccess: async (result) => {
-      toast.success(t("all.updated", { count: result.updated }));
-      setSelected(new Set());
-      await queryClient.invalidateQueries({
-        queryKey: leadsQueryKey(projectId),
-      });
-    },
-  });
-
-  const linesMutation = useMutation({
-    mutationFn: (leadIds: string[]) =>
-      generateLeadFirstLines({ data: { projectId, leadIds } }),
-    onSuccess: async (result) => {
-      toast.success(t("firstLine.written", { count: result.written }));
-      await queryClient.invalidateQueries({
-        queryKey: leadsQueryKey(projectId),
-      });
-    },
-    onError: (error) => toast.error(getStandardErrorMessage(error)),
-  });
+  const actions = useLeadActions(projectId, () => setSelected(new Set()));
+  const statusMutation = actions.status;
+  const linesMutation = actions.lines;
 
   const onExport = (format: ExportFormat) =>
     exportAllLeads(projectId, filters, format, t);
@@ -168,6 +150,21 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
             />
             {t("all.hasEmail")}
           </label>
+          <Button
+            size="sm"
+            variant={dueOnly ? "default" : "ghost"}
+            aria-pressed={dueOnly}
+            onClick={() => {
+              setDueOnly(!dueOnly);
+              resetPaging();
+            }}
+            className={cn(
+              !dueOnly && (data?.counts.due ?? 0) > 0 && "text-destructive",
+            )}
+          >
+            <Bell data-icon="inline-start" />
+            {t("notes.due", { count: data?.counts.due ?? 0 })}
+          </Button>
           <Button
             size="sm"
             variant="ghost"
@@ -312,6 +309,10 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
 
       {selected.size > 0 ? (
         <BulkBar
+          hiding={actions.hide.isPending}
+          onHide={() =>
+            actions.hide.mutate({ leadIds: [...selected], hidden: true })
+          }
           count={selected.size}
           pending={statusMutation.isPending}
           writingLines={linesMutation.isPending}

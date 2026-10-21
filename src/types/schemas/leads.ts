@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { LEAD_OUTREACH_STATUSES } from "@/shared/leadFindings";
+import {
+  LEAD_NOTE_COLORS,
+  LEAD_OUTREACH_STATUSES,
+} from "@/shared/leadFindings";
 import {
   LEAD_CATEGORY_GROUP_KEYS,
   LEAD_NEED_FILTERS,
@@ -69,6 +72,8 @@ export const importStoresSchema = z.object({
   domains: z.string().trim().min(3).max(20_000),
 });
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
 export const LEAD_LIST_MAX_PAGE_SIZE = 2000;
 export const LEAD_STATUS_MAX_IDS = 500;
 
@@ -79,8 +84,24 @@ export const listProjectLeadsSchema = z.object({
   searchId: z.string().min(1).optional(),
   hasEmail: z.boolean().optional(),
   minScore: z.number().int().min(0).max(100).optional(),
+  dueBy: isoDate.optional(),
+  today: isoDate.optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(LEAD_LIST_MAX_PAGE_SIZE).default(50),
+});
+
+export const setLeadHiddenSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(LEAD_STATUS_MAX_IDS),
+  hidden: z.boolean(),
+});
+
+export const setLeadNoteSchema = z.object({
+  ...projectIdShape,
+  leadId: z.string().min(1),
+  color: z.enum(LEAD_NOTE_COLORS).nullable(),
+  text: z.string().max(2000),
+  remindAt: isoDate.nullable(),
 });
 
 export const setLeadStatusSchema = z.object({

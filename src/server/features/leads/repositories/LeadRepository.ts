@@ -115,7 +115,13 @@ async function listLeads(projectId: string, searchId: string) {
   return db
     .select()
     .from(leads)
-    .where(and(eq(leads.projectId, projectId), eq(leads.searchId, searchId)))
+    .where(
+      and(
+        eq(leads.projectId, projectId),
+        eq(leads.searchId, searchId),
+        isNull(leads.hiddenAt),
+      ),
+    )
     .orderBy(asc(leads.createdAt), asc(leads.name));
 }
 

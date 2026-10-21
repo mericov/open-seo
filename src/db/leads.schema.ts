@@ -10,6 +10,7 @@ import { sql } from "drizzle-orm";
 import { projects } from "./app.schema";
 import {
   LEAD_FINDING_CODES,
+  LEAD_NOTE_COLORS,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
 import { LEAD_NEED_FILTERS } from "@/shared/leadScan";
@@ -109,6 +110,13 @@ export const leads = sqliteTable(
       .default("new"),
     contactedAt: text("contacted_at"),
     firstLine: text("first_line"),
+    hiddenAt: text("hidden_at"),
+    noteColor: text("note_color", { enum: LEAD_NOTE_COLORS }),
+    noteText: text("note_text"),
+    noteUpdatedAt: text("note_updated_at"),
+    remindAt: text("remind_at"),
+    reportToken: text("report_token"),
+    reportCreatedAt: text("report_created_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -126,6 +134,7 @@ export const leads = sqliteTable(
       table.projectId,
       table.outreachStatus,
     ),
+    uniqueIndex("leads_report_token_unique").on(table.reportToken),
   ],
 );
 

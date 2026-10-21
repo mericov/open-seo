@@ -23,6 +23,18 @@ export const LEAD_OUTREACH_STATUSES = [
   "client",
 ] as const;
 
+export const LEAD_NOTE_COLORS = [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "gray",
+] as const;
+
+export type LeadNoteColor = (typeof LEAD_NOTE_COLORS)[number];
+
 export type LeadOutreachStatus = (typeof LEAD_OUTREACH_STATUSES)[number];
 
 const FINDING_WEIGHTS: Record<LeadFindingCode, number> = {
