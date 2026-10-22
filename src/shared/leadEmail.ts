@@ -22,15 +22,15 @@ const REPORT_OFFER: Record<
 > = {
   en: {
     ready: (link) =>
-      `I put together a short audit of your site, free and with no call needed: ${link}`,
+      `The full audit is here, with what each issue costs you and what changes once it's fixed: ${link}`,
     later:
-      "If you'd like, I can send you a short report this week showing what you could improve. It's free and there's no call needed.",
+      "I can send you the full audit this week, with what each issue costs you and what changes once it's fixed. No charge, no call needed.",
   },
   tr: {
     ready: (link) =>
-      `Siteniz için kısa bir ön denetim raporu hazırladım, ücretsiz ve görüşme gerektirmiyor: ${link}`,
+      `Raporun tamamı burada; her sorunun size neye mal olduğunu ve çözülünce ne değişeceğini görebilirsiniz: ${link}`,
     later:
-      "İsterseniz neleri iyileştirebileceğinizi gösteren kısa raporu bu hafta gönderebilirim. Ücretsiz ve görüşme gerektirmiyor.",
+      "İsterseniz raporun tamamını bu hafta gönderebilirim; her sorunun neye mal olduğunu ve çözülünce ne değişeceğini gösteriyor. Ücretsiz, görüşme gerektirmiyor.",
   },
 };
 
@@ -48,20 +48,23 @@ export const SAMPLE_TEMPLATES: {
   body: string;
 }[] = [
   {
-    name: "Ücretsiz rapor (TR)",
+    name: "Ücretsiz ön denetim (TR)",
     language: "tr",
-    subject: "{{name}} için kısa bir fikir",
+    subject: "{{website}} için kısa bir ön denetim",
     body: [
       "Merhaba {{name}} ekibi,",
       "",
       "{{first_line}}",
       "",
-      "Ben Meriç; işletmelerin Google'da ve ChatGPT gibi yapay zeka asistanlarında daha kolay bulunmasına yardımcı oluyorum.",
+      "{{website}} için kısa bir ön denetim yaptım. Öne çıkan üç şey:",
+      "{{top_issues}}",
       "",
       "{{report_offer}}",
       "",
+      "Takıldığınız bir madde olursa anlatırım; kendiniz uğraşmak istemezseniz sizin için çözebilirim de. 10 yılı aşkın süredir dijital pazarlama ve Shopify üzerine çalışıyorum.",
+      "",
       "Sevgiler,",
-      "Meriç",
+      "Meriç Özyön",
       "mericozyon.com",
       "",
       "[Şirket adresin]",
@@ -69,21 +72,24 @@ export const SAMPLE_TEMPLATES: {
     ].join("\n"),
   },
   {
-    name: "Free report (EN)",
+    name: "Free audit (EN)",
     language: "en",
-    subject: "Quick idea for {{name}}",
+    subject: "a few things I noticed on {{website}}",
     body: [
       "Hi {{name}} team,",
       "",
       "{{first_line}}",
       "",
-      "I'm Meriç, and I help businesses get found on Google and in AI assistants like ChatGPT.",
+      "I ran a quick audit of {{website}}. Three things stood out:",
+      "{{top_issues}}",
       "",
       "{{report_offer}}",
       "",
+      "Happy to walk you through any of it, or fix it for you if you'd rather hand it off. I've spent 10+ years in marketing and the last six building and growing Shopify stores.",
+      "",
       "Best,",
-      "Meriç",
-      "mericozyon.com",
+      "Meric Ozyon",
+      "mericozyon.com/en",
       "",
       "[Your business address]",
       "If you'd rather not hear from me, just reply \"no\" and I won't email again.",

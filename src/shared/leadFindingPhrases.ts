@@ -62,7 +62,7 @@ const EN: Phrases = {
   no_consent_banner:
     "I couldn't see a cookie consent banner, which Google Ads needs in Europe",
   no_email_marketing:
-    "I couldn't see an email marketing tool like Klaviyo, so automatic emails such as cart reminders are likely missing",
+    "I couldn't find an email signup form on your site, so first-time visitors who don't buy are hard to win back",
   mailchimp_store:
     "your store uses Mailchimp, which does less for online stores than tools like Klaviyo",
   no_spf: "your domain has no SPF record, so your emails can land in spam",
@@ -151,7 +151,7 @@ const TR: Phrases = {
   no_consent_banner:
     "Avrupa'da Google Ads için gereken çerez onay penceresini göremedim",
   no_email_marketing:
-    "Klaviyo gibi bir e-posta pazarlama aracı göremedim, sepet hatırlatma gibi otomatik mailler muhtemelen yok",
+    "sitenizde e-posta kayıt formu göremedim; ilk kez gelip almayan ziyaretçiye tekrar ulaşmak zor",
   mailchimp_store:
     "mağazanız Mailchimp kullanıyor, Klaviyo gibi araçlar e-ticaret için çok daha fazlasını yapıyor",
   no_spf: "alan adınızda SPF kaydı yok, mailleriniz spam'e düşebilir",

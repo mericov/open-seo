@@ -17,7 +17,9 @@ const HEATMAP =
 const CONSENT =
   /cookiebot|onetrust|cookielaw\.org|cookieyes|iubenda|usercentrics|termly|complianz|cookie-law-info|cookie-notice|osano|didomi|consentmanager|klaro|privacy-banner|trackingconsent|cookie-?consent|cookie-?banner|gdpr/i;
 const EMAIL_TOOLS =
-  /klaviyo|omnisend|widget\.privy\.com|privy\.com|sendinblue|brevo|mailerlite|getdrip|attn\.tv|attentivemobile|convertkit|activecampaign|hsforms|hs-scripts|mailjet|getresponse|constantcontact|ctctcdn|shopify-forms|forms\.shopifyapps|seguno|postscript/i;
+  /klaviyo|omnisend|widget\.privy\.com|privy\.com|sendinblue|brevo|mailerlite|getdrip|attn\.tv|attentivemobile|convertkit|activecampaign|hsforms|hs-scripts|mailjet|getresponse|constantcontact|ctctcdn|shopify-forms|forms\.shopifyapps|seguno|postscript|justuno|wisepops|optimonk|smsbump|sendlane|emarsys|bluecore|listrak|dotdigital|cordial\.io|iterable|moosend|flodesk|aweber|beehiiv|tinyalbert|shopify-email|retention\.com/i;
+const EMAIL_FORM =
+  /name\s*=\s*["']contact\[email\]["']|<form\b[^>]*(?:newsletter|subscribe)[^>]*>|class\s*=\s*["'][^"']*newsletter/i;
 const MAILCHIMP = /chimpstatic\.com|list-manage\.com|mailchimp/i;
 const REVIEW_APPS =
   /judge\.me|judgeme|yotpo|loox|okendo|stamped\.io|reviews\.io|trustpilot|junip|rivyo|air-reviews|growave|opinew|ali-reviews|spr-badge|shopify-product-reviews|feefo|trustindex|kudobuzz|woocommerce-product-rating|star-rating/i;
@@ -126,7 +128,8 @@ export function detectMarketingFindings(input: {
 
   if (input.store) {
     if (!EMAIL_TOOLS.test(html)) {
-      add(MAILCHIMP.test(html) ? "mailchimp_store" : "no_email_marketing");
+      if (MAILCHIMP.test(html)) add("mailchimp_store");
+      else if (!EMAIL_FORM.test(html)) add("no_email_marketing");
     }
     if (!REVIEW_APPS.test(all)) add("no_reviews_app");
   }

@@ -152,6 +152,24 @@ async function hasSitemap(origin: string, listed: boolean) {
   );
 }
 
+function sitemapLocs(xml: string) {
+  return [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map((match) =>
+    match[1].replace(/&amp;/g, "&"),
+  );
+}
+
+async function sitemapPaths(origin: string, kind: string) {
+  const root = await fetchText(`${origin}/sitemap.xml`);
+  if (!root || root.status !== 200) return [];
+  const children = sitemapLocs(root.body).filter((loc) => loc.includes(kind));
+  const bodies = await Promise.all(
+    children.slice(0, 2).map((loc) => fetchText(loc)),
+  );
+  return bodies
+    .flatMap((child) => (child?.status === 200 ? sitemapLocs(child.body) : []))
+    .map((loc) => URL.parse(loc)?.pathname.toLowerCase() ?? "");
+}
+
 async function hasLlmsTxt(origin: string) {
   const response = await fetchText(`${origin}/llms.txt`);
   if (!response) return null;
@@ -209,14 +227,23 @@ export async function auditSite(input: {
     ? allowed(productUrlFrom(catalog, page, home.finalUrl))
     : null;
 
-  const [sitemap, llms, https, blog, product, mail] = await Promise.all([
-    hasSitemap(url.origin, robots.sitemapUrls.length > 0),
-    hasLlmsTxt(url.origin),
-    redirectsToHttps(url),
-    blogUrl ? fetchBody(blogUrl, "html") : null,
-    productUrl ? fetchBody(productUrl, "html") : null,
-    mailRecords(url.hostname),
-  ]);
+  const [sitemap, llms, https, blog, product, mail, blogPaths, pagePaths] =
+    await Promise.all([
+      hasSitemap(url.origin, robots.sitemapUrls.length > 0),
+      hasLlmsTxt(url.origin),
+      redirectsToHttps(url),
+      blogUrl ? fetchBody(blogUrl, "html") : null,
+      productUrl ? fetchBody(productUrl, "html") : null,
+      mailRecords(url.hostname),
+      blogUrl ? [] : sitemapPaths(url.origin, "blogs"),
+      sitemapPaths(url.origin, "pages"),
+    ]);
+  const hasArticles = blogPaths.some((path) =>
+    /\/blogs\/[^/]+\/[^/]+/.test(path),
+  );
+  const hasAboutPage = pagePaths.some((path) =>
+    /about|hakkimizda|our-story|hikayemiz|who-we-are|biz-kimiz/.test(path),
+  );
 
   const findings: LeadFinding[] = [
     ...detectPageFindings({
@@ -263,7 +290,10 @@ export async function auditSite(input: {
   const reviewedProduct = product && /aggregateRating/i.test(product.body);
   return uniqueBy(
     findings.filter(
-      (finding) => !(reviewedProduct && finding.code === "no_review_schema"),
+      (finding) =>
+        !(reviewedProduct && finding.code === "no_review_schema") &&
+        !(hasArticles && finding.code === "no_blog") &&
+        !(hasAboutPage && finding.code === "no_about_page"),
     ),
     (finding) => finding.code,
   );
