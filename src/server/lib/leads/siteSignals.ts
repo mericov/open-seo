@@ -175,7 +175,10 @@ function detectGeoAndTrust(input: PageInput): LeadFinding[] {
   }
   if (!page.hasFavicon) add("no_favicon");
 
-  if (!anyLink(SOCIAL_PATTERN)) add("no_social_links");
+  const socialSameAs = nodes.some((node) =>
+    SOCIAL_PATTERN.test(JSON.stringify(node.sameAs ?? "")),
+  );
+  if (!anyLink(SOCIAL_PATTERN) && !socialSameAs) add("no_social_links");
   if (!anyLink(ABOUT_PATTERN)) add("no_about_page");
   if (!anyLink(PRIVACY_PATTERN)) add("no_privacy_policy");
   if (input.store && !anyLink(REFUND_PATTERN)) add("no_refund_policy");

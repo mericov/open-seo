@@ -16,6 +16,8 @@ const HEATMAP =
   /clarity\.ms|hotjar|luckyorange|mouseflow|fullstory|smartlook|crazyegg|contentsquare/i;
 const CONSENT =
   /cookiebot|onetrust|cookielaw\.org|cookieyes|iubenda|usercentrics|termly|complianz|cookie-law-info|cookie-notice|osano|didomi|consentmanager|klaro|privacy-banner|trackingconsent|cookie-?consent|cookie-?banner|gdpr/i;
+const CONSENT_MANAGER =
+  /cookiebot|onetrust|cookielaw\.org|cookieyes|iubenda|usercentrics|termly|complianz|osano|didomi|consentmanager|klaro|shopify-pc__banner|pandectes|consentmo|axeptio|sirdata|quantcast|trustarc/i;
 const EMAIL_TOOLS =
   /klaviyo|omnisend|widget\.privy\.com|privy\.com|sendinblue|brevo|mailerlite|getdrip|attn\.tv|attentivemobile|convertkit|activecampaign|hsforms|hs-scripts|mailjet|getresponse|constantcontact|ctctcdn|shopify-forms|forms\.shopifyapps|seguno|postscript|justuno|wisepops|optimonk|smsbump|sendlane|emarsys|bluecore|listrak|dotdigital|cordial\.io|iterable|moosend|flodesk|aweber|beehiiv|tinyalbert|shopify-email|retention\.com/i;
 const EMAIL_FORM =
@@ -116,14 +118,17 @@ export function detectMarketingFindings(input: {
   const add = (code: LeadFinding["code"], detail?: string | null) =>
     findings.push({ code, detail: detail ?? null });
 
-  if (!MODERN_ANALYTICS.test(html)) {
-    add(LEGACY_ANALYTICS.test(html) ? "legacy_analytics" : "no_analytics");
+  const gated = CONSENT_MANAGER.test(html);
+  if (LEGACY_ANALYTICS.test(html) && !MODERN_ANALYTICS.test(html)) {
+    add("legacy_analytics");
+  } else if (!gated && !MODERN_ANALYTICS.test(html)) add("no_analytics");
+  if (!gated) {
+    if (!META_PIXEL.test(html)) add("no_meta_pixel");
+    if (!GOOGLE_ADS.test(html)) add("no_google_ads_tag");
+    if (input.store && !TIKTOK_PIXEL.test(html)) add("no_tiktok_pixel");
+    if (input.store && !PINTEREST_TAG.test(html)) add("no_pinterest_tag");
+    if (!HEATMAP.test(html)) add("no_heatmap");
   }
-  if (!META_PIXEL.test(html)) add("no_meta_pixel");
-  if (!GOOGLE_ADS.test(html)) add("no_google_ads_tag");
-  if (input.store && !TIKTOK_PIXEL.test(html)) add("no_tiktok_pixel");
-  if (input.store && !PINTEREST_TAG.test(html)) add("no_pinterest_tag");
-  if (!HEATMAP.test(html)) add("no_heatmap");
   if (input.market.eu && !CONSENT.test(html)) add("no_consent_banner");
 
   if (input.store) {

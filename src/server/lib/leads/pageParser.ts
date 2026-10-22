@@ -35,6 +35,8 @@ const JUNK_LOCAL_PARTS = new Set([
 ]);
 const ASSET_EXTENSION = /\.(png|jpe?g|gif|svg|webp|avif|css|js|ico)$/i;
 const HIDDEN_TEXT_TAGS = new Set(["script", "style", "noscript", "template"]);
+const OVERLAY_CLASS =
+  /\b[\w-]*(modal|drawer|quick-add|predictive-search|popup)[\w-]*\b/i;
 
 export type ParsedPage = {
   lang: string | null;
@@ -78,6 +80,8 @@ export function parseHtml(html: string): ParsedPage {
   let titleText: string | null = null;
   let hiddenDepth = 0;
   let svgDepth = 0;
+  const overlayStack: boolean[] = [];
+  let overlayDepth = 0;
   const textChunks: string[] = [];
   const visibleChunks: string[] = [];
 
@@ -90,7 +94,16 @@ export function parseHtml(html: string): ParsedPage {
         if (name === "title" && page.title === null && svgDepth === 0) {
           titleText = "";
         }
-        if (name === "h1") page.h1Count++;
+        const overlay =
+          name === "dialog" ||
+          "hidden" in attrs ||
+          attrs["aria-hidden"] === "true" ||
+          OVERLAY_CLASS.test(`${name} ${attrs.class ?? ""}`);
+        overlayStack.push(overlay);
+        if (overlay) overlayDepth++;
+        if (name === "h1" && hiddenDepth === 0 && overlayDepth === 0) {
+          page.h1Count++;
+        }
         if (name === "img") readImage(page, attrs);
         if (name === "meta") readMeta(page, attrs);
         if (name === "link") readLink(page, attrs);
@@ -116,6 +129,7 @@ export function parseHtml(html: string): ParsedPage {
         if (openAnchor) openAnchor.text += text;
       },
       onclosetag(name) {
+        if (overlayStack.pop()) overlayDepth--;
         if (HIDDEN_TEXT_TAGS.has(name) && hiddenDepth > 0) hiddenDepth--;
         if (name === "svg" && svgDepth > 0) svgDepth--;
         if (name === "title" && titleText !== null) {
