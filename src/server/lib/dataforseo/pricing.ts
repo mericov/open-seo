@@ -11,9 +11,11 @@ import {
   fetchBacklinksHistory,
   fetchBacklinksRows,
   fetchBacklinksSummary,
+  fetchDomainIntersection,
   fetchDomainPagesSummary,
   fetchReferringDomains,
 } from "@/server/lib/dataforseo/backlinks";
+import { fetchBulkTrafficEstimation } from "@/server/lib/dataforseo/traffic";
 import {
   fetchDomainRankOverview,
   fetchKeywordIdeas,
@@ -32,6 +34,7 @@ import {
   clampSerpDepth,
   fetchLiveSerp,
   fetchLocalSerp,
+  fetchNewsSerp,
   fetchRankCheckSerp,
   postLocalSerpTasks,
   postRankCheckTasks,
@@ -238,6 +241,9 @@ export const dataforseoPricing = {
     history: priced(fetchBacklinksHistory, (input) =>
       backlinksUsd(daysInclusive(input.dateFrom, input.dateTo)),
     ),
+    domainIntersection: priced(fetchDomainIntersection, (input) =>
+      backlinksUsd(input.limit),
+    ),
   },
   keywords: {
     related: priced(fetchRelatedKeywords, (input) =>
@@ -257,6 +263,9 @@ export const dataforseoPricing = {
   },
   domain: {
     rankOverview: priced(fetchDomainRankOverview, () => labsUsd(1)),
+    bulkTraffic: priced(fetchBulkTrafficEstimation, (input) =>
+      labsUsd(input.targets.length),
+    ),
     rankedKeywords: priced(fetchRankedKeywords, (input) =>
       labsUsd(input.limit),
     ),
@@ -269,6 +278,9 @@ export const dataforseoPricing = {
         "live",
         input.keyword,
       ),
+    ),
+    news: priced(fetchNewsSerp, (input) =>
+      serpUsd(clampSerpDepth(input.depth), "live", input.keyword),
     ),
     rankCheck: priced(fetchRankCheckSerp, (input) =>
       serpUsd(clampSerpDepth(input.depth), "live", input.keyword),

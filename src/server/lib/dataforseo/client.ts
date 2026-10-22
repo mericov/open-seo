@@ -27,9 +27,11 @@ import {
   fetchBacklinksHistory,
   fetchBacklinksRows,
   fetchBacklinksSummary,
+  fetchDomainIntersection,
   fetchDomainPagesSummary,
   fetchReferringDomains,
 } from "@/server/lib/dataforseo/backlinks";
+import { fetchBulkTrafficEstimation } from "@/server/lib/dataforseo/traffic";
 import {
   fetchDomainRankOverview,
   fetchKeywordIdeas,
@@ -47,6 +49,7 @@ import {
 import {
   fetchLiveSerp,
   fetchLocalSerp,
+  fetchNewsSerp,
   fetchRankCheckSerp,
   postLocalSerpTasks,
   postRankCheckTasks,
@@ -168,6 +171,11 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         fetchBacklinksHistory,
         dataforseoPricing.backlinks.history,
       ),
+      domainIntersection: meter(
+        customer,
+        fetchDomainIntersection,
+        dataforseoPricing.backlinks.domainIntersection,
+      ),
     },
     keywords: {
       related: meter(
@@ -213,9 +221,16 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         fetchRelevantPages,
         dataforseoPricing.domain.relevantPages,
       ),
+      bulkTraffic: meter(
+        customer,
+        fetchBulkTrafficEstimation,
+        dataforseoPricing.domain.bulkTraffic,
+        "domain_overview",
+      ),
     },
     serp: {
       live: meter(customer, fetchLiveSerp, dataforseoPricing.serp.live),
+      news: meter(customer, fetchNewsSerp, dataforseoPricing.serp.news),
       // A rank check batch shares one credit hold and one settle across its
       // live calls (see meterDataforseoCalls). Resolves per call, in order.
       rankCheckBatch: (inputs: Parameters<typeof fetchRankCheckSerp>[0][]) =>

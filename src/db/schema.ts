@@ -12,6 +12,7 @@ import * as sqliteGsc from "./gsc.schema";
 import * as sqliteTelemetry from "./telemetry.schema";
 import * as sqliteAiVisibility from "./ai-visibility.schema";
 import * as sqliteLeads from "./leads.schema";
+import * as sqliteDigitalPr from "./digital-pr.schema";
 import * as pgApp from "./pg/app.schema";
 import * as pgProjectContext from "./pg/project-context.schema";
 import * as pgReports from "./pg/reports.schema";
@@ -25,6 +26,7 @@ import * as pgGsc from "./pg/gsc.schema";
 import * as pgTelemetry from "./pg/telemetry.schema";
 import * as pgAiVisibility from "./pg/ai-visibility.schema";
 import * as pgLeads from "./pg/leads.schema";
+import * as pgDigitalPr from "./pg/digital-pr.schema";
 
 // Canonical schema barrel. Repositories import their tables from here and the
 // provider-aware `db` from "@/db", so each repository is written ONCE for both
@@ -48,7 +50,8 @@ type AppSchema = typeof sqliteApp &
   typeof sqliteGsc &
   typeof sqliteTelemetry &
   typeof sqliteAiVisibility &
-  typeof sqliteLeads;
+  typeof sqliteLeads &
+  typeof sqliteDigitalPr;
 
 const runtimeSchema =
   getDatabaseProvider() === "postgres"
@@ -66,6 +69,7 @@ const runtimeSchema =
         ...pgTelemetry,
         ...pgAiVisibility,
         ...pgLeads,
+        ...pgDigitalPr,
       }
     : {
         ...sqliteApp,
@@ -81,6 +85,7 @@ const runtimeSchema =
         ...sqliteTelemetry,
         ...sqliteAiVisibility,
         ...sqliteLeads,
+        ...sqliteDigitalPr,
       };
 
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- guarded by schema-parity.test.ts
@@ -139,4 +144,17 @@ export const {
   leadEmails,
   leadFindings,
   leadEmailTemplates,
+  mediaTopics,
+  mediaScanSettings,
+  mediaScanRuns,
+  mediaOutlets,
+  mediaOutletTopics,
+  mediaContacts,
+  mediaArticles,
+  prTargets,
+  prEmailTemplates,
+  prGapRuns,
+  prGapCompetitors,
+  prGapDomains,
+  prGapDomainHits,
 } = schema;

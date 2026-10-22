@@ -347,3 +347,62 @@ export type BacklinksItem = z.infer<typeof backlinksItemSchema>;
 export type ReferringDomainItem = z.infer<typeof referringDomainItemSchema>;
 export type DomainPageSummaryItem = z.infer<typeof domainPageSummaryItemSchema>;
 export type BacklinksHistoryItem = z.infer<typeof backlinksHistoryItemSchema>;
+
+const domainIntersectionTargetSchema = z
+  .object({
+    target: z.string().nullable().optional(),
+    rank: z.number().nullable().optional(),
+    backlinks: z.number().nullable().optional(),
+    first_seen: z.string().nullable().optional(),
+    backlinks_spam_score: z.number().nullable().optional(),
+  })
+  .passthrough();
+
+const domainIntersectionItemSchema = z
+  .object({
+    domain_intersection: z
+      .record(z.string(), domainIntersectionTargetSchema.nullable())
+      .nullable()
+      .optional(),
+  })
+  .passthrough();
+
+export async function fetchDomainIntersection(input: {
+  targets: string[];
+  excludeTargets: string[];
+  limit: number;
+}) {
+  const response = await dataforseoPost(
+    "/v3/backlinks/domain_intersection/live",
+    [
+      {
+        targets: Object.fromEntries(
+          input.targets.map((target, index) => [String(index + 1), target]),
+        ),
+        exclude_targets: input.excludeTargets,
+        limit: input.limit,
+        order_by: ["1.backlinks,desc"],
+        include_subdomains: true,
+        exclude_internal_backlinks: true,
+        backlinks_status_type: "live",
+        rank_scale: "one_hundred",
+      },
+    ],
+    { classify: classifyBacklinksError },
+  );
+  const task = assertOk(
+    response,
+    assertOptions("/v3/backlinks/domain_intersection/live"),
+  );
+  return {
+    data: {
+      items: parseTaskItems(
+        "domain-intersection-live",
+        task,
+        domainIntersectionItemSchema,
+      ),
+      totalCount: parseTaskTotalCount(task),
+    },
+    billing: buildTaskBilling(task),
+  };
+}

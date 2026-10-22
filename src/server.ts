@@ -206,11 +206,20 @@ export default {
     _ctx: ExecutionContext,
   ) {
     if (controller.cron === LEAD_SCAN_CRON) {
-      await withPgClient(async () => {
+      const leadRun = await withPgClient(async () => {
         const { runScheduledLeadScans } =
           await import("@/server/features/leads/services/LeadScanService");
         await runScheduledLeadScans();
+      }).then(
+        () => null,
+        (error: unknown) => error,
+      );
+      await withPgClient(async () => {
+        const { runScheduledMediaScans } =
+          await import("@/server/features/digital-pr/services/MediaScanService");
+        await runScheduledMediaScans();
       });
+      if (leadRun) throw leadRun;
       return;
     }
     if (controller.cron === MCP_OAUTH_PURGE_CRON) {

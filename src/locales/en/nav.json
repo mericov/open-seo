@@ -6,7 +6,8 @@
     "research": "Research",
     "aiVisibility": "AI Visibility",
     "mySite": "My Site",
-    "aiTools": "AI Tools"
+    "aiTools": "AI Tools",
+    "digitalPr": "Digital PR"
   },
   "items": {
     "dashboard": "Dashboard",
@@ -25,7 +26,10 @@
     "agentSetup": "Agent setup",
     "blogTracking": "Blog Tracking",
     "blogWriter": "Blog Writer",
-    "leadFinder": "Lead Finder"
+    "leadFinder": "Lead Finder",
+    "prGap": "Competitor Gap",
+    "prMedia": "Media Database",
+    "prOutreach": "Outreach"
   },
   "account": {
     "helpCommunity": "Help & Community",

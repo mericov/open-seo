@@ -6,7 +6,8 @@
     "research": "Araştırma",
     "aiVisibility": "AI Görünürlüğü",
     "mySite": "Sitem",
-    "aiTools": "AI Araçları"
+    "aiTools": "AI Araçları",
+    "digitalPr": "Digital PR"
   },
   "items": {
     "dashboard": "Dashboard",
@@ -25,7 +26,10 @@
     "agentSetup": "Agent kurulumu",
     "blogTracking": "Blog Takibi",
     "blogWriter": "Blog Yazarı",
-    "leadFinder": "Lead Bulucu"
+    "leadFinder": "Lead Bulucu",
+    "prGap": "Rakip Boşluğu",
+    "prMedia": "Medya Veritabanı",
+    "prOutreach": "Gönderim"
   },
   "account": {
     "helpCommunity": "Yardım ve Topluluk",

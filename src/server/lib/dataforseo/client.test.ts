@@ -88,6 +88,7 @@ vi.mock("@/server/lib/dataforseo/serp", () => ({
   fetchRankCheckSerp: vi.fn(),
   postRankCheckTasks: vi.fn(),
   fetchLocalSerp: vi.fn(),
+  fetchNewsSerp: vi.fn(),
   postLocalSerpTasks: vi.fn(),
   clampSerpDepth: (depth: number) => depth,
   SERP_ANALYSIS_DEPTH: 20,
@@ -109,7 +110,11 @@ vi.mock("@/server/lib/dataforseo/backlinks", () => ({
   fetchReferringDomains: vi.fn(),
   fetchDomainPagesSummary: vi.fn(),
   fetchBacklinksHistory: vi.fn(),
+  fetchDomainIntersection: vi.fn(),
   BACKLINKS_DEFAULT_LIMIT: 100,
+}));
+vi.mock("@/server/lib/dataforseo/traffic", () => ({
+  fetchBulkTrafficEstimation: vi.fn(),
 }));
 vi.mock("@/server/lib/dataforseo/lighthouse", () => ({
   fetchLighthouseResult: vi.fn(),

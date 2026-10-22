@@ -5,13 +5,16 @@ import {
   ChartLine,
   ClipboardCheck,
   FileText,
+  GitCompareArrows,
   Globe,
   LayoutDashboard,
+  Library,
   Link2,
   MessageSquare,
   Newspaper,
   PenLine,
   Search,
+  Send,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -61,6 +64,21 @@ const projectNavItems = [
     to: "/p/$projectId/leads" as const,
     label: "nav:items.leadFinder" as const,
     icon: Users,
+  },
+  {
+    to: "/p/$projectId/digital-pr/gap" as const,
+    label: "nav:items.prGap" as const,
+    icon: GitCompareArrows,
+  },
+  {
+    to: "/p/$projectId/digital-pr/media" as const,
+    label: "nav:items.prMedia" as const,
+    icon: Library,
+  },
+  {
+    to: "/p/$projectId/digital-pr/outreach" as const,
+    label: "nav:items.prOutreach" as const,
+    icon: Send,
   },
   {
     to: "/p/$projectId/domain" as const,
@@ -149,6 +167,14 @@ export function getProjectNavGroups(projectId: string) {
         byPath("/p/$projectId/domain"),
         byPath("/p/$projectId/backlinks"),
         byPath("/p/$projectId/leads"),
+      ],
+    },
+    {
+      label: "nav:groups.digitalPr" as const,
+      items: [
+        byPath("/p/$projectId/digital-pr/gap"),
+        byPath("/p/$projectId/digital-pr/media"),
+        byPath("/p/$projectId/digital-pr/outreach"),
       ],
     },
     {

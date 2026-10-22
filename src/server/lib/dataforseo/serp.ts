@@ -515,3 +515,38 @@ export async function fetchLocalSerpTaskResult(
   }
   return { status: "completed", items: task.result?.[0]?.items ?? [] };
 }
+
+const newsSerpItemSchema = z
+  .object({
+    type: z.string(),
+    domain: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    url: z.string().nullable().optional(),
+    source: z.string().nullable().optional(),
+    snippet: z.string().nullable().optional(),
+    timestamp: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+type NewsSerpItem = z.infer<typeof newsSerpItemSchema>;
+
+export async function fetchNewsSerp(input: {
+  keyword: string;
+  locationCode: number;
+  languageCode: string;
+  depth: number;
+}): Promise<DataforseoApiResponse<NewsSerpItem[]>> {
+  const response = await dataforseoPost("/v3/serp/google/news/live/advanced", [
+    {
+      keyword: input.keyword,
+      location_code: input.locationCode,
+      language_code: input.languageCode,
+      depth: clampSerpDepth(input.depth),
+    },
+  ]);
+  const task = assertOk(response, { treatNoResultsAsEmpty: true });
+  return {
+    data: parseTaskItems("google-news-live-advanced", task, newsSerpItemSchema),
+    billing: buildTaskBilling(task),
+  };
+}
