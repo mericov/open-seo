@@ -285,9 +285,19 @@ async function setReportToken(
   token: string,
 ) {
   const now = new Date().toISOString();
+  const [current] = await db
+    .select({ reportToken: leads.reportToken })
+    .from(leads)
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+  const newLink = current?.reportToken !== token;
   await db
     .update(leads)
-    .set({ reportToken: token, reportCreatedAt: now, updatedAt: now })
+    .set({
+      reportToken: token,
+      reportCreatedAt: now,
+      updatedAt: now,
+      ...(newLink ? { reportViews: 0, reportLastViewedAt: null } : {}),
+    })
     .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
 }
 

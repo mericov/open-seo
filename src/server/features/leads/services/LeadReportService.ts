@@ -36,12 +36,19 @@ async function save(projectId: string, leadId: string, html: string) {
   }
   const lead = await LeadListRepository.getReportToken(projectId, leadId);
   if (!lead) throw new AppError("NOT_FOUND");
-  const token = lead.reportToken ?? mintToken(lead.domain, lead.website);
+  const legacy =
+    lead.reportToken && LEGACY_TOKEN_PATTERN.test(lead.reportToken);
+  const token =
+    lead.reportToken && !legacy
+      ? lead.reportToken
+      : mintToken(lead.domain, lead.website);
   const clean = html.replace(/<script[\s\S]*?<\/script>/gi, "");
   await env.R2.put(reportKey(token), clean, {
     httpMetadata: { contentType: "text/html; charset=utf-8" },
   });
   await LeadListRepository.setReportToken(projectId, leadId, token);
+  if (legacy && lead.reportToken)
+    await env.R2.delete(reportKey(lead.reportToken));
   return { token };
 }
 

@@ -13,6 +13,7 @@ vi.mock("cloudflare:workers", () => ({
   env: {
     R2: {
       put: async (key: string, body: string) => mocks.objects.set(key, body),
+      delete: async (key: string) => mocks.objects.delete(key),
       get: async (key: string) => {
         const body = mocks.objects.get(key);
         return body === undefined ? null : { text: async () => body };
@@ -64,4 +65,19 @@ it("stores a report without scripts and serves it sandboxed at its link", async 
 
   mocks.reportTokenExists.mockResolvedValue(false);
   expect((await LeadReportService.render(visit(), token)).status).toBe(404);
+});
+
+it("gives a report with an old long link a short one on refresh", async () => {
+  const old = "A".repeat(32);
+  mocks.objects.set(`lead-reports/${old}.html`, "<p>old</p>");
+  mocks.getReportToken.mockResolvedValue({
+    reportToken: old,
+    domain: "3ina.com",
+    website: null,
+  });
+
+  const { token } = await LeadReportService.save("p1", "lead-1", "<p>new</p>");
+
+  expect(token).toMatch(/^3ina-[a-z0-9]{6}$/);
+  expect(mocks.objects.has(`lead-reports/${old}.html`)).toBe(false);
 });
