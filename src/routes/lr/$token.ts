@@ -4,7 +4,8 @@ import { LeadReportService } from "@/server/features/leads/services/LeadReportSe
 export const Route = createFileRoute("/lr/$token")({
   server: {
     handlers: {
-      GET: ({ params }) => LeadReportService.render(params.token),
+      GET: ({ request, params }) =>
+        LeadReportService.render(request, params.token),
     },
   },
 });

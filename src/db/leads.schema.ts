@@ -120,6 +120,8 @@ export const leads = sqliteTable(
     remindAt: text("remind_at"),
     reportToken: text("report_token"),
     reportCreatedAt: text("report_created_at"),
+    reportViews: integer("report_views").notNull().default(0),
+    reportLastViewedAt: text("report_last_viewed_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),

@@ -14,7 +14,7 @@ export const LEAD_TEMPLATE_VARIABLES = [
   "report_link",
 ] as const;
 
-export const LEAD_REPORT_PATH = "/lr/";
+export const LEAD_REPORT_PATH = "/audit/";
 
 const REPORT_OFFER: Record<
   LeadEmailLanguage,

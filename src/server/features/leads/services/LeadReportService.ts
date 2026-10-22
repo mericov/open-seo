@@ -2,17 +2,32 @@ import { env } from "cloudflare:workers";
 import { AppError } from "@/server/lib/errors";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 
-const LEAD_REPORT_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32}$/;
+const LEGACY_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32}$/;
+const SLUG_TOKEN_PATTERN = /^[a-z0-9-]{1,40}-[a-z0-9]{6}$/;
+const SLUG_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+const BOT_USER_AGENT =
+  /bot|crawl|spider|preview|scan|safelinks|proofpoint|mimecast|barracuda|headless|python|curl|wget/i;
 const MAX_REPORT_BYTES = 3_000_000;
 
 const reportKey = (token: string) => `lead-reports/${token}.html`;
 
-function mintToken() {
-  const bytes = crypto.getRandomValues(new Uint8Array(24));
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+function siteSlug(domain: string | null, website: string | null) {
+  const host = domain ?? (website ? (URL.parse(website)?.hostname ?? "") : "");
+  const label = host.replace(/^www\./, "").split(".")[0] ?? "";
+  const slug = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+  return slug || "audit";
+}
+
+function mintToken(domain: string | null, website: string | null) {
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  const suffix = [...bytes]
+    .map((byte) => SLUG_ALPHABET[byte % SLUG_ALPHABET.length])
+    .join("");
+  return `${siteSlug(domain, website)}-${suffix}`;
 }
 
 async function save(projectId: string, leadId: string, html: string) {
@@ -21,7 +36,7 @@ async function save(projectId: string, leadId: string, html: string) {
   }
   const lead = await LeadListRepository.getReportToken(projectId, leadId);
   if (!lead) throw new AppError("NOT_FOUND");
-  const token = lead.reportToken ?? mintToken();
+  const token = lead.reportToken ?? mintToken(lead.domain, lead.website);
   const clean = html.replace(/<script[\s\S]*?<\/script>/gi, "");
   await env.R2.put(reportKey(token), clean, {
     httpMetadata: { contentType: "text/html; charset=utf-8" },
@@ -37,11 +52,18 @@ function notFound() {
   });
 }
 
-async function render(token: string): Promise<Response> {
-  if (!LEAD_REPORT_TOKEN_PATTERN.test(token)) return notFound();
+async function render(request: Request, token: string): Promise<Response> {
+  if (!LEGACY_TOKEN_PATTERN.test(token) && !SLUG_TOKEN_PATTERN.test(token)) {
+    return notFound();
+  }
   if (!(await LeadListRepository.reportTokenExists(token))) return notFound();
   const object = await env.R2.get(reportKey(token));
   if (!object) return notFound();
+  const preview = new URL(request.url).searchParams.has("preview");
+  const agent = request.headers.get("user-agent") ?? "";
+  if (!preview && agent && !BOT_USER_AGENT.test(agent)) {
+    await LeadListRepository.recordReportView(token);
+  }
   return new Response(await object.text(), {
     headers: {
       "content-type": "text/html; charset=utf-8",

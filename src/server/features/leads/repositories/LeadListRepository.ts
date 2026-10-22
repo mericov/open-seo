@@ -102,6 +102,8 @@ async function listLeads(
         remindAt: leads.remindAt,
         reportToken: leads.reportToken,
         reportCreatedAt: leads.reportCreatedAt,
+        reportViews: leads.reportViews,
+        reportLastViewedAt: leads.reportLastViewedAt,
         createdAt: leads.createdAt,
         searchId: leads.searchId,
         searchLabel: leadSearches.label,
@@ -267,7 +269,11 @@ async function setNote(
 
 async function getReportToken(projectId: string, leadId: string) {
   const [row] = await db
-    .select({ reportToken: leads.reportToken })
+    .select({
+      reportToken: leads.reportToken,
+      domain: leads.domain,
+      website: leads.website,
+    })
     .from(leads)
     .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
   return row ?? null;
@@ -294,6 +300,16 @@ async function reportTokenExists(token: string) {
   return Boolean(row);
 }
 
+async function recordReportView(token: string) {
+  await db
+    .update(leads)
+    .set({
+      reportViews: sql`${leads.reportViews} + 1`,
+      reportLastViewedAt: new Date().toISOString(),
+    })
+    .where(eq(leads.reportToken, token));
+}
+
 export const LeadListRepository = {
   listLeads,
   statusCounts,
@@ -307,4 +323,5 @@ export const LeadListRepository = {
   getReportToken,
   setReportToken,
   reportTokenExists,
+  recordReportView,
 };

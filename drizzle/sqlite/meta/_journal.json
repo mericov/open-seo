@@ -470,6 +470,13 @@
       "when": 1792666985379,
       "tag": "0066_digital_pr",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "6",
+      "when": 1792681390311,
+      "tag": "0067_lead_report_views",
+      "breakpoints": true
     }
   ]
 }

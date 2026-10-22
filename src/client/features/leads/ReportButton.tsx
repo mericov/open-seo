@@ -77,6 +77,29 @@ export function reportUrlFor(token: string | null) {
   return token ? `${window.location.origin}${LEAD_REPORT_PATH}${token}` : null;
 }
 
+function ReportViews({ lead }: { lead: ProjectLeadRow }) {
+  const { t, i18n } = useTranslation("leads");
+  const date = lead.reportLastViewedAt
+    ? new Date(lead.reportLastViewedAt).toLocaleDateString(i18n.language, {
+        month: "short",
+        day: "numeric",
+      })
+    : "";
+  return (
+    <span
+      className={
+        lead.reportViews > 0
+          ? "text-xs font-medium text-emerald-600"
+          : "text-xs text-muted-foreground"
+      }
+    >
+      {lead.reportViews > 0
+        ? t("report.views", { count: lead.reportViews, date })
+        : t("report.notViewed")}
+    </span>
+  );
+}
+
 export function ReportButton({
   projectId,
   lead,
@@ -120,11 +143,14 @@ export function ReportButton({
           className="rounded-full"
           aria-label={t("report.open")}
           title={t("report.open")}
-          render={<a href={url} target="_blank" rel="noreferrer" />}
+          render={
+            <a href={`${url}?preview`} target="_blank" rel="noreferrer" />
+          }
         >
           <ExternalLink />
         </Button>
       ) : null}
+      {url ? <ReportViews lead={lead} /> : null}
       <Button
         size="sm"
         variant="ghost"

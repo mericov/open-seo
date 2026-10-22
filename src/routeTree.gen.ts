@@ -30,6 +30,7 @@ import { Route as AuthenticatedSubscribeRouteImport } from './routes/_authentica
 import { Route as AuthenticatedYcRouteImport } from './routes/_authenticated.yc'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as AuditTokenRouteImport } from './routes/audit/$token'
 import { Route as LrTokenRouteImport } from './routes/lr/$token'
 import { Route as RReportIdRouteImport } from './routes/r/$reportId'
 import { Route as AppBillingFixPaymentRouteImport } from './routes/_app/billing_.fix-payment'
@@ -51,6 +52,7 @@ import { Route as AppPProjectIdBlogTrackingRouteImport } from './routes/_app/p/$
 import { Route as AppPProjectIdBlogWriterRouteImport } from './routes/_app/p/$projectId/blog-writer'
 import { Route as AppPProjectIdBrandLookupRouteImport } from './routes/_app/p/$projectId/brand-lookup'
 import { Route as AppPProjectIdContextRouteImport } from './routes/_app/p/$projectId/context'
+import { Route as AppPProjectIdDigitalPrRouteImport } from './routes/_app/p/$projectId/digital-pr'
 import { Route as AppPProjectIdDomainRouteImport } from './routes/_app/p/$projectId/domain'
 import { Route as AppPProjectIdKeywordsRouteImport } from './routes/_app/p/$projectId/keywords'
 import { Route as AppPProjectIdLeadsRouteImport } from './routes/_app/p/$projectId/leads'
@@ -65,6 +67,10 @@ import { Route as ApiGscOauthCallbackRouteImport } from './routes/api/gsc/oauth/
 import { Route as AppPProjectIdAiVisibilityIndexRouteImport } from './routes/_app/p/$projectId/ai-visibility/index'
 import { Route as AppPProjectIdAiVisibilityResearchRouteImport } from './routes/_app/p/$projectId/ai-visibility/research'
 import { Route as AppPProjectIdAuditIndexRouteImport } from './routes/_app/p/$projectId/audit/index'
+import { Route as AppPProjectIdDigitalPrIndexRouteImport } from './routes/_app/p/$projectId/digital-pr/index'
+import { Route as AppPProjectIdDigitalPrGapRouteImport } from './routes/_app/p/$projectId/digital-pr/gap'
+import { Route as AppPProjectIdDigitalPrMediaRouteImport } from './routes/_app/p/$projectId/digital-pr/media'
+import { Route as AppPProjectIdDigitalPrOutreachRouteImport } from './routes/_app/p/$projectId/digital-pr/outreach'
 import { Route as AppPProjectIdRankTrackingIndexRouteImport } from './routes/_app/p/$projectId/rank-tracking/index'
 import { Route as AppPProjectIdRankTrackingConfigIdRouteImport } from './routes/_app/p/$projectId/rank-tracking/$configId'
 import { Route as AppPProjectIdReportsIndexRouteImport } from './routes/_app/p/$projectId/reports/index'
@@ -180,6 +186,11 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditTokenRoute = AuditTokenRouteImport.update({
+  id: '/audit/$token',
+  path: '/audit/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LrTokenRoute = LrTokenRouteImport.update({
   id: '/lr/$token',
   path: '/lr/$token',
@@ -289,6 +300,11 @@ const AppPProjectIdContextRoute = AppPProjectIdContextRouteImport.update({
   path: '/context',
   getParentRoute: () => AppPProjectIdRouteRoute,
 } as any)
+const AppPProjectIdDigitalPrRoute = AppPProjectIdDigitalPrRouteImport.update({
+  id: '/digital-pr',
+  path: '/digital-pr',
+  getParentRoute: () => AppPProjectIdRouteRoute,
+} as any)
 const AppPProjectIdDomainRoute = AppPProjectIdDomainRouteImport.update({
   id: '/domain',
   path: '/domain',
@@ -364,6 +380,30 @@ const AppPProjectIdAuditIndexRoute = AppPProjectIdAuditIndexRouteImport.update({
   path: '/audit/',
   getParentRoute: () => AppPProjectIdRouteRoute,
 } as any)
+const AppPProjectIdDigitalPrIndexRoute =
+  AppPProjectIdDigitalPrIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppPProjectIdDigitalPrRoute,
+  } as any)
+const AppPProjectIdDigitalPrGapRoute =
+  AppPProjectIdDigitalPrGapRouteImport.update({
+    id: '/gap',
+    path: '/gap',
+    getParentRoute: () => AppPProjectIdDigitalPrRoute,
+  } as any)
+const AppPProjectIdDigitalPrMediaRoute =
+  AppPProjectIdDigitalPrMediaRouteImport.update({
+    id: '/media',
+    path: '/media',
+    getParentRoute: () => AppPProjectIdDigitalPrRoute,
+  } as any)
+const AppPProjectIdDigitalPrOutreachRoute =
+  AppPProjectIdDigitalPrOutreachRouteImport.update({
+    id: '/outreach',
+    path: '/outreach',
+    getParentRoute: () => AppPProjectIdDigitalPrRoute,
+  } as any)
 const AppPProjectIdRankTrackingIndexRoute =
   AppPProjectIdRankTrackingIndexRouteImport.update({
     id: '/',
@@ -444,6 +484,7 @@ export interface FileRoutesByFullPath {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/p/$projectId': typeof AppPProjectIdRouteRouteWithChildren
@@ -464,6 +505,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/blog-writer': typeof AppPProjectIdBlogWriterRoute
   '/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
   '/p/$projectId/context': typeof AppPProjectIdContextRoute
+  '/p/$projectId/digital-pr': typeof AppPProjectIdDigitalPrRouteWithChildren
   '/p/$projectId/domain': typeof AppPProjectIdDomainRoute
   '/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
   '/p/$projectId/leads': typeof AppPProjectIdLeadsRoute
@@ -477,6 +519,9 @@ export interface FileRoutesByFullPath {
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/p/$projectId/': typeof AppPProjectIdIndexRoute
   '/p/$projectId/ai-visibility/research': typeof AppPProjectIdAiVisibilityResearchRoute
+  '/p/$projectId/digital-pr/gap': typeof AppPProjectIdDigitalPrGapRoute
+  '/p/$projectId/digital-pr/media': typeof AppPProjectIdDigitalPrMediaRoute
+  '/p/$projectId/digital-pr/outreach': typeof AppPProjectIdDigitalPrOutreachRoute
   '/p/$projectId/rank-tracking/$configId': typeof AppPProjectIdRankTrackingConfigIdRoute
   '/p/$projectId/reports/$reportId': typeof AppPProjectIdReportsReportIdRoute
   '/p/$projectId/reports/templates': typeof AppPProjectIdReportsTemplatesRoute
@@ -484,6 +529,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/settings/integrations': typeof AppPProjectIdSettingsIntegrationsRoute
   '/p/$projectId/ai-visibility/': typeof AppPProjectIdAiVisibilityIndexRoute
   '/p/$projectId/audit/': typeof AppPProjectIdAuditIndexRoute
+  '/p/$projectId/digital-pr/': typeof AppPProjectIdDigitalPrIndexRoute
   '/p/$projectId/rank-tracking/': typeof AppPProjectIdRankTrackingIndexRoute
   '/p/$projectId/reports/': typeof AppPProjectIdReportsIndexRoute
   '/p/$projectId/settings/': typeof AppPProjectIdSettingsIndexRoute
@@ -508,6 +554,7 @@ export interface FileRoutesByTo {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/billing/fix-payment': typeof AppBillingFixPaymentRoute
@@ -537,6 +584,9 @@ export interface FileRoutesByTo {
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/p/$projectId': typeof AppPProjectIdIndexRoute
   '/p/$projectId/ai-visibility/research': typeof AppPProjectIdAiVisibilityResearchRoute
+  '/p/$projectId/digital-pr/gap': typeof AppPProjectIdDigitalPrGapRoute
+  '/p/$projectId/digital-pr/media': typeof AppPProjectIdDigitalPrMediaRoute
+  '/p/$projectId/digital-pr/outreach': typeof AppPProjectIdDigitalPrOutreachRoute
   '/p/$projectId/rank-tracking/$configId': typeof AppPProjectIdRankTrackingConfigIdRoute
   '/p/$projectId/reports/$reportId': typeof AppPProjectIdReportsReportIdRoute
   '/p/$projectId/reports/templates': typeof AppPProjectIdReportsTemplatesRoute
@@ -544,6 +594,7 @@ export interface FileRoutesByTo {
   '/p/$projectId/settings/integrations': typeof AppPProjectIdSettingsIntegrationsRoute
   '/p/$projectId/ai-visibility': typeof AppPProjectIdAiVisibilityIndexRoute
   '/p/$projectId/audit': typeof AppPProjectIdAuditIndexRoute
+  '/p/$projectId/digital-pr': typeof AppPProjectIdDigitalPrIndexRoute
   '/p/$projectId/rank-tracking': typeof AppPProjectIdRankTrackingIndexRoute
   '/p/$projectId/reports': typeof AppPProjectIdReportsIndexRoute
   '/p/$projectId/settings': typeof AppPProjectIdSettingsIndexRoute
@@ -572,6 +623,7 @@ export interface FileRoutesById {
   '/_authenticated/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
   '/_app/': typeof AppIndexRoute
@@ -593,6 +645,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/blog-writer': typeof AppPProjectIdBlogWriterRoute
   '/_app/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
   '/_app/p/$projectId/context': typeof AppPProjectIdContextRoute
+  '/_app/p/$projectId/digital-pr': typeof AppPProjectIdDigitalPrRouteWithChildren
   '/_app/p/$projectId/domain': typeof AppPProjectIdDomainRoute
   '/_app/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
   '/_app/p/$projectId/leads': typeof AppPProjectIdLeadsRoute
@@ -606,6 +659,9 @@ export interface FileRoutesById {
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/_app/p/$projectId/': typeof AppPProjectIdIndexRoute
   '/_app/p/$projectId/ai-visibility/research': typeof AppPProjectIdAiVisibilityResearchRoute
+  '/_app/p/$projectId/digital-pr/gap': typeof AppPProjectIdDigitalPrGapRoute
+  '/_app/p/$projectId/digital-pr/media': typeof AppPProjectIdDigitalPrMediaRoute
+  '/_app/p/$projectId/digital-pr/outreach': typeof AppPProjectIdDigitalPrOutreachRoute
   '/_app/p/$projectId/rank-tracking/$configId': typeof AppPProjectIdRankTrackingConfigIdRoute
   '/_app/p/$projectId/reports/$reportId': typeof AppPProjectIdReportsReportIdRoute
   '/_app/p/$projectId/reports/templates': typeof AppPProjectIdReportsTemplatesRoute
@@ -613,6 +669,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/settings/integrations': typeof AppPProjectIdSettingsIntegrationsRoute
   '/_app/p/$projectId/ai-visibility/': typeof AppPProjectIdAiVisibilityIndexRoute
   '/_app/p/$projectId/audit/': typeof AppPProjectIdAuditIndexRoute
+  '/_app/p/$projectId/digital-pr/': typeof AppPProjectIdDigitalPrIndexRoute
   '/_app/p/$projectId/rank-tracking/': typeof AppPProjectIdRankTrackingIndexRoute
   '/_app/p/$projectId/reports/': typeof AppPProjectIdReportsIndexRoute
   '/_app/p/$projectId/settings/': typeof AppPProjectIdSettingsIndexRoute
@@ -640,6 +697,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
     | '/p/$projectId'
@@ -660,6 +718,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/blog-writer'
     | '/p/$projectId/brand-lookup'
     | '/p/$projectId/context'
+    | '/p/$projectId/digital-pr'
     | '/p/$projectId/domain'
     | '/p/$projectId/keywords'
     | '/p/$projectId/leads'
@@ -673,6 +732,9 @@ export interface FileRouteTypes {
     | '/api/gsc/oauth/callback'
     | '/p/$projectId/'
     | '/p/$projectId/ai-visibility/research'
+    | '/p/$projectId/digital-pr/gap'
+    | '/p/$projectId/digital-pr/media'
+    | '/p/$projectId/digital-pr/outreach'
     | '/p/$projectId/rank-tracking/$configId'
     | '/p/$projectId/reports/$reportId'
     | '/p/$projectId/reports/templates'
@@ -680,6 +742,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/settings/integrations'
     | '/p/$projectId/ai-visibility/'
     | '/p/$projectId/audit/'
+    | '/p/$projectId/digital-pr/'
     | '/p/$projectId/rank-tracking/'
     | '/p/$projectId/reports/'
     | '/p/$projectId/settings/'
@@ -704,6 +767,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
     | '/billing/fix-payment'
@@ -733,6 +797,9 @@ export interface FileRouteTypes {
     | '/api/gsc/oauth/callback'
     | '/p/$projectId'
     | '/p/$projectId/ai-visibility/research'
+    | '/p/$projectId/digital-pr/gap'
+    | '/p/$projectId/digital-pr/media'
+    | '/p/$projectId/digital-pr/outreach'
     | '/p/$projectId/rank-tracking/$configId'
     | '/p/$projectId/reports/$reportId'
     | '/p/$projectId/reports/templates'
@@ -740,6 +807,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/settings/integrations'
     | '/p/$projectId/ai-visibility'
     | '/p/$projectId/audit'
+    | '/p/$projectId/digital-pr'
     | '/p/$projectId/rank-tracking'
     | '/p/$projectId/reports'
     | '/p/$projectId/settings'
@@ -767,6 +835,7 @@ export interface FileRouteTypes {
     | '/_authenticated/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
     | '/_app/'
@@ -788,6 +857,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/blog-writer'
     | '/_app/p/$projectId/brand-lookup'
     | '/_app/p/$projectId/context'
+    | '/_app/p/$projectId/digital-pr'
     | '/_app/p/$projectId/domain'
     | '/_app/p/$projectId/keywords'
     | '/_app/p/$projectId/leads'
@@ -801,6 +871,9 @@ export interface FileRouteTypes {
     | '/api/gsc/oauth/callback'
     | '/_app/p/$projectId/'
     | '/_app/p/$projectId/ai-visibility/research'
+    | '/_app/p/$projectId/digital-pr/gap'
+    | '/_app/p/$projectId/digital-pr/media'
+    | '/_app/p/$projectId/digital-pr/outreach'
     | '/_app/p/$projectId/rank-tracking/$configId'
     | '/_app/p/$projectId/reports/$reportId'
     | '/_app/p/$projectId/reports/templates'
@@ -808,6 +881,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/settings/integrations'
     | '/_app/p/$projectId/ai-visibility/'
     | '/_app/p/$projectId/audit/'
+    | '/_app/p/$projectId/digital-pr/'
     | '/_app/p/$projectId/rank-tracking/'
     | '/_app/p/$projectId/reports/'
     | '/_app/p/$projectId/settings/'
@@ -826,6 +900,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OpenaiAppsChallengeRoute: typeof Char91DotwellKnownChar93OpenaiAppsChallengeRoute
   AcceptInvitationIdRoute: typeof AcceptInvitationIdRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  AuditTokenRoute: typeof AuditTokenRoute
   LrTokenRoute: typeof LrTokenRoute
   RReportIdRoute: typeof RReportIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -986,6 +1061,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/audit/$token': {
+      id: '/audit/$token'
+      path: '/audit/$token'
+      fullPath: '/audit/$token'
+      preLoaderRoute: typeof AuditTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lr/$token': {
       id: '/lr/$token'
       path: '/lr/$token'
@@ -1133,6 +1215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPProjectIdContextRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
+    '/_app/p/$projectId/digital-pr': {
+      id: '/_app/p/$projectId/digital-pr'
+      path: '/digital-pr'
+      fullPath: '/p/$projectId/digital-pr'
+      preLoaderRoute: typeof AppPProjectIdDigitalPrRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
     '/_app/p/$projectId/domain': {
       id: '/_app/p/$projectId/domain'
       path: '/domain'
@@ -1230,6 +1319,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/p/$projectId/audit/'
       preLoaderRoute: typeof AppPProjectIdAuditIndexRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
+    }
+    '/_app/p/$projectId/digital-pr/': {
+      id: '/_app/p/$projectId/digital-pr/'
+      path: '/'
+      fullPath: '/p/$projectId/digital-pr/'
+      preLoaderRoute: typeof AppPProjectIdDigitalPrIndexRouteImport
+      parentRoute: typeof AppPProjectIdDigitalPrRoute
+    }
+    '/_app/p/$projectId/digital-pr/gap': {
+      id: '/_app/p/$projectId/digital-pr/gap'
+      path: '/gap'
+      fullPath: '/p/$projectId/digital-pr/gap'
+      preLoaderRoute: typeof AppPProjectIdDigitalPrGapRouteImport
+      parentRoute: typeof AppPProjectIdDigitalPrRoute
+    }
+    '/_app/p/$projectId/digital-pr/media': {
+      id: '/_app/p/$projectId/digital-pr/media'
+      path: '/media'
+      fullPath: '/p/$projectId/digital-pr/media'
+      preLoaderRoute: typeof AppPProjectIdDigitalPrMediaRouteImport
+      parentRoute: typeof AppPProjectIdDigitalPrRoute
+    }
+    '/_app/p/$projectId/digital-pr/outreach': {
+      id: '/_app/p/$projectId/digital-pr/outreach'
+      path: '/outreach'
+      fullPath: '/p/$projectId/digital-pr/outreach'
+      preLoaderRoute: typeof AppPProjectIdDigitalPrOutreachRouteImport
+      parentRoute: typeof AppPProjectIdDigitalPrRoute
     }
     '/_app/p/$projectId/rank-tracking/': {
       id: '/_app/p/$projectId/rank-tracking/'
@@ -1338,6 +1455,26 @@ const AppPProjectIdAiVisibilityRouteWithChildren =
     AppPProjectIdAiVisibilityRouteChildren,
   )
 
+interface AppPProjectIdDigitalPrRouteChildren {
+  AppPProjectIdDigitalPrGapRoute: typeof AppPProjectIdDigitalPrGapRoute
+  AppPProjectIdDigitalPrMediaRoute: typeof AppPProjectIdDigitalPrMediaRoute
+  AppPProjectIdDigitalPrOutreachRoute: typeof AppPProjectIdDigitalPrOutreachRoute
+  AppPProjectIdDigitalPrIndexRoute: typeof AppPProjectIdDigitalPrIndexRoute
+}
+
+const AppPProjectIdDigitalPrRouteChildren: AppPProjectIdDigitalPrRouteChildren =
+  {
+    AppPProjectIdDigitalPrGapRoute: AppPProjectIdDigitalPrGapRoute,
+    AppPProjectIdDigitalPrMediaRoute: AppPProjectIdDigitalPrMediaRoute,
+    AppPProjectIdDigitalPrOutreachRoute: AppPProjectIdDigitalPrOutreachRoute,
+    AppPProjectIdDigitalPrIndexRoute: AppPProjectIdDigitalPrIndexRoute,
+  }
+
+const AppPProjectIdDigitalPrRouteWithChildren =
+  AppPProjectIdDigitalPrRoute._addFileChildren(
+    AppPProjectIdDigitalPrRouteChildren,
+  )
+
 interface AppPProjectIdRankTrackingRouteChildren {
   AppPProjectIdRankTrackingConfigIdRoute: typeof AppPProjectIdRankTrackingConfigIdRoute
   AppPProjectIdRankTrackingIndexRoute: typeof AppPProjectIdRankTrackingIndexRoute
@@ -1380,6 +1517,7 @@ interface AppPProjectIdRouteRouteChildren {
   AppPProjectIdBlogWriterRoute: typeof AppPProjectIdBlogWriterRoute
   AppPProjectIdBrandLookupRoute: typeof AppPProjectIdBrandLookupRoute
   AppPProjectIdContextRoute: typeof AppPProjectIdContextRoute
+  AppPProjectIdDigitalPrRoute: typeof AppPProjectIdDigitalPrRouteWithChildren
   AppPProjectIdDomainRoute: typeof AppPProjectIdDomainRoute
   AppPProjectIdKeywordsRoute: typeof AppPProjectIdKeywordsRoute
   AppPProjectIdLeadsRoute: typeof AppPProjectIdLeadsRoute
@@ -1404,6 +1542,7 @@ const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
   AppPProjectIdBlogWriterRoute: AppPProjectIdBlogWriterRoute,
   AppPProjectIdBrandLookupRoute: AppPProjectIdBrandLookupRoute,
   AppPProjectIdContextRoute: AppPProjectIdContextRoute,
+  AppPProjectIdDigitalPrRoute: AppPProjectIdDigitalPrRouteWithChildren,
   AppPProjectIdDomainRoute: AppPProjectIdDomainRoute,
   AppPProjectIdKeywordsRoute: AppPProjectIdKeywordsRoute,
   AppPProjectIdLeadsRoute: AppPProjectIdLeadsRoute,
@@ -1496,6 +1635,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OpenaiAppsChallengeRoute,
   AcceptInvitationIdRoute: AcceptInvitationIdRoute,
   ApiHealthRoute: ApiHealthRoute,
+  AuditTokenRoute: AuditTokenRoute,
   LrTokenRoute: LrTokenRoute,
   RReportIdRoute: RReportIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
