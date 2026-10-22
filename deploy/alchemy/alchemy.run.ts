@@ -267,6 +267,13 @@ const resolveSelfHostAccess = (
         domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
         path: "lr",
       });
+      yield* publicPathBypass({
+        policyId: "SelfHostAuditReportsBypass",
+        applicationId: "SelfHostAuditReports",
+        name: `open-seo ${stage} audit reports`,
+        domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
+        path: "audit",
+      });
     }
 
     return { teamDomain, policyAud };
