@@ -43,7 +43,7 @@ const FAQ_PATTERN =
 const COPYRIGHT_PATTERN =
   /(?:©|&copy;|copyright)\s*(?:\d{4}\s*[-–]\s*)?((?:19|20)\d{2})/gi;
 const ABOUT_PATTERN =
-  /about|hakkimizda|hakkımızda|our-story|our story|hikayemiz|biz kimiz|who-we-are|uber-uns|qui-sommes/i;
+  /about|hakkimizda|hakkımızda|hakkimda|hakkımda|our-story|our story|hikayemiz|biz kimiz|who-we-are|uber-uns|qui-sommes|\/author\//i;
 const PRIVACY_PATTERN =
   /privacy|gizlilik|datenschutz|confidentialit|privacidad|\/policies\/privacy/i;
 const REFUND_PATTERN =
