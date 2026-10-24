@@ -477,6 +477,13 @@
       "when": 1792681390311,
       "tag": "0067_lead_report_views",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "6",
+      "when": 1792830871035,
+      "tag": "0068_inbound_leads",
+      "breakpoints": true
     }
   ]
 }

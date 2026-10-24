@@ -1,0 +1,40 @@
+{
+  "title": "Siteden Gelen Talepler",
+  "description": "Kendi web sitenizdeki formlardan gelen talepler. Lead Bulucu'dan ayrı tutulur.",
+  "verdict": {
+    "ok": "Talepler",
+    "suspicious": "Şüpheli",
+    "spam": "Spam"
+  },
+  "status": {
+    "all": "Tüm durumlar",
+    "new": "Yeni",
+    "contacted": "Görüşüldü",
+    "client": "Müşteri oldu",
+    "lost": "Olumsuz"
+  },
+  "empty": {
+    "ok": "Henüz siteden talep gelmedi",
+    "suspicious": "Şüpheli gönderim yok",
+    "spam": "Yakalanan spam yok",
+    "hint": "Sitenizdeki formlardan gelen talepler geldiği anda burada görünür."
+  },
+  "unnamed": "İsimsiz",
+  "seconds": "sayfada {{count}} sn",
+  "reason": "İşaretlenme nedeni",
+  "notePlaceholder": "Ne konuşuldu, ne zaman dönülecek…",
+  "noteSaved": "Not kaydedildi",
+  "addNote": "Not ekle",
+  "editNote": "Notu düzenle",
+  "save": "Kaydet",
+  "cancel": "Vazgeç",
+  "markSpam": "Spam olarak işaretle",
+  "notSpam": "Spam değil",
+  "markReal": "Gerçek talep",
+  "delete": "Sil",
+  "confirmDelete": "Bu talep kalıcı olarak silinsin mi?",
+  "range": "{{from}}–{{to}} / {{total}}",
+  "previous": "Önceki",
+  "next": "Sonraki",
+  "loadError": "Talepler yüklenemedi."
+}

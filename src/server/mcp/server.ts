@@ -129,6 +129,10 @@ import {
   listLeadsTool,
   updateLeadsTool,
 } from "@/server/mcp/tools/lead-outreach-tools";
+import {
+  listInboundLeadsTool,
+  updateInboundLeadsTool,
+} from "@/server/mcp/tools/inbound-leads-tools";
 
 type ToolSchema = z.ZodType | z.ZodRawShape;
 
@@ -308,6 +312,8 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(updateLeadsTool);
   register(enrichLeadsTool);
   register(getLeadsTool);
+  register(listInboundLeadsTool);
+  register(updateInboundLeadsTool);
 
   return server;
 }

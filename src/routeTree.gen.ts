@@ -30,6 +30,7 @@ import { Route as AuthenticatedSubscribeRouteImport } from './routes/_authentica
 import { Route as AuthenticatedYcRouteImport } from './routes/_authenticated.yc'
 import { Route as AcceptInvitationIdRouteImport } from './routes/accept-invitation.$id'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiInboundLeadsRouteImport } from './routes/api/inbound-leads'
 import { Route as AuditTokenRouteImport } from './routes/audit/$token'
 import { Route as LrTokenRouteImport } from './routes/lr/$token'
 import { Route as RReportIdRouteImport } from './routes/r/$reportId'
@@ -54,6 +55,7 @@ import { Route as AppPProjectIdBrandLookupRouteImport } from './routes/_app/p/$p
 import { Route as AppPProjectIdContextRouteImport } from './routes/_app/p/$projectId/context'
 import { Route as AppPProjectIdDigitalPrRouteImport } from './routes/_app/p/$projectId/digital-pr'
 import { Route as AppPProjectIdDomainRouteImport } from './routes/_app/p/$projectId/domain'
+import { Route as AppPProjectIdInboundLeadsRouteImport } from './routes/_app/p/$projectId/inbound-leads'
 import { Route as AppPProjectIdKeywordsRouteImport } from './routes/_app/p/$projectId/keywords'
 import { Route as AppPProjectIdLeadsRouteImport } from './routes/_app/p/$projectId/leads'
 import { Route as AppPProjectIdPromptExplorerRouteImport } from './routes/_app/p/$projectId/prompt-explorer'
@@ -186,6 +188,11 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInboundLeadsRoute = ApiInboundLeadsRouteImport.update({
+  id: '/api/inbound-leads',
+  path: '/api/inbound-leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuditTokenRoute = AuditTokenRouteImport.update({
   id: '/audit/$token',
   path: '/audit/$token',
@@ -310,6 +317,12 @@ const AppPProjectIdDomainRoute = AppPProjectIdDomainRouteImport.update({
   path: '/domain',
   getParentRoute: () => AppPProjectIdRouteRoute,
 } as any)
+const AppPProjectIdInboundLeadsRoute =
+  AppPProjectIdInboundLeadsRouteImport.update({
+    id: '/inbound-leads',
+    path: '/inbound-leads',
+    getParentRoute: () => AppPProjectIdRouteRoute,
+  } as any)
 const AppPProjectIdKeywordsRoute = AppPProjectIdKeywordsRouteImport.update({
   id: '/keywords',
   path: '/keywords',
@@ -484,6 +497,7 @@ export interface FileRoutesByFullPath {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/inbound-leads': typeof ApiInboundLeadsRoute
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
@@ -507,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/p/$projectId/digital-pr': typeof AppPProjectIdDigitalPrRouteWithChildren
   '/p/$projectId/domain': typeof AppPProjectIdDomainRoute
+  '/p/$projectId/inbound-leads': typeof AppPProjectIdInboundLeadsRoute
   '/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
   '/p/$projectId/leads': typeof AppPProjectIdLeadsRoute
   '/p/$projectId/prompt-explorer': typeof AppPProjectIdPromptExplorerRoute
@@ -554,6 +569,7 @@ export interface FileRoutesByTo {
   '/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/inbound-leads': typeof ApiInboundLeadsRoute
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
@@ -574,6 +590,7 @@ export interface FileRoutesByTo {
   '/p/$projectId/brand-lookup': typeof AppPProjectIdBrandLookupRoute
   '/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/p/$projectId/domain': typeof AppPProjectIdDomainRoute
+  '/p/$projectId/inbound-leads': typeof AppPProjectIdInboundLeadsRoute
   '/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
   '/p/$projectId/leads': typeof AppPProjectIdLeadsRoute
   '/p/$projectId/prompt-explorer': typeof AppPProjectIdPromptExplorerRoute
@@ -623,6 +640,7 @@ export interface FileRoutesById {
   '/_authenticated/yc': typeof AuthenticatedYcRoute
   '/accept-invitation/$id': typeof AcceptInvitationIdRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/inbound-leads': typeof ApiInboundLeadsRoute
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
@@ -647,6 +665,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/context': typeof AppPProjectIdContextRoute
   '/_app/p/$projectId/digital-pr': typeof AppPProjectIdDigitalPrRouteWithChildren
   '/_app/p/$projectId/domain': typeof AppPProjectIdDomainRoute
+  '/_app/p/$projectId/inbound-leads': typeof AppPProjectIdInboundLeadsRoute
   '/_app/p/$projectId/keywords': typeof AppPProjectIdKeywordsRoute
   '/_app/p/$projectId/leads': typeof AppPProjectIdLeadsRoute
   '/_app/p/$projectId/prompt-explorer': typeof AppPProjectIdPromptExplorerRoute
@@ -697,6 +716,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/api/inbound-leads'
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
@@ -720,6 +740,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/context'
     | '/p/$projectId/digital-pr'
     | '/p/$projectId/domain'
+    | '/p/$projectId/inbound-leads'
     | '/p/$projectId/keywords'
     | '/p/$projectId/leads'
     | '/p/$projectId/prompt-explorer'
@@ -767,6 +788,7 @@ export interface FileRouteTypes {
     | '/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/api/inbound-leads'
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
@@ -787,6 +809,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/brand-lookup'
     | '/p/$projectId/context'
     | '/p/$projectId/domain'
+    | '/p/$projectId/inbound-leads'
     | '/p/$projectId/keywords'
     | '/p/$projectId/leads'
     | '/p/$projectId/prompt-explorer'
@@ -835,6 +858,7 @@ export interface FileRouteTypes {
     | '/_authenticated/yc'
     | '/accept-invitation/$id'
     | '/api/health'
+    | '/api/inbound-leads'
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
@@ -859,6 +883,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/context'
     | '/_app/p/$projectId/digital-pr'
     | '/_app/p/$projectId/domain'
+    | '/_app/p/$projectId/inbound-leads'
     | '/_app/p/$projectId/keywords'
     | '/_app/p/$projectId/leads'
     | '/_app/p/$projectId/prompt-explorer'
@@ -900,6 +925,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OpenaiAppsChallengeRoute: typeof Char91DotwellKnownChar93OpenaiAppsChallengeRoute
   AcceptInvitationIdRoute: typeof AcceptInvitationIdRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  ApiInboundLeadsRoute: typeof ApiInboundLeadsRoute
   AuditTokenRoute: typeof AuditTokenRoute
   LrTokenRoute: typeof LrTokenRoute
   RReportIdRoute: typeof RReportIdRoute
@@ -1059,6 +1085,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inbound-leads': {
+      id: '/api/inbound-leads'
+      path: '/api/inbound-leads'
+      fullPath: '/api/inbound-leads'
+      preLoaderRoute: typeof ApiInboundLeadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audit/$token': {
@@ -1227,6 +1260,13 @@ declare module '@tanstack/react-router' {
       path: '/domain'
       fullPath: '/p/$projectId/domain'
       preLoaderRoute: typeof AppPProjectIdDomainRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
+    '/_app/p/$projectId/inbound-leads': {
+      id: '/_app/p/$projectId/inbound-leads'
+      path: '/inbound-leads'
+      fullPath: '/p/$projectId/inbound-leads'
+      preLoaderRoute: typeof AppPProjectIdInboundLeadsRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
     '/_app/p/$projectId/keywords': {
@@ -1519,6 +1559,7 @@ interface AppPProjectIdRouteRouteChildren {
   AppPProjectIdContextRoute: typeof AppPProjectIdContextRoute
   AppPProjectIdDigitalPrRoute: typeof AppPProjectIdDigitalPrRouteWithChildren
   AppPProjectIdDomainRoute: typeof AppPProjectIdDomainRoute
+  AppPProjectIdInboundLeadsRoute: typeof AppPProjectIdInboundLeadsRoute
   AppPProjectIdKeywordsRoute: typeof AppPProjectIdKeywordsRoute
   AppPProjectIdLeadsRoute: typeof AppPProjectIdLeadsRoute
   AppPProjectIdPromptExplorerRoute: typeof AppPProjectIdPromptExplorerRoute
@@ -1544,6 +1585,7 @@ const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
   AppPProjectIdContextRoute: AppPProjectIdContextRoute,
   AppPProjectIdDigitalPrRoute: AppPProjectIdDigitalPrRouteWithChildren,
   AppPProjectIdDomainRoute: AppPProjectIdDomainRoute,
+  AppPProjectIdInboundLeadsRoute: AppPProjectIdInboundLeadsRoute,
   AppPProjectIdKeywordsRoute: AppPProjectIdKeywordsRoute,
   AppPProjectIdLeadsRoute: AppPProjectIdLeadsRoute,
   AppPProjectIdPromptExplorerRoute: AppPProjectIdPromptExplorerRoute,
@@ -1635,6 +1677,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OpenaiAppsChallengeRoute,
   AcceptInvitationIdRoute: AcceptInvitationIdRoute,
   ApiHealthRoute: ApiHealthRoute,
+  ApiInboundLeadsRoute: ApiInboundLeadsRoute,
   AuditTokenRoute: AuditTokenRoute,
   LrTokenRoute: LrTokenRoute,
   RReportIdRoute: RReportIdRoute,

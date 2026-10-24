@@ -78,6 +78,9 @@ declare namespace Cloudflare {
       }
     >;
 
+    // Shared secret the project website sends when posting form leads to /api/inbound-leads.
+    INBOUND_LEADS_SECRET?: string;
+
     // OpenRouter API key for the SAM in-app chat agent.
     OPENROUTER_API_KEY?: string;
     // Optional OpenRouter model slug override (defaults in openrouter.ts).

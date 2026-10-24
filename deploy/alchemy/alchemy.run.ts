@@ -274,6 +274,13 @@ const resolveSelfHostAccess = (
         domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
         path: "audit",
       });
+      yield* publicPathBypass({
+        policyId: "SelfHostInboundLeadsBypass",
+        applicationId: "SelfHostInboundLeads",
+        name: `open-seo ${stage} inbound leads`,
+        domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
+        path: "api/inbound-leads",
+      });
     }
 
     return { teamDomain, policyAud };
@@ -293,6 +300,7 @@ const dataEnv = {
   GOOGLE_CLIENT_ID: optionalVar("GOOGLE_CLIENT_ID"),
   GOOGLE_CLIENT_SECRET: optionalSecret("GOOGLE_CLIENT_SECRET"),
   OPENROUTER_API_KEY: optionalSecret("OPENROUTER_API_KEY"),
+  INBOUND_LEADS_SECRET: optionalSecret("INBOUND_LEADS_SECRET"),
   PEXELS_API_KEY: optionalSecret("PEXELS_API_KEY"),
   UNSPLASH_ACCESS_KEY: optionalSecret("UNSPLASH_ACCESS_KEY"),
   PIXABAY_API_KEY: optionalSecret("PIXABAY_API_KEY"),

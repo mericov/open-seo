@@ -7,6 +7,7 @@ import {
   FileText,
   GitCompareArrows,
   Globe,
+  Inbox,
   LayoutDashboard,
   Library,
   Link2,
@@ -59,6 +60,11 @@ const projectNavItems = [
     to: "/p/$projectId/blog-writer" as const,
     label: "nav:items.blogWriter" as const,
     icon: PenLine,
+  },
+  {
+    to: "/p/$projectId/inbound-leads" as const,
+    label: "nav:items.inboundLeads" as const,
+    icon: Inbox,
   },
   {
     to: "/p/$projectId/leads" as const,
@@ -188,6 +194,7 @@ export function getProjectNavGroups(projectId: string) {
     {
       label: "nav:groups.mySite" as const,
       items: [
+        byPath("/p/$projectId/inbound-leads"),
         byPath("/p/$projectId/search-performance"),
         byPath("/p/$projectId/rank-tracking"),
         byPath("/p/$projectId/blog-tracking"),

@@ -1,0 +1,40 @@
+{
+  "title": "Site Leads",
+  "description": "Requests sent through the forms on your own website. Kept separate from Lead Finder.",
+  "verdict": {
+    "ok": "Leads",
+    "suspicious": "Suspicious",
+    "spam": "Spam"
+  },
+  "status": {
+    "all": "All statuses",
+    "new": "New",
+    "contacted": "Contacted",
+    "client": "Became a client",
+    "lost": "Not a fit"
+  },
+  "empty": {
+    "ok": "No site leads yet",
+    "suspicious": "No suspicious submissions",
+    "spam": "No spam caught",
+    "hint": "Form submissions from your website show up here as soon as they arrive."
+  },
+  "unnamed": "No name",
+  "seconds": "{{count}}s on page",
+  "reason": "Flagged because",
+  "notePlaceholder": "What did you agree, when to follow up…",
+  "noteSaved": "Note saved",
+  "addNote": "Add note",
+  "editNote": "Edit note",
+  "save": "Save",
+  "cancel": "Cancel",
+  "markSpam": "Mark as spam",
+  "notSpam": "Not spam",
+  "markReal": "Mark as real",
+  "delete": "Delete",
+  "confirmDelete": "Delete this lead for good?",
+  "range": "{{from}}–{{to}} of {{total}}",
+  "previous": "Previous",
+  "next": "Next",
+  "loadError": "Could not load site leads."
+}

@@ -9,6 +9,7 @@ import enOnboarding from "./en/onboarding.json";
 import enIntegrations from "./en/integrations.json";
 import enLeads from "./en/leads.json";
 import enDigitalPr from "./en/digitalPr.json";
+import enInboundLeads from "./en/inboundLeads.json";
 import trAuth from "./tr/auth.json";
 import trBlogTracking from "./tr/blogTracking.json";
 import trBlogWriter from "./tr/blogWriter.json";
@@ -20,6 +21,7 @@ import trOnboarding from "./tr/onboarding.json";
 import trIntegrations from "./tr/integrations.json";
 import trLeads from "./tr/leads.json";
 import trDigitalPr from "./tr/digitalPr.json";
+import trInboundLeads from "./tr/inboundLeads.json";
 
 export const resources = {
   en: {
@@ -34,6 +36,7 @@ export const resources = {
     integrations: enIntegrations,
     leads: enLeads,
     digitalPr: enDigitalPr,
+    inboundLeads: enInboundLeads,
   },
   tr: {
     auth: trAuth,
@@ -47,6 +50,7 @@ export const resources = {
     integrations: trIntegrations,
     leads: trLeads,
     digitalPr: trDigitalPr,
+    inboundLeads: trInboundLeads,
   },
 } as const;
 
