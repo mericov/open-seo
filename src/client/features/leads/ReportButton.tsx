@@ -12,7 +12,7 @@ import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import { saveLeadReport } from "@/serverFunctions/leads";
 import { LEAD_REPORT_PATH } from "@/shared/leadEmail";
 
-const REPORT_TIMEOUT_MS = 120_000;
+const REPORT_TIMEOUT_MS = 180_000;
 
 function useExtensionVersion() {
   const [version, setVersion] = useState<string | null>(null);
