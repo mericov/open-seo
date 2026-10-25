@@ -152,6 +152,27 @@ export const LEAD_STORE_PLATFORMS = [
 
 export type LeadStorePlatform = (typeof LEAD_STORE_PLATFORMS)[number];
 
+export const LEAD_CAMPAIGN_PRESETS = [
+  "product_b2b",
+  "shopify_service",
+  "local_service",
+] as const;
+
+export const LEAD_SEARCH_SCOPES = ["place", "country", "list"] as const;
+
+const PRODUCT_B2B_CATEGORIES = [
+  "interior_designer",
+  "interior_decorator",
+  "home_staging_service",
+  "interior_plant_service",
+  "real_estate_agency",
+  "property_management_company",
+  "coworking_space",
+  "office_furniture_store",
+  "furniture_store",
+  "event_venue",
+] as const;
+
 export const LEAD_RUN_SIZE_MAX = 50;
 export const LEAD_AUTO_RUN_INTERVAL_DAYS = 7;
 
@@ -160,6 +181,9 @@ export function categoriesForSearch(search: {
   categoryGroup: string | null;
 }): string[] | undefined {
   if (!search.categoryGroup) return [search.category];
+  if (search.categoryGroup === "product_b2b") {
+    return [...PRODUCT_B2B_CATEGORIES];
+  }
   const group = LEAD_CATEGORY_GROUP_NAMES.find(
     (name) => name === search.categoryGroup,
   );

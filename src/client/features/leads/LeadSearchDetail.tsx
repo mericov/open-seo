@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { Archive, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/client/components/ConfirmDialog";
@@ -84,7 +84,7 @@ export function LeadSearchDetail({
       await navigate({
         to: "/p/$projectId/leads",
         params: { projectId },
-        search: {},
+        search: { view: "campaigns" },
       });
     },
   });
@@ -126,9 +126,6 @@ export function LeadSearchDetail({
   const failedReads = searchQuery.data.leads.filter(
     (lead) => lead.enrichmentStatus === "failed",
   ).length;
-  const trackedLeads = searchQuery.data.leads.filter(
-    (lead) => lead.outreachStatus !== "new",
-  ).length;
   const leads =
     isStoreSearch && verifiedOnly
       ? searchQuery.data.leads.filter((lead) => !isHiddenStore(lead))
@@ -165,7 +162,7 @@ export function LeadSearchDetail({
             <Link
               to="/p/$projectId/leads"
               params={{ projectId }}
-              search={{}}
+              search={{ view: "campaigns" }}
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="size-3" />
@@ -175,16 +172,35 @@ export function LeadSearchDetail({
               {search.label}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {isStoreSearch
-                ? t("detail.storeScope", {
-                    platform: search.technology ?? t("detail.domainList"),
-                    keywords: search.keywordQuery ?? t("detail.allKeywords"),
-                    country: search.countryCode ?? t("stores.countries.any"),
-                  })
-                : t("detail.radius", {
-                    radius: search.radiusKm,
-                    location: search.locationLabel,
-                  })}
+              {search.scope === "country" && searchQuery.data.areas
+                ? [
+                    t("detail.countryScope", {
+                      country: search.countryCode
+                        ? t(`campaign.countries.${search.countryCode}`, {
+                            defaultValue: search.countryCode,
+                          })
+                        : search.locationLabel,
+                      done: searchQuery.data.areas.done,
+                      total: searchQuery.data.areas.total,
+                    }),
+                    searchQuery.data.areas.next
+                      ? t("detail.nextArea", {
+                          name: searchQuery.data.areas.next,
+                        })
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")
+                : isStoreSearch
+                  ? t("detail.storeScope", {
+                      platform: search.technology ?? t("detail.domainList"),
+                      keywords: search.keywordQuery ?? t("detail.allKeywords"),
+                      country: search.countryCode ?? t("stores.countries.any"),
+                    })
+                  : t("detail.radius", {
+                      radius: search.radiusKm,
+                      location: search.locationLabel,
+                    })}
             </p>
           </div>
           <Button
@@ -192,7 +208,7 @@ export function LeadSearchDetail({
             size="sm"
             onClick={() => setConfirmDelete(true)}
           >
-            <Trash2 data-icon="inline-start" />
+            <Archive data-icon="inline-start" />
             {t("detail.delete")}
           </Button>
         </div>
@@ -215,7 +231,11 @@ export function LeadSearchDetail({
         ) : null}
 
         {!isStoreSearch || search.technology ? (
-          <LeadAutoScan projectId={projectId} search={search} />
+          <LeadAutoScan
+            projectId={projectId}
+            search={search}
+            pool={searchQuery.data.pool}
+          />
         ) : null}
 
         {failedReads > 0 && pending === 0 ? (
@@ -341,17 +361,11 @@ export function LeadSearchDetail({
         <ConfirmDialog
           title={t("detail.deleteTitle")}
           confirmLabel={t("detail.delete")}
-          destructive
           pending={deleteMutation.isPending}
           onConfirm={() => deleteMutation.mutate()}
           onClose={() => setConfirmDelete(false)}
         >
           {t("detail.deleteDescription")}
-          {trackedLeads > 0 ? (
-            <span className="mt-2 block font-medium text-destructive">
-              {t("detail.deleteTracked", { count: trackedLeads })}
-            </span>
-          ) : null}
         </ConfirmDialog>
       ) : null}
     </div>

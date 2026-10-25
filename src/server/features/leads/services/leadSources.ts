@@ -3,7 +3,10 @@ import type { BillingCustomerContext } from "@/server/billing/subscription";
 import { createDataforseoClient } from "@/server/lib/dataforseo";
 import { isRecord } from "@/server/lib/dataforseo/envelope";
 import { classifyEmail } from "@/server/lib/leads/emailChecks";
+import { ContactRegistryRepository } from "@/server/features/leads/repositories/ContactRegistryRepository";
+import { CampaignRepository } from "@/server/features/leads/repositories/CampaignRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
+import { ownDomain } from "@/shared/leads";
 import { FEW_REVIEWS_THRESHOLD, type LeadNeedFilter } from "@/shared/leadScan";
 
 type LocalSourceParams = {
@@ -29,11 +32,12 @@ export type SourcePageResult = {
   returned: number;
   found: number;
   added: number;
+  linked: number;
 };
 
 export async function fetchAndSaveLocal(
   billing: BillingCustomerContext,
-  target: { projectId: string; searchId: string },
+  target: SaveTarget,
   params: LocalSourceParams,
   page: Page,
 ): Promise<SourcePageResult> {
@@ -61,15 +65,88 @@ export async function fetchAndSaveLocal(
     const listing = toListing(row);
     return listing ? [listing] : [];
   });
-  const existing = await LeadRepository.existingBusinessKeys(
+  const saved = await saveFoundLeads(target, listings);
+  return { returned: rows.length, ...saved };
+}
+
+type FoundLead = {
+  keys: [string, ...string[]];
+  lead: Omit<LeadInsert, "id" | "businessKey">;
+  emails?: string[];
+};
+
+type LeadInsert = Parameters<typeof LeadRepository.insertLeads>[2][number];
+
+export type SaveTarget = {
+  organizationId: string;
+  projectId: string;
+  searchId: string;
+};
+
+// Saves a page of found businesses into a campaign. A business the project
+// already holds (matched on any of its keys) is linked instead of inserted, so
+// a new campaign still shows it with its outreach history. Domains the
+// organization asked never to contact again are dropped.
+async function saveFoundLeads(target: SaveTarget, found: FoundLead[]) {
+  const unique = [...new Map(found.map((row) => [row.keys[0], row])).values()];
+  const [existing, registry] = await Promise.all([
+    LeadRepository.findLeadIdsByKeys(
+      target.projectId,
+      unique.flatMap((row) => row.keys),
+    ),
+    ContactRegistryRepository.listByKeys(
+      target.organizationId,
+      unique.flatMap((row) => {
+        const domain = ownDomain(row.lead.domain ?? null);
+        return domain ? [domain] : [];
+      }),
+    ),
+  ]);
+  const suppressed = new Set(
+    registry.filter((row) => row.suppressedAt).map((row) => row.contactKey),
+  );
+  const fresh: (FoundLead & { id: string })[] = [];
+  const known: string[] = [];
+  for (const row of unique) {
+    const domain = ownDomain(row.lead.domain ?? null);
+    if (domain && suppressed.has(domain)) continue;
+    const knownId = row.keys
+      .map((key) => existing.get(key))
+      .find((id) => id != null);
+    if (knownId) known.push(knownId);
+    else fresh.push({ ...row, id: crypto.randomUUID() });
+  }
+
+  await LeadRepository.insertLeads(
     target.projectId,
-    listings.map((listing) => listing.businessKey),
+    target.searchId,
+    fresh.map((row) => ({ ...row.lead, id: row.id, businessKey: row.keys[0] })),
   );
-  const fresh = listings.filter(
-    (listing) => !existing.has(listing.businessKey),
+  await LeadRepository.insertFoundEmails(
+    fresh.flatMap((row) =>
+      (row.emails ?? []).map((email) => ({
+        leadId: row.id,
+        email,
+        checkStatus: "mx_ok" as const,
+        ...classifyEmail(email, row.lead.domain ?? null),
+        isPrimary: false,
+      })),
+    ),
   );
-  await LeadRepository.insertLeads(target.projectId, target.searchId, fresh);
-  return { returned: rows.length, found: listings.length, added: fresh.length };
+  const alreadyLinked = await CampaignRepository.listLinkedLeadIds(
+    target.searchId,
+    known,
+  );
+  const newlyLinked = known.filter((id) => !alreadyLinked.has(id));
+  await CampaignRepository.linkLeads(target.searchId, [
+    ...fresh.map((row) => row.id),
+    ...newlyLinked,
+  ]);
+  return {
+    found: unique.length,
+    added: fresh.length,
+    linked: newlyLinked.length,
+  };
 }
 
 const technologyItemSchema = z.object({
@@ -145,46 +222,23 @@ export async function fetchStoreRows(
   return { returned: items.length, rows };
 }
 
-export async function saveStoreRows(
-  target: { projectId: string; searchId: string },
-  rows: StoreRow[],
-) {
-  const unique = [...new Map(rows.map((row) => [row.domain, row])).values()];
-  const existing = await LeadRepository.existingBusinessKeys(
-    target.projectId,
-    unique.map((row) => storeKey(row.domain)),
-  );
-  const fresh = unique
-    .filter((row) => !existing.has(storeKey(row.domain)))
-    .map((row) => ({ ...row, id: crypto.randomUUID() }));
-
-  await LeadRepository.insertLeads(
-    target.projectId,
-    target.searchId,
-    fresh.map((row) => ({
-      id: row.id,
-      businessKey: storeKey(row.domain),
-      name: row.name,
-      phone: row.phone,
-      website: `https://${row.domain}/`,
-      domain: row.domain,
-      countryCode: row.countryCode,
-      domainRank: row.domainRank,
-      enrichmentStatus: "pending" as const,
+export async function saveStoreRows(target: SaveTarget, rows: StoreRow[]) {
+  return saveFoundLeads(
+    target,
+    rows.map((row) => ({
+      keys: [storeKey(row.domain)],
+      lead: {
+        name: row.name,
+        phone: row.phone,
+        website: `https://${row.domain}/`,
+        domain: row.domain,
+        countryCode: row.countryCode,
+        domainRank: row.domainRank,
+        enrichmentStatus: "pending" as const,
+      },
+      emails: row.emails,
     })),
   );
-  await LeadRepository.insertFoundEmails(
-    fresh.flatMap((row) =>
-      row.emails.map((email) => ({
-        leadId: row.id,
-        email,
-        checkStatus: "mx_ok" as const,
-        ...classifyEmail(email, row.domain),
-        isPrimary: false,
-      })),
-    ),
-  );
-  return { found: unique.length, added: fresh.length };
 }
 
 export function normalizeDomain(raw: string): string | null {
@@ -215,36 +269,44 @@ function toListing(row: Record<string, unknown>) {
   if (!name) return null;
   const cid = stringField(row.cid);
   const placeId = stringField(row.place_id);
-  const domain = stringField(row.domain)?.toLowerCase() ?? null;
+  const rawDomain = stringField(row.domain);
+  const domain = rawDomain ? normalizeDomain(rawDomain) : null;
   const address = stringField(row.address);
-  const businessKey =
-    (cid && `cid:${cid}`) ||
-    (placeId && `place:${placeId}`) ||
-    (domain && `domain:${domain}`) ||
-    `name:${name.toLowerCase()}|${address?.toLowerCase() ?? ""}`;
+  const businessDomain = ownDomain(domain);
+  const [first, ...rest] = [
+    businessDomain && storeKey(businessDomain),
+    cid && `cid:${cid}`,
+    placeId && `place:${placeId}`,
+  ].filter((key): key is string => Boolean(key));
+  const keys: [string, ...string[]] = [
+    first ?? `name:${name.toLowerCase()}|${address?.toLowerCase() ?? ""}`,
+    ...rest,
+  ];
   const rating = isRecord(row.rating) ? row.rating : {};
   return {
-    businessKey,
-    name,
-    category: stringField(row.category),
-    address,
-    phone: stringField(row.phone),
-    website: stringField(row.url),
-    domain,
-    rating: numberField(rating.value),
-    reviewsCount: numberField(rating.votes_count),
-    isClaimed: typeof row.is_claimed === "boolean" ? row.is_claimed : null,
-    photosCount: numberField(row.total_photos),
-    hoursListed:
-      "work_time" in row
-        ? isRecord(row.work_time) &&
-          isRecord(row.work_time.work_hours) &&
-          isRecord(row.work_time.work_hours.timetable)
-        : null,
-    mapsUrl:
-      stringField(row.check_url) ??
-      (cid ? `https://www.google.com/maps?cid=${cid}` : null),
-    enrichmentStatus: "pending" as const,
+    keys,
+    lead: {
+      name,
+      category: stringField(row.category),
+      address,
+      phone: stringField(row.phone),
+      website: stringField(row.url),
+      domain,
+      rating: numberField(rating.value),
+      reviewsCount: numberField(rating.votes_count),
+      isClaimed: typeof row.is_claimed === "boolean" ? row.is_claimed : null,
+      photosCount: numberField(row.total_photos),
+      hoursListed:
+        "work_time" in row
+          ? isRecord(row.work_time) &&
+            isRecord(row.work_time.work_hours) &&
+            isRecord(row.work_time.work_hours.timetable)
+          : null,
+      mapsUrl:
+        stringField(row.check_url) ??
+        (cid ? `https://www.google.com/maps?cid=${cid}` : null),
+      enrichmentStatus: "pending" as const,
+    },
   };
 }
 

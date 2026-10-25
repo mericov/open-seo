@@ -330,6 +330,13 @@
       "when": 1792830875279,
       "tag": "0046_inbound_leads",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792928885794,
+      "tag": "0047_lead_campaigns",
+      "breakpoints": true
     }
   ]
 }

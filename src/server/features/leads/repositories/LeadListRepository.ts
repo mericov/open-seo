@@ -12,7 +12,13 @@ import {
 } from "drizzle-orm";
 import { chunk } from "remeda";
 import { db } from "@/db";
-import { leadEmails, leadFindings, leads, leadSearches } from "@/db/schema";
+import {
+  leadEmails,
+  leadFindings,
+  leads,
+  leadSearches,
+  leadSearchLeads,
+} from "@/db/schema";
 import type {
   LeadFindingCode,
   LeadNoteColor,
@@ -49,7 +55,15 @@ function filterConditions(
         )
       : undefined,
     filters.source ? eq(leadSearches.source, filters.source) : undefined,
-    filters.searchId ? eq(leads.searchId, filters.searchId) : undefined,
+    filters.searchId
+      ? inArray(
+          leads.id,
+          db
+            .select({ id: leadSearchLeads.leadId })
+            .from(leadSearchLeads)
+            .where(eq(leadSearchLeads.searchId, filters.searchId)),
+        )
+      : undefined,
     filters.hasEmail ? isNotNull(leadEmails.email) : undefined,
     filters.minScore != null
       ? gte(leads.opportunityScore, filters.minScore)
@@ -206,6 +220,23 @@ async function listForFirstLines(projectId: string, leadIds: string[]) {
   return groups.flat();
 }
 
+async function listContactFields(projectId: string, leadIds: string[]) {
+  const groups = await Promise.all(
+    chunk(leadIds, ID_CHUNK).map((ids) =>
+      db
+        .select({
+          id: leads.id,
+          domain: leads.domain,
+          primaryEmail: leadEmails.email,
+        })
+        .from(leads)
+        .leftJoin(leadEmails, primaryEmailJoin)
+        .where(and(eq(leads.projectId, projectId), inArray(leads.id, ids))),
+    ),
+  );
+  return groups.flat();
+}
+
 async function setFirstLine(
   projectId: string,
   leadId: string,
@@ -326,6 +357,7 @@ export const LeadListRepository = {
   listFindings,
   setOutreachStatus,
   listForFirstLines,
+  listContactFields,
   setFirstLine,
   countDue,
   setHidden,

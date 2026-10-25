@@ -15,8 +15,10 @@ import { LEAD_RUN_SIZE_MAX } from "@/shared/leadScan";
 export function LeadAutoScan({
   projectId,
   search,
+  pool,
 }: {
   projectId: string;
+  pool: { ready: number; pending: number; target: number };
   search: {
     id: string;
     autoRun: boolean;
@@ -41,14 +43,18 @@ export function LeadAutoScan({
     mutationFn: () =>
       runLeadSearchNow({ data: { projectId, searchId: search.id } }),
     onSuccess: async (result) => {
-      toast.success(t("scan.ranNow", { count: result.added }));
+      toast.success(
+        result.added > 0
+          ? t("scan.ranNow", { count: result.added })
+          : t("scan.poolFull"),
+      );
       await invalidate();
     },
     onError: (error) => toast.error(getStandardErrorMessage(error)),
   });
 
   const saveRunSize = () => {
-    const size = Math.min(LEAD_RUN_SIZE_MAX, Math.max(1, runSize || 1));
+    const size = Math.min(LEAD_RUN_SIZE_MAX, Math.max(5, runSize || 5));
     setRunSize(size);
     if (size !== search.runSize) {
       scheduleMutation.mutate({ autoRun: search.autoRun, runSize: size });
@@ -60,7 +66,14 @@ export function LeadAutoScan({
       <div className="flex items-start gap-3">
         <RefreshCw className="mt-0.5 size-4 text-muted-foreground" />
         <div className="space-y-0.5">
-          <p className="text-sm font-medium">{t("scan.autoTitle")}</p>
+          <p className="text-sm font-medium">
+            {t("pool.status", { ready: pool.ready, target: pool.target })}
+          </p>
+          {pool.pending > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {t("pool.reading", { count: pool.pending })}
+            </p>
+          ) : null}
           <p className="text-xs text-muted-foreground">
             {search.autoRun && search.nextRunAt
               ? t("scan.nextRun", {
@@ -88,7 +101,7 @@ export function LeadAutoScan({
           {t("scan.perRun")}
           <Input
             type="number"
-            min={1}
+            min={5}
             max={LEAD_RUN_SIZE_MAX}
             value={runSize}
             onChange={(event) => setRunSize(Number(event.target.value))}
@@ -103,7 +116,7 @@ export function LeadAutoScan({
           onClick={() => runMutation.mutate()}
         >
           <Play data-icon="inline-start" />
-          {t("scan.runNow", { count: search.runSize })}
+          {t("scan.runNow")}
         </Button>
       </div>
     </div>

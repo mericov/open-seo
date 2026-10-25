@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { CampaignService } from "@/server/features/leads/services/CampaignService";
 import { LeadFinderService } from "@/server/features/leads/services/LeadFinderService";
 import { LeadFirstLineService } from "@/server/features/leads/services/LeadFirstLineService";
 import { LeadReportService } from "@/server/features/leads/services/LeadReportService";
@@ -8,7 +9,6 @@ import { LeadOutreachService } from "@/server/features/leads/services/LeadOutrea
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
-  leadCategoryQuerySchema,
   leadLocationQuerySchema,
   generateFirstLinesSchema,
   importStoresSchema,
@@ -24,16 +24,9 @@ import {
   setLeadScheduleSchema,
   setLeadStatusSchema,
   listLeadSearchesSchema,
-  startLeadSearchSchema,
-  startStoreSearchSchema,
+  createLeadCampaignSchema,
+  suppressLeadsSchema,
 } from "@/types/schemas/leads";
-
-export const listLeadCategories = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(leadCategoryQuerySchema)
-  .handler(async ({ data }) =>
-    LeadFinderService.listCategories(data.query, 20),
-  );
 
 export const findLeadLocations = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
@@ -44,44 +37,24 @@ export const listLeadSearches = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(listLeadSearchesSchema)
   .handler(async ({ context }) =>
-    LeadFinderService.listSearches(context.projectId),
+    CampaignService.listSearches(context.projectId),
   );
 
-export const startLeadSearch = createServerFn({ method: "POST" })
+export const createLeadCampaign = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
-  .validator(startLeadSearchSchema)
+  .validator(createLeadCampaignSchema)
   .handler(async ({ data, context }) =>
-    LeadFinderService.startSearch(
-      {
-        projectId: context.projectId,
-        category: data.category,
-        categoryGroup: data.categoryGroup,
-        needFilter: data.needFilter,
-        nameQuery: data.nameQuery,
-        location: data.location,
-        place: data.place,
-        radiusKm: data.radiusKm,
-        limit: data.limit,
-        minRating: data.minRating,
-      },
-      context,
-    ),
+    CampaignService.create({ ...data, projectId: context.projectId }, context),
   );
 
-export const startStoreSearch = createServerFn({ method: "POST" })
+export const suppressLeads = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
-  .validator(startStoreSearchSchema)
+  .validator(suppressLeadsSchema)
   .handler(async ({ data, context }) =>
-    StoreFinderService.startStoreSearch(
-      {
-        projectId: context.projectId,
-        technology: data.technology,
-        keywords: data.keywords,
-        countryCode: data.countryCode,
-        maxRank: data.maxRank,
-        limit: data.limit,
-      },
-      context,
+    LeadOutreachService.suppress(
+      context.projectId,
+      context.organizationId,
+      data.leadIds,
     ),
   );
 
@@ -89,7 +62,11 @@ export const importStores = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(importStoresSchema)
   .handler(async ({ data, context }) =>
-    StoreFinderService.importStores(context.projectId, data.domains),
+    StoreFinderService.importStores(
+      context.organizationId,
+      context.projectId,
+      data.domains,
+    ),
   );
 
 export const enrichLeadBatch = createServerFn({ method: "POST" })
@@ -103,7 +80,11 @@ export const getLeadSearch = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(leadSearchIdSchema)
   .handler(async ({ data, context }) =>
-    LeadFinderService.getSearchDetail(context.projectId, data.searchId),
+    CampaignService.getSearchDetail(
+      context.projectId,
+      context.organizationId,
+      data.searchId,
+    ),
   );
 
 export const deleteLeadSearch = createServerFn({ method: "POST" })
@@ -119,6 +100,7 @@ export const listProjectLeads = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     LeadOutreachService.listLeads(
       context.projectId,
+      context.organizationId,
       {
         status: data.status,
         source: data.source,
@@ -137,7 +119,12 @@ export const setLeadStatus = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(setLeadStatusSchema)
   .handler(async ({ data, context }) =>
-    LeadOutreachService.setStatus(context.projectId, data.leadIds, data.status),
+    LeadOutreachService.setStatus(
+      context.projectId,
+      context.organizationId,
+      data.leadIds,
+      data.status,
+    ),
   );
 
 export const runLeadSearchNow = createServerFn({ method: "POST" })

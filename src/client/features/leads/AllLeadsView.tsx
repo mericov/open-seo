@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Mail, Users } from "lucide-react";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/client/components/EmptyState";
 import { ExportMenu } from "@/client/components/ExportMenu";
@@ -19,6 +18,7 @@ import { useLeadActions } from "@/client/features/leads/useLeadActions";
 import { useMailClient } from "@/client/features/leads/useMailClient";
 import {
   BulkBar,
+  CampaignFilter,
   FilterSelect,
 } from "@/client/features/leads/AllLeadsControls";
 import {
@@ -33,7 +33,6 @@ import {
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
 } from "@/shared/leadFindings";
-import { LEAD_FIRST_LINE_MAX_IDS } from "@/types/schemas/leads";
 import { cn } from "cn";
 
 const PAGE_SIZE = 50;
@@ -51,6 +50,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
   const [hasEmail, setHasEmail] = useState(false);
   const [dueOnly, setDueOnly] = useState(false);
   const [finding, setFinding] = useState<FindingFilter>("any");
+  const [campaign, setCampaign] = useState("any");
   const today = localToday();
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -62,6 +62,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     hasEmail: hasEmail || undefined,
     dueBy: dueOnly ? today : undefined,
     finding: finding === "any" ? undefined : finding,
+    searchId: campaign === "any" ? undefined : campaign,
     today,
     page,
     pageSize: PAGE_SIZE,
@@ -118,6 +119,14 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <CampaignFilter
+            projectId={projectId}
+            value={campaign}
+            onChange={(value) => {
+              setCampaign(value);
+              resetPaging();
+            }}
+          />
           <FilterSelect
             value={source}
             options={SOURCES}
@@ -331,6 +340,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
         <BulkBar
           rescanning={actions.rescan.isPending}
           onRescan={() => actions.rescan.mutate([...selected])}
+          suppressing={actions.suppress.isPending}
+          onSuppress={() => actions.suppress.mutate([...selected])}
           hiding={actions.hide.isPending}
           onHide={() =>
             actions.hide.mutate({ leadIds: [...selected], hidden: true })
@@ -338,15 +349,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
           count={selected.size}
           pending={statusMutation.isPending}
           writingLines={linesMutation.isPending}
-          onWriteLines={() => {
-            if (selected.size > LEAD_FIRST_LINE_MAX_IDS) {
-              toast.error(
-                t("firstLine.tooMany", { max: LEAD_FIRST_LINE_MAX_IDS }),
-              );
-              return;
-            }
-            linesMutation.mutate([...selected]);
-          }}
+          onWriteLines={() => actions.writeLines([...selected])}
           onStatus={(next) =>
             statusMutation.mutate({ leadIds: [...selected], status: next })
           }

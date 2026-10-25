@@ -4,6 +4,7 @@ import {
   LEAD_NOTE_COLORS,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
+import { LEAD_AREA_COUNTRIES } from "@/shared/leadAreas";
 import {
   LEAD_CATEGORY_GROUP_KEYS,
   LEAD_NEED_FILTERS,
@@ -15,57 +16,9 @@ const projectIdShape = { projectId: z.string().min(1) };
 
 export const LEAD_SEARCH_MAX_LIMIT = 100;
 
-export const leadCategoryQuerySchema = z.object({
-  ...projectIdShape,
-  query: z.string().trim().max(80).optional(),
-});
-
 export const leadLocationQuerySchema = z.object({
   ...projectIdShape,
   query: z.string().trim().min(2).max(200),
-});
-
-export const startLeadSearchSchema = z
-  .object({
-    ...projectIdShape,
-    category: z
-      .string()
-      .trim()
-      .min(1)
-      .max(120)
-      .regex(/^[a-z0-9_]+$/, "Pick a category from the list.")
-      .optional(),
-    categoryGroup: z.enum(LEAD_CATEGORY_GROUP_KEYS).optional(),
-    needFilter: z.enum(LEAD_NEED_FILTERS).optional(),
-    nameQuery: z.string().trim().max(120).optional(),
-    location: z.string().trim().min(2).max(200),
-    place: z
-      .object({
-        label: z.string().trim().min(1).max(300),
-        latitude: z.number().min(-90).max(90),
-        longitude: z.number().min(-180).max(180),
-      })
-      .optional(),
-    radiusKm: z.number().int().min(1).max(100),
-    limit: z.number().int().min(1).max(LEAD_SEARCH_MAX_LIMIT),
-    minRating: z.number().min(1).max(5).optional(),
-  })
-  .refine((data) => Boolean(data.category || data.categoryGroup), {
-    message: "Pick a category or a sector group.",
-    path: ["category"],
-  });
-
-export const startStoreSearchSchema = z.object({
-  ...projectIdShape,
-  technology: z.enum(LEAD_STORE_PLATFORMS).default("Shopify"),
-  keywords: z.array(z.string().trim().min(1).max(60)).max(10),
-  countryCode: z
-    .string()
-    .trim()
-    .regex(/^[A-Z]{2}$/)
-    .optional(),
-  maxRank: z.number().int().min(0).max(1000).optional(),
-  limit: z.number().int().min(1).max(LEAD_SEARCH_MAX_LIMIT),
 });
 
 export const importStoresSchema = z.object({
@@ -165,3 +118,55 @@ export const leadSearchIdSchema = z.object({
 });
 
 export const listLeadSearchesSchema = z.object(projectIdShape);
+
+const campaignAreaSchema = z.discriminatedUnion("scope", [
+  z.object({
+    scope: z.literal("country"),
+    countryCode: z.enum(LEAD_AREA_COUNTRIES),
+  }),
+  z.object({
+    scope: z.literal("place"),
+    place: z.object({
+      label: z.string().trim().min(1).max(300),
+      latitude: z.number().min(-90).max(90),
+      longitude: z.number().min(-180).max(180),
+    }),
+    radiusKm: z.number().int().min(1).max(100),
+  }),
+]);
+
+const campaignPoolShape = {
+  ...projectIdShape,
+  weeklyTarget: z.number().int().min(5).max(LEAD_RUN_SIZE_MAX),
+  autoRun: z.boolean(),
+};
+
+export const createLeadCampaignSchema = z.discriminatedUnion("preset", [
+  z.object({
+    ...campaignPoolShape,
+    preset: z.literal("product_b2b"),
+    area: campaignAreaSchema,
+  }),
+  z.object({
+    ...campaignPoolShape,
+    preset: z.literal("local_service"),
+    categoryGroup: z.enum(LEAD_CATEGORY_GROUP_KEYS),
+    needFilter: z.enum(LEAD_NEED_FILTERS).optional(),
+    area: campaignAreaSchema,
+  }),
+  z.object({
+    ...campaignPoolShape,
+    preset: z.literal("shopify_service"),
+    technology: z.enum(LEAD_STORE_PLATFORMS).default("Shopify"),
+    countryCode: z.enum(LEAD_AREA_COUNTRIES),
+    keywords: z.array(z.string().trim().min(1).max(60)).max(10),
+    maxRank: z.number().int().min(0).max(1000).optional(),
+  }),
+]);
+
+export type CreateLeadCampaignInput = z.infer<typeof createLeadCampaignSchema>;
+
+export const suppressLeadsSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(LEAD_STATUS_MAX_IDS),
+});

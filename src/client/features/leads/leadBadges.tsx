@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, History } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/client/components/ui/dropdown-menu";
+import { formatRelativeTime } from "@/client/lib/relative-time";
 import { cn } from "cn";
 import {
   LEAD_OUTREACH_STATUSES,
@@ -115,5 +116,36 @@ export function OutreachStatusMenu({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function PriorContactBadge({
+  prior,
+}: {
+  prior: {
+    contactedAt: string | null;
+    otherProject: boolean;
+    suppressed: boolean;
+  } | null;
+}) {
+  const { t } = useTranslation("leads");
+  if (!prior) return null;
+  const label = prior.suppressed
+    ? t("prior.suppressed")
+    : t(prior.otherProject ? "prior.contactedOther" : "prior.contacted", {
+        when: prior.contactedAt ? formatRelativeTime(prior.contactedAt) : "",
+      });
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset",
+        prior.suppressed
+          ? "bg-destructive/10 text-destructive ring-destructive/20"
+          : "bg-warning/10 text-warning ring-warning/20",
+      )}
+    >
+      <History className="size-3" />
+      {label}
+    </span>
   );
 }

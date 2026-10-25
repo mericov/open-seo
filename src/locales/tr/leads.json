@@ -1,6 +1,6 @@
 {
   "title": "Lead Bulucu",
-  "description": "Yerel işletmeleri veya Shopify mağazalarını bul, sitelerindeki iletişim bilgilerini oku ve gerçekten ulaşabileceklerini ayır.",
+  "description": "Ne için lead aradığını seç; sistem işletmeleri bulsun, sitelerinden iletişim bilgilerini okusun ve haftalık hedefin kadar hazır lead tutsun.",
   "form": {
     "title": "Yeni lead araması",
     "category": "İşletme kategorisi",
@@ -24,26 +24,26 @@
     "started": "{{found}} işletme bulundu, {{added}} yeni lead eklendi."
   },
   "list": {
-    "title": "Lead aramaları",
-    "empty": "Henüz lead araması yok",
-    "emptyDescription": "İlk lead listeni oluşturmak için yukarıdan bir arama başlat.",
+    "title": "Kampanyalar",
+    "empty": "Henüz kampanya yok",
+    "emptyDescription": "İlk kampanyanı oluştur; sistem lead'leri bulup hazır havuzu doldursun.",
     "summary": "{{total}} lead · {{ready}} tanesine hemen mail atılabilir",
     "pending": "{{count}} bekliyor",
     "ready": "{{count}} hazır"
   },
   "detail": {
-    "back": "Tüm lead aramaları",
+    "back": "Kampanyalar",
     "radius": "{{location}} çevresinde {{radius}} km",
-    "skipped": "{{count}} işletme, daha önceki bir aramada zaten bulunduğu için atlandı.",
+    "skipped": "{{count}} işletme projede zaten vardı; tekrar eklenmedi, geçmişleriyle bu kampanyaya bağlandı.",
     "progressTitle": "Web siteleri okunuyor",
     "progress": "{{total}} siteden {{done}} tanesi okundu",
     "pause": "Duraklat",
     "resume": "Devam et",
-    "loadFailed": "Bu lead araması yüklenemedi.",
-    "delete": "Aramayı sil",
-    "deleteTitle": "Bu lead araması silinsin mi?",
-    "deleteDescription": "Arama ve içindeki tüm lead'ler silinecek. Bu işletmeler yeni bir aramayla tekrar bulunabilir.",
-    "deleted": "Lead araması silindi",
+    "loadFailed": "Bu kampanya yüklenemedi.",
+    "delete": "Kampanyayı arşivle",
+    "deleteTitle": "Kampanya arşivlensin mi?",
+    "deleteDescription": "Kampanya listeden kalkar ve otomatik çalışması durur. Bulunan lead'ler ve takip durumları Lead'ler sekmesinde kalır.",
+    "deleted": "Kampanya arşivlendi",
     "filterAll": "Tümü",
     "noLeads": "Bu filtreye uyan lead yok.",
     "storeScope": "{{platform}} · {{keywords}} · {{country}}",
@@ -52,10 +52,11 @@
     "shownStores": "Aktif Shopify mağazası olduğu doğrulanamayan {{count}} site gösteriliyor.",
     "showAll": "Göster",
     "hideUnverified": "Gizle",
-    "deleteTracked": "Bu aramadaki {{count}} lead'in takip durumu var. Arama silinirse bu leadler ve durumları da silinir.",
     "allKeywords": "tüm nişler",
     "failedReads": "{{count}} site okunamadı.",
-    "retryFailed": "Tekrar dene"
+    "retryFailed": "Tekrar dene",
+    "countryScope": "Tüm {{country}} · {{done}} / {{total}} bölge tamamlandı",
+    "nextArea": "sıradaki: {{name}}"
   },
   "reachability": {
     "ready": "Mail atılabilir",
@@ -133,8 +134,8 @@
     "platform": "Platform"
   },
   "views": {
-    "searches": "Aramalar",
-    "all": "Tüm leadler"
+    "all": "Lead'ler",
+    "campaigns": "Kampanyalar"
   },
   "score": {
     "label": "Fırsat",
@@ -244,7 +245,8 @@
     "contactedOn": "mail {{when}}",
     "selectAll": "Bu sayfadakilerin hepsini seç",
     "selectLead": "{{name}} seç",
-    "findingAll": "Tüm bulgular"
+    "findingAll": "Tüm bulgular",
+    "campaignAll": "Tüm kampanyalar"
   },
   "scan": {
     "byCategory": "Tek kategori",
@@ -271,14 +273,15 @@
       "unclaimed": "Google profili sahiplenilmemiş",
       "few_reviews": "10'dan az yorum"
     },
-    "autoTitle": "Otomatik tarama",
-    "autoHint": "Açarsan her hafta, bir önceki çalışmanın kaldığı yerden devam ederek yeni leadler getirir.",
+    "autoTitle": "Otomatik doldurma",
+    "autoHint": "Açarsan her hafta hazır havuzu hedefe kadar doldurur.",
     "nextRun": "Sonraki çalışma {{when}}",
     "lastRun": "son çalışma {{when}}",
     "weekly": "Haftalık",
-    "perRun": "Her seferinde",
-    "runNow": "Şimdi çalıştır ({{count}})",
-    "ranNow": "{{count}} yeni lead eklendi"
+    "perRun": "Haftalık hedef",
+    "runNow": "Havuzu doldur",
+    "ranNow": "{{count}} yeni lead eklendi",
+    "poolFull": "Havuz zaten dolu, yeni arama yapılmadı."
   },
   "firstLine": {
     "write": "İlk cümle yaz",
@@ -466,5 +469,72 @@
     "irregular_blog": "3 ayda {{value}} yazı",
     "out_of_stock": "{{value}} tükenmiş",
     "missing_alt": "{{value}} alt metinsiz"
+  },
+  "pool": {
+    "title": "Hazır havuz",
+    "status": "{{ready}} / {{target}} lead mail atmaya hazır",
+    "reading": "{{count}} lead'in sitesi okunuyor"
+  },
+  "campaign": {
+    "new": "Yeni kampanya",
+    "cancel": "Vazgeç",
+    "next": "Devam",
+    "back": "Geri",
+    "step": "Adım {{current}} / {{total}}",
+    "presetTitle": "Ne için lead arıyorsun?",
+    "presets": {
+      "product_b2b": {
+        "title": "Ürün satışı – B2B alıcılar",
+        "body": "İç mimar, home staging, emlak, coworking ve etkinlik mekânı gibi mekânını donatan işletmeler."
+      },
+      "shopify_service": {
+        "title": "Online mağazalar – hizmet satışı",
+        "body": "SEO, GEO ve Shopify hizmetleri için aktif online mağazalar."
+      },
+      "local_service": {
+        "title": "Yerel işletmeler – hizmet satışı",
+        "body": "Web sitesi ve SEO ihtiyacı olan klinik, salon, restoran gibi işletmeler."
+      },
+      "import": {
+        "title": "Domain listesi yapıştır",
+        "body": "Elindeki mağaza listesini ekle. Arama yapılmaz, ücretsizdir."
+      }
+    },
+    "whereTitle": "Kimi, nerede arıyoruz?",
+    "scope": {
+      "country": "Tüm ülke",
+      "place": "Tek şehir"
+    },
+    "country": "Ülke",
+    "countries": {
+      "US": "ABD",
+      "TR": "Türkiye"
+    },
+    "countryHint": "Büyük şehirlerden başlayarak tüm ülke sırayla taranır; aynı bölge iki kez taranmaz.",
+    "sector": "Sektör",
+    "need": "İhtiyaç (isteğe bağlı)",
+    "niche": "Niş anahtar kelimeler (isteğe bağlı)",
+    "nicheHint": "Virgülle ayırın, örn. skincare, mum. Boş bırakırsan o ülkedeki tüm mağazalar gelir.",
+    "advanced": "Gelişmiş ayarlar",
+    "targetTitle": "Haftada kaç kişiye yazabiliyorsun?",
+    "target": "Haftalık hazır lead hedefi",
+    "targetHint": "Sistem, e-postası bulunmuş ve henüz yazılmamış lead sayısı bu hedefe ulaşana kadar arar; fazlasını çekip kredi harcamaz.",
+    "weekly": "Her hafta otomatik doldur",
+    "create": "Kampanyayı başlat",
+    "created": "Kampanya başladı: {{added}} yeni lead eklendi, siteleri okunuyor.",
+    "costNote": "Lead çekmek az miktarda DataForSEO kredisi kullanır; siteleri okumak ve e-postaları kontrol etmek ücretsiz."
+  },
+  "prior": {
+    "contacted": "{{when}} yazıldı",
+    "contactedOther": "Başka bir projeden {{when}} yazıldı",
+    "suppressed": "Bir daha yazılmayacak",
+    "confirmTitle": "Bu işletmeye daha önce yazıldı",
+    "confirmBody": "Aynı işletmeye {{when}} mail gönderilmiş. Yine de yazmak istiyor musun?",
+    "confirmSuppressed": "Bu işletme \"bir daha yazma\" listesinde. Yine de yazmak istiyor musun?",
+    "send": "Yine de yaz"
+  },
+  "suppress": {
+    "action": "Bir daha yazma",
+    "done": "{{count}} lead engellendi; bu işletmeler yeni kampanyalara da eklenmeyecek."
   }
 }

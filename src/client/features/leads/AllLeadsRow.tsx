@@ -7,6 +7,7 @@ import { FirstLineEditor } from "@/client/features/leads/FirstLineEditor";
 import { LeadNote } from "@/client/features/leads/LeadNote";
 import {
   OutreachStatusMenu,
+  PriorContactBadge,
   ScoreBadge,
 } from "@/client/features/leads/leadBadges";
 import { LeadFindings } from "@/client/features/leads/LeadFindings";
@@ -62,6 +63,11 @@ export function AllLeadsRow({
           <span className="mx-1.5 opacity-40">·</span>
           <span title={lead.searchLabel}>{lead.searchLabel}</span>
         </p>
+        {lead.priorContact ? (
+          <div className="mt-1">
+            <PriorContactBadge prior={lead.priorContact} />
+          </div>
+        ) : null}
         <FirstLineEditor
           projectId={projectId}
           leadId={lead.id}

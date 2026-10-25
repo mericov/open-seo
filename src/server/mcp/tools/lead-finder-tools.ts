@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CampaignService } from "@/server/features/leads/services/CampaignService";
 import {
   LEAD_ENRICH_BATCH_SIZE,
   LeadFinderService,
@@ -26,7 +27,7 @@ import { LEAD_SEARCH_MAX_LIMIT } from "@/types/schemas/leads";
 const leadsPath = (projectId: string, searchId?: string) =>
   searchId
     ? `/p/${projectId}/leads?search=${searchId}`
-    : `/p/${projectId}/leads`;
+    : `/p/${projectId}/leads?view=campaigns`;
 
 // ---------------------------------------------------------------------------
 // find_leads
@@ -218,6 +219,7 @@ export const findShopifyStoresTool = {
     ) => {
       const result = args.domains?.length
         ? await StoreFinderService.importStores(
+            context.billing.organizationId,
             args.projectId,
             args.domains.join("\n"),
           )
@@ -310,7 +312,7 @@ const getLeadsInputSchema = {
 } as const;
 
 type LeadRow = Awaited<
-  ReturnType<typeof LeadFinderService.getSearchDetail>
+  ReturnType<typeof CampaignService.getSearchDetail>
 >["leads"][number];
 
 const LEAD_COLUMNS: McpTableColumn<LeadRow>[] = [
@@ -366,7 +368,7 @@ export const getLeadsTool = {
   handler: withMcpProjectAuth(
     async (args: z.infer<z.ZodObject<typeof getLeadsInputSchema>>, context) => {
       if (!args.searchId) {
-        const searches = await LeadFinderService.listSearches(args.projectId);
+        const searches = await CampaignService.listSearches(args.projectId);
         const text =
           searches.length === 0
             ? "No lead searches yet. Start one with find_leads."
@@ -387,8 +389,9 @@ export const getLeadsTool = {
         });
       }
 
-      const detail = await LeadFinderService.getSearchDetail(
+      const detail = await CampaignService.getSearchDetail(
         args.projectId,
+        context.billing.organizationId,
         args.searchId,
       );
       const { summary } = detail;

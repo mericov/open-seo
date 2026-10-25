@@ -35,3 +35,50 @@ export function leadReachability(lead: {
   if (hasSocial || lead.phone) return "social_only";
   return "no_contact";
 }
+
+// Hosts many unrelated businesses list as their website (a Facebook page, a
+// link-in-bio page). They say nothing about who the business is, so they never
+// identify a lead or a contact.
+const SHARED_HOSTS = new Set([
+  "facebook.com",
+  "m.facebook.com",
+  "instagram.com",
+  "linktr.ee",
+  "linkin.bio",
+  "google.com",
+  "sites.google.com",
+  "business.site",
+  "yelp.com",
+  "tiktok.com",
+  "x.com",
+  "twitter.com",
+  "linkedin.com",
+  "youtube.com",
+  "wa.me",
+  "etsy.com",
+  "amazon.com",
+  "calendly.com",
+  "booksy.com",
+  "vagaro.com",
+  "houzz.com",
+  "thumbtack.com",
+  "nextdoor.com",
+  "sahibinden.com",
+  "trendyol.com",
+  "hepsiburada.com",
+]);
+
+export function ownDomain(domain: string | null): string | null {
+  if (!domain) return null;
+  const host = domain.toLowerCase().replace(/^www\./, "");
+  return SHARED_HOSTS.has(host) ? null : host;
+}
+
+// The registry key for a lead: its business domain, or the address itself
+// when the business has no domain of its own.
+export function contactKeyFor(lead: {
+  domain: string | null;
+  primaryEmail: string | null;
+}): string | null {
+  return ownDomain(lead.domain) ?? lead.primaryEmail?.toLowerCase() ?? null;
+}
