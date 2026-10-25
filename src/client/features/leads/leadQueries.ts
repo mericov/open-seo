@@ -8,17 +8,26 @@ import {
 
 export const leadsQueryKey = (projectId: string) => ["leads", projectId];
 
+// A request cut off on its way back (a deploy swapping the Worker, an expired
+// Access session) resolves with no body. Throwing lets the query retry instead
+// of failing at once, so a passing blip never reaches the screen.
+async function withData<T>(request: Promise<T>): Promise<T> {
+  const data = await request;
+  if (data === undefined) throw new Error("Empty response");
+  return data;
+}
+
 export function leadSearchesOptions(projectId: string) {
   return queryOptions({
     queryKey: [...leadsQueryKey(projectId), "searches"],
-    queryFn: () => listLeadSearches({ data: { projectId } }),
+    queryFn: () => withData(listLeadSearches({ data: { projectId } })),
   });
 }
 
 export function leadSearchOptions(projectId: string, searchId: string) {
   return queryOptions({
     queryKey: [...leadsQueryKey(projectId), "search", searchId],
-    queryFn: () => getLeadSearch({ data: { projectId, searchId } }),
+    queryFn: () => withData(getLeadSearch({ data: { projectId, searchId } })),
   });
 }
 
@@ -44,7 +53,8 @@ export function projectLeadsOptions(
 ) {
   return queryOptions({
     queryKey: [...leadsQueryKey(projectId), "all", filters],
-    queryFn: () => listProjectLeads({ data: { projectId, ...filters } }),
+    queryFn: () =>
+      withData(listProjectLeads({ data: { projectId, ...filters } })),
     placeholderData: keepPreviousData,
   });
 }

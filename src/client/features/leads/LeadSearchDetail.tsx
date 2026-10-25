@@ -57,6 +57,7 @@ export function LeadSearchDetail({
 
   const enrichMutation = useMutation({
     mutationFn: () => enrichLeadBatch({ data: { projectId, searchId } }),
+    retry: 2,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: leadSearchOptions(projectId, searchId).queryKey,
@@ -102,7 +103,7 @@ export function LeadSearchDetail({
   }, [canEnrich, enrich]);
 
   if (searchQuery.isPending) return <SkeletonPage />;
-  if (searchQuery.isError) {
+  if (searchQuery.isError && !searchQuery.data) {
     return (
       <div className="p-6">
         <QueryError

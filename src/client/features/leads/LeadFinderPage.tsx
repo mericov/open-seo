@@ -85,7 +85,7 @@ function CampaignsView({ projectId }: { projectId: string }) {
         </h2>
         {searchesQuery.isPending ? (
           <SkeletonPage />
-        ) : searchesQuery.isError ? (
+        ) : searchesQuery.isError && !searchesQuery.data ? (
           <QueryError
             error={searchesQuery.error}
             fallback={t("detail.loadFailed")}

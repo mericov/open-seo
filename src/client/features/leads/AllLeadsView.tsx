@@ -208,7 +208,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
 
       {leadsQuery.isPending ? (
         <SkeletonPage />
-      ) : leadsQuery.isError ? (
+      ) : leadsQuery.isError && !leadsQuery.data ? (
         <QueryError
           error={leadsQuery.error}
           fallback={t("detail.loadFailed")}
