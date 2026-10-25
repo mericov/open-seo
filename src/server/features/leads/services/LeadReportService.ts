@@ -3,7 +3,8 @@ import { AppError } from "@/server/lib/errors";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 
 const LEGACY_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32}$/;
-const SLUG_TOKEN_PATTERN = /^[a-z0-9-]{1,40}-[a-z0-9]{6}$/;
+const SLUG_TOKEN_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_TOKEN_LENGTH = 64;
 const SLUG_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 const BOT_USER_AGENT =
   /bot|crawl|spider|preview|scan|safelinks|proofpoint|mimecast|barracuda|headless|python|curl|wget/i;
@@ -11,23 +12,37 @@ const MAX_REPORT_BYTES = 3_000_000;
 
 const reportKey = (token: string) => `lead-reports/${token}.html`;
 
-function siteSlug(domain: string | null, website: string | null) {
-  const host = domain ?? (website ? (URL.parse(website)?.hostname ?? "") : "");
-  const label = host.replace(/^www\./, "").split(".")[0] ?? "";
-  const slug = label
+const slugify = (text: string) =>
+  text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 40);
-  return slug || "audit";
-}
 
-function mintToken(domain: string | null, website: string | null) {
+function randomSuffix() {
   const bytes = crypto.getRandomValues(new Uint8Array(6));
-  const suffix = [...bytes]
+  return [...bytes]
     .map((byte) => SLUG_ALPHABET[byte % SLUG_ALPHABET.length])
     .join("");
-  return `${siteSlug(domain, website)}-${suffix}`;
+}
+
+async function mintToken(domain: string | null, website: string | null) {
+  const host = (
+    domain ?? (website ? (URL.parse(website)?.hostname ?? "") : "")
+  ).replace(/^www\./, "");
+  const brand = slugify(host.split(".")[0] ?? "") || "audit";
+  const full = slugify(host) || brand;
+  const candidates = [
+    brand,
+    full,
+    ...Array.from({ length: 8 }, (_, i) => `${full}-${i + 2}`),
+  ];
+  for (const candidate of candidates) {
+    if (!(await LeadListRepository.reportTokenExists(candidate))) {
+      return candidate;
+    }
+  }
+  return `${full}-${randomSuffix()}`;
 }
 
 async function save(projectId: string, leadId: string, html: string) {
@@ -41,7 +56,7 @@ async function save(projectId: string, leadId: string, html: string) {
   const token =
     lead.reportToken && !legacy
       ? lead.reportToken
-      : mintToken(lead.domain, lead.website);
+      : await mintToken(lead.domain, lead.website);
   const clean = html.replace(/<script[\s\S]*?<\/script>/gi, "");
   await env.R2.put(reportKey(token), clean, {
     httpMetadata: { contentType: "text/html; charset=utf-8" },
@@ -60,7 +75,10 @@ function notFound() {
 }
 
 async function render(request: Request, token: string): Promise<Response> {
-  if (!LEGACY_TOKEN_PATTERN.test(token) && !SLUG_TOKEN_PATTERN.test(token)) {
+  if (
+    token.length > MAX_TOKEN_LENGTH ||
+    (!LEGACY_TOKEN_PATTERN.test(token) && !SLUG_TOKEN_PATTERN.test(token))
+  ) {
     return notFound();
   }
   if (!(await LeadListRepository.reportTokenExists(token))) return notFound();

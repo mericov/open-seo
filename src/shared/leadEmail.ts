@@ -22,13 +22,13 @@ const REPORT_OFFER: Record<
 > = {
   en: {
     ready: (link) =>
-      `The full audit is here, with what each issue costs you and what changes once it's fixed: ${link}`,
+      `These are just the top three. The full audit covers many more findings like these, with screenshots, what each one costs you and what changes once it's fixed: ${link}`,
     later:
       "I can send you the full audit this week, with what each issue costs you and what changes once it's fixed. No charge, no call needed.",
   },
   tr: {
     ready: (link) =>
-      `Raporun tamamı burada; her sorunun size neye mal olduğunu ve çözülünce ne değişeceğini görebilirsiniz: ${link}`,
+      `Bunlar yalnızca öne çıkan üçü. Raporun tamamında bunlar gibi çok sayıda tespiti; ekran görüntüleriyle, her birinin size neye mal olduğu ve çözülünce ne değişeceğiyle birlikte görebilirsiniz: ${link}`,
     later:
       "İsterseniz raporun tamamını bu hafta gönderebilirim; her sorunun neye mal olduğunu ve çözülünce ne değişeceğini gösteriyor. Ücretsiz, görüşme gerektirmiyor.",
   },

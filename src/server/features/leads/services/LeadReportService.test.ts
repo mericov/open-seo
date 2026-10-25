@@ -36,7 +36,7 @@ beforeEach(() => {
     domain: "www.3ina.com",
     website: null,
   });
-  mocks.reportTokenExists.mockResolvedValue(true);
+  mocks.reportTokenExists.mockResolvedValue(false);
 });
 
 it("stores a report without scripts and serves it sandboxed at its link", async () => {
@@ -46,8 +46,9 @@ it("stores a report without scripts and serves it sandboxed at its link", async 
     "<html><body><h1>Audit</h1><script>alert(1)</script></body></html>",
   );
 
-  expect(token).toMatch(/^3ina-[a-z0-9]{6}$/);
+  expect(token).toBe("3ina");
   expect(mocks.setReportToken).toHaveBeenCalledWith("p1", "lead-1", token);
+  mocks.reportTokenExists.mockResolvedValue(true);
 
   const visit = (query = "") =>
     new Request(`https://seo.example/audit/${token}${query}`, {
@@ -78,6 +79,16 @@ it("gives a report with an old long link a short one on refresh", async () => {
 
   const { token } = await LeadReportService.save("p1", "lead-1", "<p>new</p>");
 
-  expect(token).toMatch(/^3ina-[a-z0-9]{6}$/);
+  expect(token).toBe("3ina");
   expect(mocks.objects.has(`lead-reports/${old}.html`)).toBe(false);
+});
+
+it("falls back to the full domain when another lead already uses the brand link", async () => {
+  mocks.reportTokenExists.mockImplementation(
+    async (token: string) => token === "3ina",
+  );
+
+  const { token } = await LeadReportService.save("p1", "lead-1", "<p>new</p>");
+
+  expect(token).toBe("3ina-com");
 });
