@@ -90,6 +90,7 @@ export const listLeadsTool = {
     ) => {
       const result = await LeadOutreachService.listLeads(
         args.projectId,
+        context.billing.organizationId,
         {
           status: args.status,
           source: args.source,
@@ -153,6 +154,7 @@ export const updateLeadsTool = {
     ) => {
       const result = await LeadOutreachService.setStatus(
         args.projectId,
+        context.billing.organizationId,
         args.leadIds,
         args.status,
       );

@@ -9,12 +9,17 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { projects } from "./app.schema";
+import { organization } from "./better-auth-schema";
 import {
   LEAD_FINDING_CODES,
   LEAD_NOTE_COLORS,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
-import { LEAD_NEED_FILTERS } from "@/shared/leadScan";
+import {
+  LEAD_CAMPAIGN_PRESETS,
+  LEAD_NEED_FILTERS,
+  LEAD_SEARCH_SCOPES,
+} from "@/shared/leadScan";
 
 // Timestamps are stored as *text* (same column shape as the SQLite schema); see
 // the note in pg/app.schema.ts.
@@ -53,6 +58,11 @@ export const leadSearches = pgTable(
     nextOffset: integer("next_offset").notNull().default(0),
     nextRunAt: text("next_run_at"),
     lastRunAt: text("last_run_at"),
+    preset: text("preset", { enum: LEAD_CAMPAIGN_PRESETS }),
+    scope: text("scope", { enum: LEAD_SEARCH_SCOPES })
+      .notNull()
+      .default("place"),
+    archivedAt: text("archived_at"),
     createdAt: text("created_at").notNull().default(isoNow),
     updatedAt: text("updated_at").notNull().default(isoNow),
   },
@@ -189,4 +199,69 @@ export const leadEmailTemplates = pgTable(
     updatedAt: text("updated_at").notNull().default(isoNow),
   },
   (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
+);
+
+export const leadSearchLeads = pgTable(
+  "lead_search_leads",
+  {
+    id: text("id").primaryKey(),
+    searchId: text("search_id")
+      .notNull()
+      .references(() => leadSearches.id, { onDelete: "cascade" }),
+    leadId: text("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("lead_search_leads_search_lead_unique").on(
+      table.searchId,
+      table.leadId,
+    ),
+    index("lead_search_leads_lead_idx").on(table.leadId),
+  ],
+);
+
+export const leadSearchAreas = pgTable(
+  "lead_search_areas",
+  {
+    id: text("id").primaryKey(),
+    searchId: text("search_id")
+      .notNull()
+      .references(() => leadSearches.id, { onDelete: "cascade" }),
+    areaCode: text("area_code").notNull(),
+    nextOffset: integer("next_offset").notNull().default(0),
+    exhaustedAt: text("exhausted_at"),
+    lastRunAt: text("last_run_at"),
+  },
+  (table) => [
+    uniqueIndex("lead_search_areas_search_area_unique").on(
+      table.searchId,
+      table.areaCode,
+    ),
+  ],
+);
+
+export const contactRegistry = pgTable(
+  "contact_registry",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    contactKey: text("contact_key").notNull(),
+    lastContactedAt: text("last_contacted_at"),
+    lastProjectId: text("last_project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }),
+    suppressedAt: text("suppressed_at"),
+    createdAt: text("created_at").notNull().default(isoNow),
+    updatedAt: text("updated_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("contact_registry_org_key_unique").on(
+      table.organizationId,
+      table.contactKey,
+    ),
+  ],
 );

@@ -2,6 +2,7 @@ import {
   LeadListRepository,
   type LeadListFilters,
 } from "@/server/features/leads/repositories/LeadListRepository";
+import { ContactRegistryService } from "@/server/features/leads/services/ContactRegistryService";
 import { leadEmailLanguage } from "@/shared/leadEmail";
 import {
   LEAD_OUTREACH_STATUSES,
@@ -12,6 +13,7 @@ import {
 
 async function listLeads(
   projectId: string,
+  organizationId: string,
   filters: LeadListFilters & { today?: string },
   page: { page: number; pageSize: number },
 ) {
@@ -25,9 +27,10 @@ async function listLeads(
     LeadListRepository.statusCounts(projectId, countFilters),
     LeadListRepository.countDue(projectId, today),
   ]);
-  const findings = await LeadListRepository.listFindings(
-    rows.map((row) => row.id),
-  );
+  const [findings, prior] = await Promise.all([
+    LeadListRepository.listFindings(rows.map((row) => row.id)),
+    ContactRegistryService.priorContacts(organizationId, projectId, rows),
+  ]);
 
   const counts = Object.fromEntries(
     LEAD_OUTREACH_STATUSES.map((key) => [
@@ -41,6 +44,7 @@ async function listLeads(
       ...row,
       language: leadEmailLanguage({ ...row, locationLabel }),
       ...findingsForLead(findings, row.id),
+      priorContact: prior.get(row.id) ?? null,
     })),
     total,
     page: page.page,
@@ -55,10 +59,30 @@ async function listLeads(
 
 async function setStatus(
   projectId: string,
+  organizationId: string,
   leadIds: string[],
   status: LeadOutreachStatus,
 ) {
   await LeadListRepository.setOutreachStatus(projectId, leadIds, status);
+  await ContactRegistryService.recordStatus(
+    organizationId,
+    projectId,
+    leadIds,
+    status,
+  );
+  return { updated: leadIds.length };
+}
+
+async function suppress(
+  projectId: string,
+  organizationId: string,
+  leadIds: string[],
+) {
+  await ContactRegistryService.suppressLeads(
+    organizationId,
+    projectId,
+    leadIds,
+  );
   return { updated: leadIds.length };
 }
 
@@ -84,4 +108,10 @@ async function setNote(
   });
 }
 
-export const LeadOutreachService = { listLeads, setStatus, setHidden, setNote };
+export const LeadOutreachService = {
+  listLeads,
+  setStatus,
+  suppress,
+  setHidden,
+  setNote,
+};

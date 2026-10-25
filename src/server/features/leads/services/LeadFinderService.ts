@@ -8,6 +8,8 @@ import { findPlaces } from "@/server/lib/leads/geocode";
 import { listingFindings } from "@/server/lib/leads/listingSignals";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
+import { ContactRegistryService } from "@/server/features/leads/services/ContactRegistryService";
+import { leadAreasFor } from "@/shared/leadAreas";
 import { leadEmailLanguage } from "@/shared/leadEmail";
 import { fetchAndSaveLocal } from "@/server/features/leads/services/leadSources";
 import {
@@ -76,10 +78,15 @@ async function startSearch(
     radiusKm,
     minRating: input.minRating ?? null,
     requestedLimit: input.limit,
+    preset: "local_service",
   });
   const result = await fetchAndSaveLocal(
     billing,
-    { projectId: input.projectId, searchId },
+    {
+      organizationId: billing.organizationId,
+      projectId: input.projectId,
+      searchId,
+    },
     {
       categories: categoriesForSearch({
         category: input.category ?? "",
@@ -273,15 +280,36 @@ async function listSearches(projectId: string) {
   });
 }
 
-async function getSearchDetail(projectId: string, searchId: string) {
+async function getSearchDetail(
+  projectId: string,
+  organizationId: string,
+  searchId: string,
+) {
   const search = await requireSearch(projectId, searchId);
-  const [leadRows, emailRows] = await Promise.all([
+  const [leadRows, emailRows, pool, areaRows] = await Promise.all([
     LeadRepository.listLeads(projectId, searchId),
     LeadRepository.listEmailsForSearch(projectId, searchId),
+    LeadRepository.poolCounts(projectId, searchId),
+    search.scope === "country" && search.source === "local"
+      ? LeadRepository.listAreas(searchId)
+      : Promise.resolve([]),
   ]);
-  const findingRows = await LeadListRepository.listFindings(
-    leadRows.map((lead) => lead.id),
+  const primaryByLead = new Map(
+    emailRows
+      .filter((row) => row.isPrimary)
+      .map((row) => [row.leadId, row.email]),
   );
+  const [findingRows, prior] = await Promise.all([
+    LeadListRepository.listFindings(leadRows.map((lead) => lead.id)),
+    ContactRegistryService.priorContacts(
+      organizationId,
+      projectId,
+      leadRows.map((lead) => ({
+        ...lead,
+        primaryEmail: primaryByLead.get(lead.id) ?? null,
+      })),
+    ),
+  ]);
 
   const leads = leadRows.map((lead) => {
     const emails = emailRows.filter((email) => email.leadId === lead.id);
@@ -333,6 +361,7 @@ async function getSearchDetail(projectId: string, searchId: string) {
         onOwnDomain,
       })),
       reachability,
+      priorContact: prior.get(lead.id) ?? null,
     };
   });
   const sortedLeads = sortBy(leads, (lead) =>
@@ -369,7 +398,11 @@ async function getSearchDetail(projectId: string, searchId: string) {
       requestedLimit: search.requestedLimit,
       skippedDuplicates: search.skippedDuplicates,
       createdAt: search.createdAt,
+      preset: search.preset,
+      scope: search.scope,
     },
+    pool: { ...pool, target: search.runSize },
+    areas: areaProgress(search.countryCode, areaRows),
     summary,
     leads: sortedLeads,
   };
@@ -382,13 +415,32 @@ async function retryFailed(projectId: string, searchId: string) {
 
 async function deleteSearch(projectId: string, searchId: string) {
   await requireSearch(projectId, searchId);
-  await LeadRepository.deleteSearch(projectId, searchId);
+  await LeadRepository.archiveSearch(projectId, searchId);
 }
 
 async function requireSearch(projectId: string, searchId: string) {
   const search = await LeadRepository.getSearch(projectId, searchId);
   if (!search) throw new AppError("NOT_FOUND");
   return search;
+}
+
+function areaProgress(
+  countryCode: string | null,
+  rows: Awaited<ReturnType<typeof LeadRepository.listAreas>>,
+) {
+  const areas = leadAreasFor(countryCode);
+  if (rows.length === 0 && areas.length === 0) return null;
+  const exhausted = new Set(
+    rows.filter((row) => row.exhaustedAt).map((row) => row.areaCode),
+  );
+  const started = new Set(rows.map((row) => row.areaCode));
+  const next = areas.find((area) => !exhausted.has(area.code));
+  return {
+    total: areas.length,
+    done: exhausted.size,
+    started: started.size,
+    next: next?.name ?? null,
+  };
 }
 
 function humanizeCategory(category: string) {

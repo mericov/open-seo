@@ -8,12 +8,17 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 import { projects } from "./app.schema";
+import { organization } from "./better-auth-schema";
 import {
   LEAD_FINDING_CODES,
   LEAD_NOTE_COLORS,
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
-import { LEAD_NEED_FILTERS } from "@/shared/leadScan";
+import {
+  LEAD_CAMPAIGN_PRESETS,
+  LEAD_NEED_FILTERS,
+  LEAD_SEARCH_SCOPES,
+} from "@/shared/leadScan";
 
 // ============================================================================
 // Lead finder: a search pulls business listings for one category around one
@@ -53,6 +58,11 @@ export const leadSearches = sqliteTable(
     nextOffset: integer("next_offset").notNull().default(0),
     nextRunAt: text("next_run_at"),
     lastRunAt: text("last_run_at"),
+    preset: text("preset", { enum: LEAD_CAMPAIGN_PRESETS }),
+    scope: text("scope", { enum: LEAD_SEARCH_SCOPES })
+      .notNull()
+      .default("place"),
+    archivedAt: text("archived_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -209,4 +219,81 @@ export const leadEmailTemplates = sqliteTable(
       .default(sql`(current_timestamp)`),
   },
   (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
+);
+
+// A campaign (stored as a lead search) links every lead it found, including
+// leads an earlier campaign of the project already holds. The lead's own
+// search_id stays the campaign that found it first.
+export const leadSearchLeads = sqliteTable(
+  "lead_search_leads",
+  {
+    id: text("id").primaryKey(),
+    searchId: text("search_id")
+      .notNull()
+      .references(() => leadSearches.id, { onDelete: "cascade" }),
+    leadId: text("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("lead_search_leads_search_lead_unique").on(
+      table.searchId,
+      table.leadId,
+    ),
+    index("lead_search_leads_lead_idx").on(table.leadId),
+  ],
+);
+
+// How far a country-wide campaign has read into each metro area.
+export const leadSearchAreas = sqliteTable(
+  "lead_search_areas",
+  {
+    id: text("id").primaryKey(),
+    searchId: text("search_id")
+      .notNull()
+      .references(() => leadSearches.id, { onDelete: "cascade" }),
+    areaCode: text("area_code").notNull(),
+    nextOffset: integer("next_offset").notNull().default(0),
+    exhaustedAt: text("exhausted_at"),
+    lastRunAt: text("last_run_at"),
+  },
+  (table) => [
+    uniqueIndex("lead_search_areas_search_area_unique").on(
+      table.searchId,
+      table.areaCode,
+    ),
+  ],
+);
+
+// Who the organization has already written to, across every project. Keyed by
+// the business domain, or by the address itself for free-provider inboxes.
+export const contactRegistry = sqliteTable(
+  "contact_registry",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    contactKey: text("contact_key").notNull(),
+    lastContactedAt: text("last_contacted_at"),
+    lastProjectId: text("last_project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }),
+    suppressedAt: text("suppressed_at"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("contact_registry_org_key_unique").on(
+      table.organizationId,
+      table.contactKey,
+    ),
+  ],
 );

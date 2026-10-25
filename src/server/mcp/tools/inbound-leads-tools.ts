@@ -86,7 +86,11 @@ export const listInboundLeadsTool = {
           result.leads.length === 0
             ? header
             : `${header}\n${formatMcpTable(result.leads, COLUMNS)}`,
-        meta: buildProjectMeta(context, args.projectId, sitePath(args.projectId)),
+        meta: buildProjectMeta(
+          context,
+          args.projectId,
+          sitePath(args.projectId),
+        ),
         structuredContent: result,
       });
     },
@@ -130,7 +134,11 @@ export const updateInboundLeadsTool = {
       );
       return mcpResponse({
         text: `Updated ${result.updated} site leads.`,
-        meta: buildProjectMeta(context, args.projectId, sitePath(args.projectId)),
+        meta: buildProjectMeta(
+          context,
+          args.projectId,
+          sitePath(args.projectId),
+        ),
         structuredContent: result,
       });
     },

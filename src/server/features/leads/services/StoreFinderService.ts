@@ -4,6 +4,7 @@ import {
   fetchStoreRows,
   normalizeDomain,
   saveStoreRows,
+  type SaveTarget,
   type StoreRow,
 } from "@/server/features/leads/services/leadSources";
 import type { LeadStorePlatform } from "@/shared/leadScan";
@@ -12,6 +13,7 @@ export const STORE_IMPORT_MAX_DOMAINS = 200;
 
 const searchDefaults = {
   source: "shopify" as const,
+  scope: "country" as const,
   category: "shopify",
   locationLabel: "",
   latitude: 0,
@@ -40,6 +42,7 @@ async function startStoreSearch(
   const searchId = await LeadRepository.createSearch(input.projectId, {
     ...searchDefaults,
     label: `${input.technology} · ${keywordLabel}${input.countryCode ? ` · ${input.countryCode}` : ""}`,
+    preset: "shopify_service",
     technology: input.technology,
     countryCode: input.countryCode ?? null,
     keywordQuery: input.keywords.join(", ") || null,
@@ -47,10 +50,21 @@ async function startStoreSearch(
     requestedLimit: input.limit,
     nextOffset: returned,
   });
-  return finish(input.projectId, searchId, rows);
+  return finish(
+    {
+      organizationId: billing.organizationId,
+      projectId: input.projectId,
+      searchId,
+    },
+    rows,
+  );
 }
 
-async function importStores(projectId: string, text: string) {
+async function importStores(
+  organizationId: string,
+  projectId: string,
+  text: string,
+) {
   const domains = [
     ...new Set(
       text
@@ -62,12 +76,12 @@ async function importStores(projectId: string, text: string) {
 
   const searchId = await LeadRepository.createSearch(projectId, {
     ...searchDefaults,
+    scope: "list",
     label: `Store list · ${domains.length} domains`,
     requestedLimit: domains.length,
   });
   return finish(
-    projectId,
-    searchId,
+    { organizationId, projectId, searchId },
     domains.map((domain) => ({
       domain,
       name: domain,
@@ -79,12 +93,17 @@ async function importStores(projectId: string, text: string) {
   );
 }
 
-async function finish(projectId: string, searchId: string, rows: StoreRow[]) {
-  const { found, added } = await saveStoreRows({ projectId, searchId }, rows);
-  await LeadRepository.updateSearch(projectId, searchId, {
+async function finish(target: SaveTarget, rows: StoreRow[]) {
+  const { found, added } = await saveStoreRows(target, rows);
+  await LeadRepository.updateSearch(target.projectId, target.searchId, {
     skippedDuplicates: found - added,
   });
-  return { searchId, found, added, skippedDuplicates: found - added };
+  return {
+    searchId: target.searchId,
+    found,
+    added,
+    skippedDuplicates: found - added,
+  };
 }
 
 export const StoreFinderService = { startStoreSearch, importStores };

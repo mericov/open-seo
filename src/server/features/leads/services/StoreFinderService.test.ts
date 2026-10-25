@@ -3,11 +3,13 @@ import { StoreFinderService } from "@/server/features/leads/services/StoreFinder
 
 const mocks = vi.hoisted(() => ({
   domainsByTechnology: vi.fn(),
-  existingBusinessKeys: vi.fn(),
+  findLeadIdsByKeys: vi.fn(),
   createSearch: vi.fn(),
   insertLeads: vi.fn(),
   insertFoundEmails: vi.fn(),
   updateSearch: vi.fn(),
+  listLinkedLeadIds: vi.fn(),
+  linkLeads: vi.fn(),
 }));
 
 vi.mock("@/server/lib/dataforseo", () => ({
@@ -17,7 +19,9 @@ vi.mock("@/server/lib/dataforseo", () => ({
 }));
 vi.mock("@/server/features/leads/repositories/LeadRepository", () => ({
   LeadRepository: {
-    existingBusinessKeys: mocks.existingBusinessKeys,
+    findLeadIdsByKeys: mocks.findLeadIdsByKeys,
+    listLinkedLeadIds: mocks.listLinkedLeadIds,
+    linkLeads: mocks.linkLeads,
     createSearch: mocks.createSearch,
     insertLeads: mocks.insertLeads,
     insertFoundEmails: mocks.insertFoundEmails,
@@ -25,10 +29,18 @@ vi.mock("@/server/features/leads/repositories/LeadRepository", () => ({
   },
 }));
 
+vi.mock(
+  "@/server/features/leads/repositories/ContactRegistryRepository",
+  () => ({ ContactRegistryRepository: { listByKeys: async () => [] } }),
+);
+
 const billing = { organizationId: "org" } as never;
 
 beforeEach(() => {
-  mocks.existingBusinessKeys.mockResolvedValue(new Set(["domain:old.com"]));
+  mocks.findLeadIdsByKeys.mockResolvedValue(
+    new Map([["domain:old.com", "old-lead"]]),
+  );
+  mocks.listLinkedLeadIds.mockResolvedValue(new Set());
   mocks.createSearch.mockResolvedValue("search-1");
 });
 
@@ -89,6 +101,7 @@ it("looks up Shopify stores by country and size, and keeps the emails the lookup
 
 it("turns a pasted list into unique store domains without a paid lookup", async () => {
   await StoreFinderService.importStores(
+    "org",
     "p1",
     "https://www.Shop.com/products/x\nshop.com, bar.co.uk old.com nonsense",
   );

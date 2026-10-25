@@ -218,6 +218,7 @@ export const findShopifyStoresTool = {
     ) => {
       const result = args.domains?.length
         ? await StoreFinderService.importStores(
+            context.billing.organizationId,
             args.projectId,
             args.domains.join("\n"),
           )
@@ -389,6 +390,7 @@ export const getLeadsTool = {
 
       const detail = await LeadFinderService.getSearchDetail(
         args.projectId,
+        context.billing.organizationId,
         args.searchId,
       );
       const { summary } = detail;

@@ -1,11 +1,13 @@
-import { and, asc, desc, eq, inArray, isNull, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, lte } from "drizzle-orm";
 import { db } from "@/db";
 import { executeInBatches, runBatch } from "@/db/runBatch";
 import {
   leadEmails,
   leadFindings,
   leads,
+  leadSearchAreas,
   leadSearches,
+  leadSearchLeads,
   projects,
 } from "@/db/schema";
 import type { LeadFinding } from "@/shared/leadFindings";
@@ -17,13 +19,22 @@ type SearchInsert = Omit<
 type LeadInsert = Omit<
   typeof leads.$inferInsert,
   "id" | "projectId" | "searchId" | "createdAt" | "updatedAt"
-> & { id?: string };
+> & { id: string };
 type EmailInsert = Omit<
   typeof leadEmails.$inferInsert,
   "id" | "leadId" | "createdAt"
 >;
 
 const KEY_CHUNK = 90;
+
+const inSearch = (searchId: string) =>
+  inArray(
+    leads.id,
+    db
+      .select({ id: leadSearchLeads.leadId })
+      .from(leadSearchLeads)
+      .where(eq(leadSearchLeads.searchId, searchId)),
+  );
 
 async function createSearch(projectId: string, values: SearchInsert) {
   const now = new Date().toISOString();
@@ -38,7 +49,12 @@ async function listSearches(projectId: string) {
   return db
     .select()
     .from(leadSearches)
-    .where(eq(leadSearches.projectId, projectId))
+    .where(
+      and(
+        eq(leadSearches.projectId, projectId),
+        isNull(leadSearches.archivedAt),
+      ),
+    )
     .orderBy(desc(leadSearches.createdAt));
 }
 
@@ -46,28 +62,36 @@ async function getSearch(projectId: string, id: string) {
   const [row] = await db
     .select()
     .from(leadSearches)
-    .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)))
+    .where(
+      and(
+        eq(leadSearches.projectId, projectId),
+        eq(leadSearches.id, id),
+        isNull(leadSearches.archivedAt),
+      ),
+    )
     .limit(1);
   return row ?? null;
 }
 
-async function deleteSearch(projectId: string, id: string) {
+async function archiveSearch(projectId: string, id: string) {
+  const now = new Date().toISOString();
   await db
-    .delete(leadSearches)
+    .update(leadSearches)
+    .set({ archivedAt: now, autoRun: false, nextRunAt: null, updatedAt: now })
     .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)));
 }
 
-async function existingBusinessKeys(projectId: string, keys: string[]) {
-  const found = new Set<string>();
+async function findLeadIdsByKeys(projectId: string, keys: string[]) {
+  const found = new Map<string, string>();
   for (let i = 0; i < keys.length; i += KEY_CHUNK) {
     const chunk = keys.slice(i, i + KEY_CHUNK);
     const rows = await db
-      .select({ businessKey: leads.businessKey })
+      .select({ id: leads.id, businessKey: leads.businessKey })
       .from(leads)
       .where(
         and(eq(leads.projectId, projectId), inArray(leads.businessKey, chunk)),
       );
-    for (const row of rows) found.add(row.businessKey);
+    for (const row of rows) found.set(row.businessKey, row.id);
   }
   return found;
 }
@@ -81,14 +105,34 @@ async function insertLeads(
   await executeInBatches(rows, (tx, row) =>
     tx
       .insert(leads)
-      .values({
-        ...row,
-        id: row.id ?? crypto.randomUUID(),
-        projectId,
-        searchId,
-        createdAt: now,
-        updatedAt: now,
-      })
+      .values({ ...row, projectId, searchId, createdAt: now, updatedAt: now })
+      .onConflictDoNothing(),
+  );
+}
+
+async function listLinkedLeadIds(searchId: string, leadIds: string[]) {
+  const linked = new Set<string>();
+  for (let i = 0; i < leadIds.length; i += KEY_CHUNK) {
+    const rows = await db
+      .select({ leadId: leadSearchLeads.leadId })
+      .from(leadSearchLeads)
+      .where(
+        and(
+          eq(leadSearchLeads.searchId, searchId),
+          inArray(leadSearchLeads.leadId, leadIds.slice(i, i + KEY_CHUNK)),
+        ),
+      );
+    for (const row of rows) linked.add(row.leadId);
+  }
+  return linked;
+}
+
+async function linkLeads(searchId: string, leadIds: string[]) {
+  const now = new Date().toISOString();
+  await executeInBatches(leadIds, (tx, leadId) =>
+    tx
+      .insert(leadSearchLeads)
+      .values({ id: crypto.randomUUID(), searchId, leadId, createdAt: now })
       .onConflictDoNothing(),
   );
 }
@@ -118,7 +162,7 @@ async function listLeads(projectId: string, searchId: string) {
     .where(
       and(
         eq(leads.projectId, projectId),
-        eq(leads.searchId, searchId),
+        inSearch(searchId),
         isNull(leads.hiddenAt),
       ),
     )
@@ -137,23 +181,47 @@ async function listEmailsForSearch(projectId: string, searchId: string) {
     })
     .from(leadEmails)
     .innerJoin(leads, eq(leads.id, leadEmails.leadId))
-    .where(and(eq(leads.projectId, projectId), eq(leads.searchId, searchId)))
+    .where(and(eq(leads.projectId, projectId), inSearch(searchId)))
     .orderBy(desc(leadEmails.isPrimary), asc(leadEmails.email));
 }
 
 async function listLeadCounts(projectId: string) {
   return db
     .select({
-      searchId: leads.searchId,
+      searchId: leadSearchLeads.searchId,
       enrichmentStatus: leads.enrichmentStatus,
       primaryEmail: leadEmails.email,
     })
-    .from(leads)
+    .from(leadSearchLeads)
+    .innerJoin(leads, eq(leads.id, leadSearchLeads.leadId))
     .leftJoin(
       leadEmails,
       and(eq(leadEmails.leadId, leads.id), eq(leadEmails.isPrimary, true)),
     )
     .where(eq(leads.projectId, projectId));
+}
+
+async function poolCounts(projectId: string, searchId: string) {
+  const base = and(
+    eq(leads.projectId, projectId),
+    inSearch(searchId),
+    isNull(leads.hiddenAt),
+  );
+  const [[ready], [pending]] = await Promise.all([
+    db
+      .select({ total: count() })
+      .from(leads)
+      .innerJoin(
+        leadEmails,
+        and(eq(leadEmails.leadId, leads.id), eq(leadEmails.isPrimary, true)),
+      )
+      .where(and(base, eq(leads.outreachStatus, "new"))),
+    db
+      .select({ total: count() })
+      .from(leads)
+      .where(and(base, eq(leads.enrichmentStatus, "pending"))),
+  ]);
+  return { ready: ready?.total ?? 0, pending: pending?.total ?? 0 };
 }
 
 const enrichFields = {
@@ -181,7 +249,7 @@ async function listPendingLeads(
     .where(
       and(
         eq(leads.projectId, projectId),
-        eq(leads.searchId, searchId),
+        inSearch(searchId),
         eq(leads.enrichmentStatus, "pending"),
       ),
     )
@@ -274,6 +342,33 @@ async function touchSearch(projectId: string, id: string) {
     .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)));
 }
 
+async function listAreas(searchId: string) {
+  return db
+    .select()
+    .from(leadSearchAreas)
+    .where(eq(leadSearchAreas.searchId, searchId));
+}
+
+async function saveArea(
+  searchId: string,
+  areaCode: string,
+  values: { nextOffset: number; exhaustedAt: string | null; lastRunAt: string },
+) {
+  await db
+    .insert(leadSearchAreas)
+    .values({ id: crypto.randomUUID(), searchId, areaCode, ...values })
+    .onConflictDoUpdate({
+      target: [leadSearchAreas.searchId, leadSearchAreas.areaCode],
+      set: values,
+    });
+}
+
+async function resetAreas(searchId: string) {
+  await db
+    .delete(leadSearchAreas)
+    .where(eq(leadSearchAreas.searchId, searchId));
+}
+
 async function listDueSearches(now: string, limit: number) {
   return db
     .select({ search: leadSearches, organizationId: projects.organizationId })
@@ -283,6 +378,7 @@ async function listDueSearches(now: string, limit: number) {
       and(
         eq(leadSearches.autoRun, true),
         lte(leadSearches.nextRunAt, now),
+        isNull(leadSearches.archivedAt),
         isNull(projects.archivedAt),
       ),
     )
@@ -310,12 +406,14 @@ async function claimDueSearch(
 
 async function findAutoRunSearchWithPending() {
   const [row] = await db
-    .select({ projectId: leads.projectId, searchId: leads.searchId })
-    .from(leads)
-    .innerJoin(leadSearches, eq(leadSearches.id, leads.searchId))
+    .select({ projectId: leads.projectId, searchId: leadSearchLeads.searchId })
+    .from(leadSearchLeads)
+    .innerJoin(leads, eq(leads.id, leadSearchLeads.leadId))
+    .innerJoin(leadSearches, eq(leadSearches.id, leadSearchLeads.searchId))
     .where(
       and(
         eq(leadSearches.autoRun, true),
+        isNull(leadSearches.archivedAt),
         eq(leads.enrichmentStatus, "pending"),
       ),
     )
@@ -331,7 +429,7 @@ async function resetFailedLeads(projectId: string, searchId: string) {
     .where(
       and(
         eq(leads.projectId, projectId),
-        eq(leads.searchId, searchId),
+        inSearch(searchId),
         eq(leads.enrichmentStatus, "failed"),
       ),
     )
@@ -343,19 +441,25 @@ export const LeadRepository = {
   createSearch,
   listSearches,
   getSearch,
-  deleteSearch,
-  existingBusinessKeys,
+  archiveSearch,
+  findLeadIdsByKeys,
   insertLeads,
+  listLinkedLeadIds,
+  linkLeads,
   insertFoundEmails,
   listEmailsForLeads,
   listLeads,
   listEmailsForSearch,
   listLeadCounts,
+  poolCounts,
   listPendingLeads,
   listLeadsToRescan,
   saveEnrichment,
   touchSearch,
   updateSearch,
+  listAreas,
+  saveArea,
+  resetAreas,
   listDueSearches,
   claimDueSearch,
   findAutoRunSearchWithPending,
