@@ -38,8 +38,7 @@ const EN: Phrases = {
   no_faq: "I couldn't see an FAQ section that AI assistants could quote",
   no_review_schema: "your star ratings aren't shown in Google results",
   no_llms_txt: "your site has no llms.txt guide for AI assistants",
-  no_blog:
-    "your site has no regular blog, which is the main way to win search and AI traffic",
+  no_blog: "your site has no regular blog to bring in search and AI traffic",
   stale_blog: "your blog hasn't had a new post in a while (last: {detail})",
   irregular_blog:
     "your blog isn't updated regularly ({detail} posts in the last 3 months)",
