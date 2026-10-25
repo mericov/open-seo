@@ -15,6 +15,9 @@ import {
   updateFirstLineSchema,
   leadSearchIdSchema,
   leadTemplateIdSchema,
+  leadIdSchema,
+  listLeadFollowUpsSchema,
+  recordLeadMailSchema,
   saveLeadReportSchema,
   saveLeadTemplateSchema,
   listProjectLeadsSchema,
@@ -127,6 +130,36 @@ export const setLeadStatus = createServerFn({ method: "POST" })
     ),
   );
 
+export const listLeadFollowUps = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(listLeadFollowUpsSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.listFollowUps(
+      context.projectId,
+      context.organizationId,
+      data.today,
+    ),
+  );
+
+export const recordLeadMail = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(recordLeadMailSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.recordMail(
+      context.projectId,
+      context.organizationId,
+      data.leadId,
+      data.step,
+    ),
+  );
+
+export const stopLeadFollowUp = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(leadIdSchema)
+  .handler(async ({ data, context }) =>
+    LeadOutreachService.stopFollowUp(context.projectId, data.leadId),
+  );
+
 export const runLeadSearchNow = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(leadSearchIdSchema)
@@ -179,6 +212,7 @@ export const saveLeadTemplate = createServerFn({ method: "POST" })
     const input = {
       name: data.name,
       language: data.language,
+      step: data.step,
       subject: data.subject,
       body: data.body,
     };

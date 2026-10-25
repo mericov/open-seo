@@ -6,6 +6,7 @@ import type { LeadEmailLanguage } from "@/shared/leadEmail";
 type TemplateInput = {
   name: string;
   language: LeadEmailLanguage;
+  step: number;
   subject: string;
   body: string;
 };
@@ -16,12 +17,17 @@ async function list(projectId: string) {
       id: leadEmailTemplates.id,
       name: leadEmailTemplates.name,
       language: leadEmailTemplates.language,
+      step: leadEmailTemplates.step,
       subject: leadEmailTemplates.subject,
       body: leadEmailTemplates.body,
     })
     .from(leadEmailTemplates)
     .where(eq(leadEmailTemplates.projectId, projectId))
-    .orderBy(asc(leadEmailTemplates.createdAt), asc(leadEmailTemplates.name));
+    .orderBy(
+      asc(leadEmailTemplates.step),
+      asc(leadEmailTemplates.createdAt),
+      asc(leadEmailTemplates.name),
+    );
 }
 
 async function create(projectId: string, input: TemplateInput) {

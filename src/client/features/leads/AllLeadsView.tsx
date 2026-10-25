@@ -91,32 +91,63 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div
-          role="tablist"
-          className="inline-flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-muted p-1"
-        >
-          {(["all", ...LEAD_OUTREACH_STATUSES] as StatusTab[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={status === key}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div
+            role="tablist"
+            className="inline-flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-muted p-1"
+          >
+            {(["all", ...LEAD_OUTREACH_STATUSES] as StatusTab[]).map((key) => (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={status === key}
+                onClick={() => {
+                  setStatus(key);
+                  resetPaging();
+                }}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
+                  status === key && "bg-background text-foreground shadow-sm",
+                )}
+              >
+                {t(`outreach.${key}`)}
+                <span className="text-xs tabular-nums opacity-60">
+                  {data?.counts[key] ?? 0}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              variant={dueOnly ? "default" : "ghost"}
+              aria-pressed={dueOnly}
               onClick={() => {
-                setStatus(key);
+                setDueOnly(!dueOnly);
                 resetPaging();
               }}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
-                status === key && "bg-background text-foreground shadow-sm",
+                !dueOnly && (data?.counts.due ?? 0) > 0 && "text-destructive",
               )}
             >
-              {t(`outreach.${key}`)}
-              <span className="text-xs tabular-nums opacity-60">
-                {data?.counts[key] ?? 0}
-              </span>
-            </button>
-          ))}
+              <Bell data-icon="inline-start" />
+              {t("notes.due", { count: data?.counts.due ?? 0 })}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setTemplatesOpen(true)}
+            >
+              <Mail data-icon="inline-start" />
+              {t("templates.title")}
+            </Button>
+            <ExportMenu
+              actions={["csv", "sheets", "copy-json"]}
+              onExport={(format) => void onExport(format)}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <CampaignFilter
@@ -176,33 +207,6 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
             />
             {t("all.hasEmail")}
           </label>
-          <Button
-            size="sm"
-            variant={dueOnly ? "default" : "ghost"}
-            aria-pressed={dueOnly}
-            onClick={() => {
-              setDueOnly(!dueOnly);
-              resetPaging();
-            }}
-            className={cn(
-              !dueOnly && (data?.counts.due ?? 0) > 0 && "text-destructive",
-            )}
-          >
-            <Bell data-icon="inline-start" />
-            {t("notes.due", { count: data?.counts.due ?? 0 })}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setTemplatesOpen(true)}
-          >
-            <Mail data-icon="inline-start" />
-            {t("templates.title")}
-          </Button>
-          <ExportMenu
-            actions={["csv", "sheets", "copy-json"]}
-            onExport={(format) => void onExport(format)}
-          />
         </div>
       </div>
 
@@ -278,10 +282,10 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
                           templates={templatesQuery.data ?? []}
                           mailClient={mailClient}
                           onOpened={() => {
-                            if (lead.outreachStatus === "new") {
-                              statusMutation.mutate({
-                                leadIds: [lead.id],
-                                status: "contacted",
+                            if (lead.followUpStep === 0) {
+                              actions.recordMail.mutate({
+                                leadId: lead.id,
+                                step: 1,
                               });
                             }
                           }}

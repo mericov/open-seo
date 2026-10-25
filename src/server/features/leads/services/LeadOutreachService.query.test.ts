@@ -104,3 +104,33 @@ it("leaves hidden leads out and finds leads with a reminder due", async () => {
   const all = await LeadOutreachService.listLeads("p1", "o1", {}, page);
   expect(all.leads.map((lead) => lead.id)).not.toContain("a");
 });
+
+it("lines up follow-ups on business days and drops leads that replied or were skipped", async () => {
+  await LeadOutreachService.recordMail("p1", "o1", "b", 1);
+  const [b] = (
+    await LeadOutreachService.listLeads("p1", "o1", {}, page)
+  ).leads.filter((lead) => lead.id === "b");
+  expect(b).toMatchObject({ outreachStatus: "contacted", followUpStep: 1 });
+
+  await client.executeMultiple(
+    [
+      `UPDATE leads SET follow_up_sent_at = '2026-10-22T10:00:00.000Z' WHERE id = 'b';`,
+      `UPDATE leads SET follow_up_step = 2, follow_up_sent_at = '2026-10-20T10:00:00.000Z' WHERE id = 'c';`,
+    ].join("\n"),
+  );
+
+  expect(
+    await LeadOutreachService.listFollowUps("p1", "o1", "2026-10-26"),
+  ).toEqual([]);
+  const due = await LeadOutreachService.listFollowUps("p1", "o1", "2026-10-27");
+  expect(due.map((item) => [item.lead.id, item.step, item.dueOn])).toEqual([
+    ["c", 3, "2026-10-27"],
+    ["b", 2, "2026-10-27"],
+  ]);
+
+  await LeadOutreachService.stopFollowUp("p1", "b");
+  await LeadOutreachService.setStatus("p1", "o1", ["c"], "replied");
+  expect(
+    await LeadOutreachService.listFollowUps("p1", "o1", "2026-10-27"),
+  ).toEqual([]);
+});

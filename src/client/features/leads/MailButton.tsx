@@ -25,6 +25,7 @@ import {
   SAMPLE_TEMPLATES,
   type LeadMailClient,
 } from "@/shared/leadEmail";
+import type { LeadMailStep } from "@/shared/leadFollowUp";
 
 type MailTemplate = Omit<LeadTemplate, "id"> & { id?: string };
 
@@ -33,19 +34,26 @@ export function MailButton({
   templates,
   mailClient,
   onOpened,
+  step = 1,
+  label,
 }: {
   lead: ProjectLeadRow;
   templates: LeadTemplate[];
   mailClient: LeadMailClient;
   onOpened: () => void;
+  step?: LeadMailStep;
+  label?: string;
 }) {
   const { t } = useTranslation("leads");
   const [confirming, setConfirming] = useState<MailTemplate | null>(null);
   const email = lead.primaryEmail;
   if (!email) return null;
-  const prior = lead.priorContact;
+  const prior = step === 1 ? lead.priorContact : null;
 
-  const saved: MailTemplate[] = templates.length ? templates : SAMPLE_TEMPLATES;
+  const forStep = templates.filter((template) => template.step === step);
+  const saved: MailTemplate[] = forStep.length
+    ? forStep
+    : SAMPLE_TEMPLATES.filter((template) => template.step === step);
   const groups = [
     saved.filter((template) => template.language === lead.language),
     saved.filter((template) => template.language !== lead.language),
@@ -111,7 +119,7 @@ export function MailButton({
           onClick={() => open(choices[0])}
         >
           <Mail data-icon="inline-start" />
-          {t("templates.send")}
+          {label ?? t("templates.send")}
         </Button>
         {confirmDialog}
       </>
@@ -126,7 +134,7 @@ export function MailButton({
           }
         >
           <Mail data-icon="inline-start" />
-          {t("templates.send")}
+          {label ?? t("templates.send")}
           <ChevronDown data-icon="inline-end" className="opacity-60" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">

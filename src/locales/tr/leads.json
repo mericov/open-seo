@@ -135,7 +135,8 @@
   },
   "views": {
     "all": "Lead'ler",
-    "campaigns": "Kampanyalar"
+    "campaigns": "Kampanyalar",
+    "followUps": "Takip mailleri"
   },
   "score": {
     "label": "Fırsat",
@@ -297,7 +298,7 @@
       "gmail": "Gmail (web)",
       "mailto": "Mail uygulamam (Apple Mail, Outlook)"
     },
-    "empty": "Henüz şablon yok. Türkçe ve İngilizce iki örnekle başla, kendi üslubuna göre düzenle. Yazan yere şirket adresini ekle; ABD'de soğuk mailde adres zorunlu.",
+    "empty": "Henüz şablon yok. Türkçe ve İngilizce örneklerle başla: ilk mail ve iki takip maili. Kendi üslubuna göre düzenle; ABD'ye giden maillerde şirket adresi zorunlu.",
     "addSamples": "Örnek şablonları ekle",
     "new": "Yeni şablon",
     "delete": "Şablonu sil",
@@ -318,7 +319,13 @@
     },
     "save": "Kaydet",
     "cancel": "Vazgeç",
-    "send": "Mail"
+    "send": "Mail",
+    "step": "Adım",
+    "steps": {
+      "1": "1. mail",
+      "2": "2. mail (takip)",
+      "3": "3. mail (son takip)"
+    }
   },
   "hide": {
     "action": "Gizle",
@@ -354,7 +361,9 @@
     "timeout": "Rapor çok uzun sürdü. Tekrar dene.",
     "failed": "Rapor oluşturulamadı.",
     "hint": "Siteyi arka planda açar ve SEO & GEO eklentisiyle müşteri raporunu hazırlar.",
-    "needsExtension": "Rapor için SEO & GEO eklentisini kur veya güncelle (4.1+)."
+    "needsExtension": "Rapor için SEO & GEO eklentisini kur veya güncelle (4.1+).",
+    "viewsShort_one": "Rapor 1 kez açıldı",
+    "viewsShort_other": "Rapor {{count}} kez açıldı"
   },
   "findingWhy": {
     "no_website": "Haritada bulan müşterinin daha fazla bilgi alacağı veya satın alacağı bir yer yok, sitesi olan rakibe gidiyor.",
@@ -536,5 +545,21 @@
   "suppress": {
     "action": "Bir daha yazma",
     "done": "{{count}} lead engellendi; bu işletmeler yeni kampanyalara da eklenmeyecek."
+  },
+  "followUps": {
+    "description": "İlk maili gönderdiğin lead'ler 3 iş günü sonra 2. mail için, 2. mailden 5 iş günü sonra son takip için burada görünür. Yanıt verenleri işaretlemeyi unutma; MericSEO gelen kutunu göremez.",
+    "empty": "Bugün gönderilecek takip maili yok",
+    "emptyDescription": "İlk maillerini gönderdikçe takip zamanı gelen lead'ler burada sıralanır.",
+    "step": "{{step}}. mail",
+    "dueToday": "Bugün",
+    "overdue_one": "1 gün gecikti",
+    "overdue_other": "{{count}} gün gecikti",
+    "lastSent": "Son mail {{when}}",
+    "send": "Gönder",
+    "replied": "Yanıt verdi",
+    "skip": "Atla",
+    "skipped": "Bu lead'e takip gönderilmeyecek",
+    "markedReplied": "Yanıt verdi olarak işaretlendi",
+    "sent": "Takip maili kaydedildi"
   }
 }

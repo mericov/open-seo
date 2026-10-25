@@ -132,6 +132,9 @@ export const leads = sqliteTable(
     reportCreatedAt: text("report_created_at"),
     reportViews: integer("report_views").notNull().default(0),
     reportLastViewedAt: text("report_last_viewed_at"),
+    followUpStep: integer("follow_up_step").notNull().default(0),
+    followUpSentAt: text("follow_up_sent_at"),
+    followUpStoppedAt: text("follow_up_stopped_at"),
     createdAt: text("created_at")
       .notNull()
       .default(sql`(current_timestamp)`),
@@ -209,6 +212,7 @@ export const leadEmailTemplates = sqliteTable(
       .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     language: text("language", { enum: ["tr", "en"] }).notNull(),
+    step: integer("step").notNull().default(1),
     subject: text("subject").notNull(),
     body: text("body").notNull(),
     createdAt: text("created_at")

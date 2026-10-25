@@ -7,10 +7,12 @@ const LEAD_MIGRATIONS = [
   "0060_lead_outreach.sql",
   "0061_lead_scans.sql",
   "0062_lead_first_line.sql",
+  "0063_lead_email_templates.sql",
   "0064_lead_notes_reports.sql",
   "0065_lead_findings_detail.sql",
   "0067_lead_report_views.sql",
   "0069_lead_campaigns.sql",
+  "0070_lead_follow_ups.sql",
 ];
 
 // The lead tables as the real migrations build them, on top of the two parent

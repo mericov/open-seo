@@ -39,14 +39,14 @@ export function AllLeadsRow({
       className="group border-t border-border/60 transition-colors hover:bg-muted/30 data-[selected=true]:bg-muted/40"
       data-selected={selected}
     >
-      <td className="w-10 py-3.5 pr-0 pl-4 align-top">
+      <td className="w-10 py-2.5 pr-0 pl-4 align-top">
         <Checkbox
           checked={selected}
           onCheckedChange={(value) => onSelect(value === true)}
           aria-label={t("all.selectLead", { name: lead.name })}
         />
       </td>
-      <td className="max-w-96 py-3.5 pr-4 pl-3 align-top">
+      <td className="max-w-96 py-2.5 pr-4 pl-3 align-top">
         <p className="truncate font-medium leading-snug" title={lead.name}>
           {lead.name}
         </p>
@@ -75,13 +75,13 @@ export function AllLeadsRow({
         />
         <LeadNote projectId={projectId} lead={lead} />
       </td>
-      <td className="py-3.5 pr-4 align-top">
+      <td className="py-2.5 pr-4 align-top">
         <ScoreBadge score={lead.opportunityScore} />
       </td>
-      <td className="max-w-64 py-3.5 pr-4 align-top">
-        <LeadFindings lead={lead} />
+      <td className="w-72 min-w-56 py-2.5 pr-4 align-top">
+        <LeadFindings lead={lead} max={2} />
       </td>
-      <td className="py-3.5 pr-4 align-top">
+      <td className="py-2.5 pr-4 align-top">
         {lead.primaryEmail ? (
           <p className="max-w-56 truncate font-mono text-xs select-all">
             {lead.primaryEmail}
@@ -90,8 +90,8 @@ export function AllLeadsRow({
           <FallbackContact lead={lead} />
         )}
       </td>
-      <td className="py-3.5 pr-4 text-right align-top">
-        <div className="flex items-center justify-end gap-2">
+      <td className="py-2.5 pr-4 text-right align-top">
+        <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
           {mail}
           <OutreachStatusMenu
             status={lead.outreachStatus}

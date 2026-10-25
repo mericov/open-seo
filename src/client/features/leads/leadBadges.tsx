@@ -102,7 +102,7 @@ export function OutreachStatusMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         disabled={disabled}
-        className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 whitespace-nowrap hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
       >
         <StatusLabel status={status} />
         <ChevronDown className="size-3 text-muted-foreground" />

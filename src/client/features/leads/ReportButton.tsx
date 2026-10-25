@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, FileText } from "lucide-react";
+import { Eye, ExternalLink, FileText, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
@@ -85,17 +85,22 @@ function ReportViews({ lead }: { lead: ProjectLeadRow }) {
         day: "numeric",
       })
     : "";
+  const opened = lead.reportViews > 0;
   return (
     <span
+      title={
+        opened
+          ? t("report.views", { count: lead.reportViews, date })
+          : t("report.notViewed")
+      }
       className={
-        lead.reportViews > 0
-          ? "text-xs font-medium text-emerald-600"
-          : "text-xs text-muted-foreground"
+        opened
+          ? "inline-flex items-center gap-1 text-xs font-medium tabular-nums text-emerald-600"
+          : "inline-flex items-center gap-1 text-xs tabular-nums text-muted-foreground/60"
       }
     >
-      {lead.reportViews > 0
-        ? t("report.views", { count: lead.reportViews, date })
-        : t("report.notViewed")}
+      <Eye className="size-3.5" />
+      {lead.reportViews}
     </span>
   );
 }
@@ -135,7 +140,7 @@ export function ReportButton({
   const url = reportUrlFor(lead.reportToken);
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex shrink-0 items-center gap-1">
       {url ? (
         <Button
           size="icon-sm"
@@ -151,18 +156,37 @@ export function ReportButton({
         </Button>
       ) : null}
       {url ? <ReportViews lead={lead} /> : null}
-      <Button
-        size="sm"
-        variant="ghost"
-        className="rounded-full"
-        disabled={!version}
-        title={version ? t("report.hint") : t("report.needsExtension")}
-        pending={mutation.isPending}
-        onClick={() => mutation.mutate()}
-      >
-        <FileText data-icon="inline-start" />
-        {url ? t("report.refresh") : t("report.create")}
-      </Button>
+      {url ? (
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          className="rounded-full"
+          disabled={!version}
+          aria-label={t("report.refresh")}
+          title={
+            version
+              ? `${t("report.refresh")} · ${t("report.hint")}`
+              : t("report.needsExtension")
+          }
+          pending={mutation.isPending}
+          onClick={() => mutation.mutate()}
+        >
+          <RefreshCw />
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full"
+          disabled={!version}
+          title={version ? t("report.hint") : t("report.needsExtension")}
+          pending={mutation.isPending}
+          onClick={() => mutation.mutate()}
+        >
+          <FileText data-icon="inline-start" />
+          {t("report.create")}
+        </Button>
+      )}
     </div>
   );
 }

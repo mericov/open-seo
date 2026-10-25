@@ -28,10 +28,24 @@ import {
   SAMPLE_TEMPLATES,
   type LeadMailClient,
 } from "@/shared/leadEmail";
+import type { LeadMailStep } from "@/shared/leadFollowUp";
+
+const STEP_OPTIONS = ["1", "2", "3"] as const;
+type StepOption = (typeof STEP_OPTIONS)[number];
+const toStep = (value: number | string): LeadMailStep =>
+  Number(value) === 2 ? 2 : Number(value) === 3 ? 3 : 1;
+const stepOption = (value: number): StepOption =>
+  value === 2 ? "2" : value === 3 ? "3" : "1";
 
 type Draft = Omit<LeadTemplate, "id"> & { id?: string };
 
-const EMPTY_DRAFT: Draft = { name: "", language: "tr", subject: "", body: "" };
+const EMPTY_DRAFT: Draft = {
+  name: "",
+  language: "tr",
+  step: 1,
+  subject: "",
+  body: "",
+};
 
 export function LeadTemplatesSheet({
   projectId,
@@ -61,6 +75,7 @@ export function LeadTemplatesSheet({
           templateId: input.id,
           name: input.name,
           language: input.language,
+          step: toStep(input.step),
           subject: input.subject,
           body: input.body,
         },
@@ -139,7 +154,9 @@ export function LeadTemplatesSheet({
                         {template.name}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {template.language.toUpperCase()} · {template.subject}
+                        {template.language.toUpperCase()} ·{" "}
+                        {t(`templates.steps.${stepOption(template.step)}`)} ·{" "}
+                        {template.subject}
                       </p>
                     </button>
                     <Button
@@ -187,7 +204,7 @@ function TemplateEditor({
     draft.name.trim() && draft.subject.trim() && draft.body.trim().length > 0;
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
+      <div className="grid gap-3 sm:grid-cols-[1fr_7rem_9rem]">
         <Field>
           <FieldLabel htmlFor="template-name">{t("templates.name")}</FieldLabel>
           <Input
@@ -205,6 +222,14 @@ function TemplateEditor({
           options={LEAD_EMAIL_LANGUAGES}
           optionLabel={(value) => value.toUpperCase()}
           onChange={(language) => onChange({ ...draft, language })}
+        />
+        <OptionSelect
+          id="template-step"
+          label={t("templates.step")}
+          value={stepOption(draft.step)}
+          options={STEP_OPTIONS}
+          optionLabel={(value) => t(`templates.steps.${value}`)}
+          onChange={(step) => onChange({ ...draft, step: toStep(step) })}
         />
       </div>
       <Field>

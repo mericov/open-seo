@@ -35,6 +35,7 @@ export type LeadListFilters = {
   minScore?: number;
   dueBy?: string;
   finding?: LeadFindingCode;
+  followUpBefore?: string;
 };
 
 function filterConditions(
@@ -68,6 +69,14 @@ function filterConditions(
     filters.minScore != null
       ? gte(leads.opportunityScore, filters.minScore)
       : undefined,
+    ...(filters.followUpBefore
+      ? [
+          eq(leads.outreachStatus, "contacted"),
+          inArray(leads.followUpStep, [1, 2]),
+          isNull(leads.followUpStoppedAt),
+          lte(leads.followUpSentAt, filters.followUpBefore),
+        ]
+      : []),
   ];
 }
 
@@ -118,6 +127,8 @@ async function listLeads(
         reportCreatedAt: leads.reportCreatedAt,
         reportViews: leads.reportViews,
         reportLastViewedAt: leads.reportLastViewedAt,
+        followUpStep: leads.followUpStep,
+        followUpSentAt: leads.followUpSentAt,
         createdAt: leads.createdAt,
         searchId: leads.searchId,
         searchLabel: leadSearches.label,
@@ -193,6 +204,35 @@ async function setOutreachStatus(
       .set({ outreachStatus: status, contactedAt, updatedAt: now })
       .where(and(eq(leads.projectId, projectId), inArray(leads.id, ids)));
   }
+}
+
+async function getOutreachStatus(projectId: string, leadId: string) {
+  const [row] = await db
+    .select({ status: leads.outreachStatus })
+    .from(leads)
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+  return row?.status ?? null;
+}
+
+async function recordMail(projectId: string, leadId: string, step: number) {
+  const now = new Date().toISOString();
+  await db
+    .update(leads)
+    .set({
+      followUpStep: step,
+      followUpSentAt: now,
+      ...(step === 1 ? { followUpStoppedAt: null } : {}),
+      updatedAt: now,
+    })
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
+}
+
+async function stopFollowUp(projectId: string, leadId: string) {
+  const now = new Date().toISOString();
+  await db
+    .update(leads)
+    .set({ followUpStoppedAt: now, updatedAt: now })
+    .where(and(eq(leads.projectId, projectId), eq(leads.id, leadId)));
 }
 
 async function listForFirstLines(projectId: string, leadIds: string[]) {
@@ -356,6 +396,9 @@ export const LeadListRepository = {
   statusCounts,
   listFindings,
   setOutreachStatus,
+  getOutreachStatus,
+  recordMail,
+  stopFollowUp,
   listForFirstLines,
   listContactFields,
   setFirstLine,

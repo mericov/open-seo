@@ -5,7 +5,7 @@ import { LeadSearchDetail } from "@/client/features/leads/LeadSearchDetail";
 
 const searchSchema = z.object({
   search: z.string().min(1).optional().catch(undefined),
-  view: z.enum(["campaigns", "all"]).optional().catch(undefined),
+  view: z.enum(["campaigns", "all", "followups"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/_app/p/$projectId/leads")({

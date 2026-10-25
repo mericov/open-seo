@@ -2,6 +2,7 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import {
   getLeadSearch,
   listLeadSearches,
+  listLeadFollowUps,
   listLeadTemplates,
   listProjectLeads,
 } from "@/serverFunctions/leads";
@@ -58,6 +59,17 @@ export function projectLeadsOptions(
     placeholderData: keepPreviousData,
   });
 }
+
+export function leadFollowUpsOptions(projectId: string, today: string) {
+  return queryOptions({
+    queryKey: [...leadsQueryKey(projectId), "followUps", today],
+    queryFn: () => withData(listLeadFollowUps({ data: { projectId, today } })),
+  });
+}
+
+export type LeadFollowUp = Awaited<
+  ReturnType<typeof listLeadFollowUps>
+>[number];
 
 export type ProjectLeadRow = Awaited<
   ReturnType<typeof listProjectLeads>

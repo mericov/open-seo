@@ -6,12 +6,15 @@ import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import { chunk } from "remeda";
 import {
   generateLeadFirstLines,
+  recordLeadMail,
   rescanLeads,
+  stopLeadFollowUp,
   setLeadHidden,
   setLeadStatus,
   suppressLeads,
 } from "@/serverFunctions/leads";
 import type { LeadOutreachStatus } from "@/shared/leadFindings";
+import type { LeadMailStep } from "@/shared/leadFollowUp";
 import {
   LEAD_FIRST_LINE_MAX_IDS,
   LEAD_RESCAN_MAX_IDS,
@@ -104,5 +107,31 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     lines.mutate(leadIds);
   };
 
-  return { status, lines, writeLines, hide, suppress, rescan };
+  const recordMail = useMutation({
+    mutationFn: (input: { leadId: string; step: LeadMailStep }) =>
+      recordLeadMail({ data: { projectId, ...input } }),
+    onSuccess: refresh,
+    onError: (error) => toast.error(getStandardErrorMessage(error)),
+  });
+
+  const stopFollowUp = useMutation({
+    mutationFn: (leadId: string) =>
+      stopLeadFollowUp({ data: { projectId, leadId } }),
+    onSuccess: async () => {
+      toast.success(t("followUps.skipped"));
+      await refresh();
+    },
+    onError: (error) => toast.error(getStandardErrorMessage(error)),
+  });
+
+  return {
+    status,
+    lines,
+    writeLines,
+    hide,
+    suppress,
+    rescan,
+    recordMail,
+    stopFollowUp,
+  };
 }

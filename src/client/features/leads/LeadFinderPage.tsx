@@ -10,7 +10,12 @@ import { SkeletonPage } from "@/client/components/SkeletonPresets";
 import { Badge } from "@/client/components/ui/badge";
 import { Button } from "@/client/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/client/components/ui/tabs";
-import { leadSearchesOptions } from "@/client/features/leads/leadQueries";
+import {
+  leadFollowUpsOptions,
+  leadSearchesOptions,
+} from "@/client/features/leads/leadQueries";
+import { FollowUpsView } from "@/client/features/leads/FollowUpsView";
+import { localToday } from "@/client/features/leads/LeadNote";
 import { formatRelativeTime } from "@/client/lib/relative-time";
 import { AllLeadsView } from "@/client/features/leads/AllLeadsView";
 import { CampaignWizard } from "@/client/features/leads/CampaignWizard";
@@ -21,17 +26,21 @@ export function LeadFinderPage({
   view,
 }: {
   projectId: string;
-  view: "campaigns" | "all";
+  view: "campaigns" | "all" | "followups";
 }) {
   const { t } = useTranslation("leads");
   const navigate = useNavigate();
+  const followUpsQuery = useQuery(
+    leadFollowUpsOptions(projectId, localToday()),
+  );
+  const followUpCount = followUpsQuery.data?.length ?? 0;
 
   return (
     <div className="overflow-auto bg-background px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div
         className={cn(
           "mx-auto space-y-6",
-          view === "all" ? "max-w-6xl" : "max-w-5xl",
+          view === "campaigns" ? "max-w-5xl" : "max-w-6xl",
         )}
       >
         <PageHeader title={t("title")} description={t("description")} />
@@ -41,17 +50,32 @@ export function LeadFinderPage({
             void navigate({
               to: "/p/$projectId/leads",
               params: { projectId },
-              search: value === "campaigns" ? { view: "campaigns" } : {},
+              search:
+                value === "campaigns"
+                  ? { view: "campaigns" }
+                  : value === "followups"
+                    ? { view: "followups" }
+                    : {},
             })
           }
         >
           <TabsList variant="line">
             <TabsTrigger value="all">{t("views.all")}</TabsTrigger>
+            <TabsTrigger value="followups">
+              {t("views.followUps")}
+              {followUpCount > 0 ? (
+                <Badge variant="destructive" size="sm" className="ml-1.5">
+                  {followUpCount}
+                </Badge>
+              ) : null}
+            </TabsTrigger>
             <TabsTrigger value="campaigns">{t("views.campaigns")}</TabsTrigger>
           </TabsList>
         </Tabs>
         {view === "all" ? (
           <AllLeadsView projectId={projectId} />
+        ) : view === "followups" ? (
+          <FollowUpsView projectId={projectId} />
         ) : (
           <CampaignsView projectId={projectId} />
         )}

@@ -49,7 +49,13 @@ type FindingsLead = {
   language: LeadEmailLanguage;
 };
 
-export function LeadFindings({ lead }: { lead: FindingsLead }) {
+export function LeadFindings({
+  lead,
+  max,
+}: {
+  lead: FindingsLead;
+  max?: number;
+}) {
   const { t } = useTranslation("leads");
   const [open, setOpen] = useState(false);
   if (lead.findings.length === 0) return null;
@@ -77,7 +83,7 @@ export function LeadFindings({ lead }: { lead: FindingsLead }) {
         title={t("findingsPanel.open")}
         className="rounded-md text-left transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-ring"
       >
-        <FindingChips findings={lead.findings} />
+        <FindingChips findings={lead.findings} max={max} />
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className="w-full overflow-y-auto sm:max-w-lg">

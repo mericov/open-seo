@@ -5,6 +5,7 @@ import {
   LEAD_OUTREACH_STATUSES,
 } from "@/shared/leadFindings";
 import { LEAD_AREA_COUNTRIES } from "@/shared/leadAreas";
+import { LEAD_MAIL_STEPS } from "@/shared/leadFollowUp";
 import {
   LEAD_CATEGORY_GROUP_KEYS,
   LEAD_NEED_FILTERS,
@@ -90,8 +91,25 @@ export const saveLeadTemplateSchema = z.object({
   templateId: z.string().min(1).optional(),
   name: z.string().trim().min(1).max(80),
   language: z.enum(["tr", "en"]),
+  step: z.union(LEAD_MAIL_STEPS.map((step) => z.literal(step))).default(1),
   subject: z.string().trim().min(1).max(200),
   body: z.string().trim().min(1).max(5000),
+});
+
+export const listLeadFollowUpsSchema = z.object({
+  ...projectIdShape,
+  today: isoDate,
+});
+
+export const recordLeadMailSchema = z.object({
+  ...projectIdShape,
+  leadId: z.string().min(1),
+  step: z.union(LEAD_MAIL_STEPS.map((step) => z.literal(step))),
+});
+
+export const leadIdSchema = z.object({
+  ...projectIdShape,
+  leadId: z.string().min(1),
 });
 
 export const leadTemplateIdSchema = z.object({

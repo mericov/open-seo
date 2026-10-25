@@ -337,6 +337,13 @@
       "when": 1792928885794,
       "tag": "0047_lead_campaigns",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792959172648,
+      "tag": "0048_lead_follow_ups",
+      "breakpoints": true
     }
   ]
 }
