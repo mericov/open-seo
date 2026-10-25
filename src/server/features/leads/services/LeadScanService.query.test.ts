@@ -7,7 +7,8 @@ import type * as LeadScanServiceModule from "./LeadScanService";
 // Real in-memory SQLite: which leads a campaign inserts, links or skips is
 // decided by the queries themselves.
 
-const businessListings = vi.fn();
+const businessListings =
+  vi.fn<(input: Record<string, unknown>) => Promise<unknown[]>>();
 
 vi.mock("cloudflare:workers", () => ({
   env: { DATABASE_PROVIDER: "d1" },
@@ -67,11 +68,12 @@ it("walks the country's metro areas, links leads the project already has and ski
 
   const result = await LeadScanService.runNow("p1", "b2b", {
     organizationId: "o1",
-  } as never);
+    userId: "u1",
+    userEmail: "u1@example.com",
+  });
 
   expect(businessListings.mock.calls.map(([input]) => input)).toEqual([
     expect.objectContaining({
-      categories: expect.arrayContaining(["home_staging_service"]),
       locationCoordinate: "40.7128,-74.006,50",
       limit: 10,
     }),
@@ -80,6 +82,9 @@ it("walks the country's metro areas, links leads the project already has and ski
       limit: 8,
     }),
   ]);
+  expect(businessListings.mock.calls[0]?.[0].categories).toContain(
+    "home_staging_service",
+  );
   expect(result).toMatchObject({ added: 9, target: 5 });
 
   const leads = await client.execute(

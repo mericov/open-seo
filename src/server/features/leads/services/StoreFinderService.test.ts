@@ -20,8 +20,6 @@ vi.mock("@/server/lib/dataforseo", () => ({
 vi.mock("@/server/features/leads/repositories/LeadRepository", () => ({
   LeadRepository: {
     findLeadIdsByKeys: mocks.findLeadIdsByKeys,
-    listLinkedLeadIds: mocks.listLinkedLeadIds,
-    linkLeads: mocks.linkLeads,
     createSearch: mocks.createSearch,
     insertLeads: mocks.insertLeads,
     insertFoundEmails: mocks.insertFoundEmails,
@@ -29,6 +27,12 @@ vi.mock("@/server/features/leads/repositories/LeadRepository", () => ({
   },
 }));
 
+vi.mock("@/server/features/leads/repositories/CampaignRepository", () => ({
+  CampaignRepository: {
+    listLinkedLeadIds: mocks.listLinkedLeadIds,
+    linkLeads: mocks.linkLeads,
+  },
+}));
 vi.mock(
   "@/server/features/leads/repositories/ContactRegistryRepository",
   () => ({ ContactRegistryRepository: { listByKeys: async () => [] } }),

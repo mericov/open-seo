@@ -5,7 +5,7 @@ import { LeadSearchDetail } from "@/client/features/leads/LeadSearchDetail";
 
 const searchSchema = z.object({
   search: z.string().min(1).optional().catch(undefined),
-  view: z.enum(["searches", "all"]).optional().catch(undefined),
+  view: z.enum(["campaigns", "all"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/_app/p/$projectId/leads")({
@@ -19,6 +19,6 @@ function LeadsRoute() {
   return search ? (
     <LeadSearchDetail key={search} projectId={projectId} searchId={search} />
   ) : (
-    <LeadFinderPage projectId={projectId} view={view ?? "searches"} />
+    <LeadFinderPage projectId={projectId} view={view ?? "all"} />
   );
 }

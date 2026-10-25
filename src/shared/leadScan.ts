@@ -158,13 +158,9 @@ export const LEAD_CAMPAIGN_PRESETS = [
   "local_service",
 ] as const;
 
-export type LeadCampaignPreset = (typeof LEAD_CAMPAIGN_PRESETS)[number];
-
 export const LEAD_SEARCH_SCOPES = ["place", "country", "list"] as const;
 
-export type LeadSearchScope = (typeof LEAD_SEARCH_SCOPES)[number];
-
-export const PRODUCT_B2B_CATEGORIES = [
+const PRODUCT_B2B_CATEGORIES = [
   "interior_designer",
   "interior_decorator",
   "home_staging_service",

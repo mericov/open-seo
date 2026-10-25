@@ -1,6 +1,6 @@
 {
   "title": "Lead Finder",
-  "description": "Find local businesses or Shopify stores, read their websites for contact details, and keep the ones you can actually reach.",
+  "description": "Pick what you're looking for; the finder pulls businesses, reads their sites for contact details and keeps as many ready leads as you can write to each week.",
   "form": {
     "title": "New lead search",
     "category": "Business category",
@@ -24,26 +24,26 @@
     "started": "Found {{found}} businesses, added {{added}} new leads."
   },
   "list": {
-    "title": "Lead searches",
-    "empty": "No lead searches yet",
-    "emptyDescription": "Start a search above to build your first lead list.",
+    "title": "Campaigns",
+    "empty": "No campaigns yet",
+    "emptyDescription": "Create your first campaign and the finder fills its pool of ready leads.",
     "summary": "{{total}} leads · {{ready}} ready to email",
     "pending": "{{count}} pending",
     "ready": "{{count}} ready"
   },
   "detail": {
-    "back": "All lead searches",
+    "back": "Campaigns",
     "radius": "{{radius}} km around {{location}}",
-    "skipped": "{{count}} businesses were skipped because an earlier search already found them.",
+    "skipped": "{{count}} businesses were already in this project; they were linked to this campaign with their history instead of being added again.",
     "progressTitle": "Reading websites",
     "progress": "{{done}} of {{total}} websites read",
     "pause": "Pause",
     "resume": "Resume",
-    "loadFailed": "Couldn't load this lead search.",
-    "delete": "Delete search",
-    "deleteTitle": "Delete this lead search?",
-    "deleteDescription": "The search and all of its leads will be removed. Businesses in it can be found again by a new search.",
-    "deleted": "Lead search deleted",
+    "loadFailed": "Couldn't load this campaign.",
+    "delete": "Archive campaign",
+    "deleteTitle": "Archive this campaign?",
+    "deleteDescription": "The campaign leaves the list and stops running. Its leads and their outreach status stay under Leads.",
+    "deleted": "Campaign archived",
     "filterAll": "All",
     "noLeads": "No leads match this filter.",
     "storeScope": "{{platform}} · {{keywords}} · {{country}}",
@@ -52,10 +52,11 @@
     "shownStores": "Showing {{count}} sites that couldn't be confirmed as live Shopify stores.",
     "showAll": "Show them",
     "hideUnverified": "Hide them",
-    "deleteTracked": "{{count}} leads in this search have an outreach status. Deleting the search removes them and their status too.",
     "allKeywords": "any niche",
     "failedReads": "{{count}} sites couldn't be read.",
-    "retryFailed": "Try again"
+    "retryFailed": "Try again",
+    "countryScope": "All of {{country}} · {{done}} / {{total}} areas done",
+    "nextArea": "next: {{name}}"
   },
   "reachability": {
     "ready": "Ready to email",
@@ -133,8 +134,8 @@
     "platform": "Platform"
   },
   "views": {
-    "searches": "Searches",
-    "all": "All leads"
+    "all": "Leads",
+    "campaigns": "Campaigns"
   },
   "score": {
     "label": "Opportunity",
@@ -244,7 +245,8 @@
     "contactedOn": "emailed {{when}}",
     "selectAll": "Select all on this page",
     "selectLead": "Select {{name}}",
-    "findingAll": "Any finding"
+    "findingAll": "Any finding",
+    "campaignAll": "All campaigns"
   },
   "scan": {
     "byCategory": "One category",
@@ -271,14 +273,15 @@
       "unclaimed": "Google profile not claimed",
       "few_reviews": "Fewer than 10 reviews"
     },
-    "autoTitle": "Automatic search",
-    "autoHint": "Turn on to pull new leads every week, continuing where the last run stopped.",
+    "autoTitle": "Automatic refill",
+    "autoHint": "Turn on to top the ready pool up to its target every week.",
     "nextRun": "Next run {{when}}",
     "lastRun": "last run {{when}}",
     "weekly": "Weekly",
-    "perRun": "Leads per run",
-    "runNow": "Run now ({{count}})",
-    "ranNow": "{{count}} new leads added"
+    "perRun": "Weekly target",
+    "runNow": "Fill pool",
+    "ranNow": "{{count}} new leads added",
+    "poolFull": "The pool is already full, so nothing new was searched."
   },
   "firstLine": {
     "write": "Write first lines",
@@ -466,5 +469,72 @@
     "irregular_blog": "{{value}} posts in 3 months",
     "out_of_stock": "{{value}} sold out",
     "missing_alt": "{{value}} without alt"
+  },
+  "pool": {
+    "title": "Ready pool",
+    "status": "{{ready}} / {{target}} leads ready to email",
+    "reading": "Reading the sites of {{count}} leads"
+  },
+  "campaign": {
+    "new": "New campaign",
+    "cancel": "Cancel",
+    "next": "Continue",
+    "back": "Back",
+    "step": "Step {{current}} of {{total}}",
+    "presetTitle": "What are you finding leads for?",
+    "presets": {
+      "product_b2b": {
+        "title": "Product sales – B2B buyers",
+        "body": "Businesses that furnish spaces: interior designers, home stagers, real estate, coworking and event venues."
+      },
+      "shopify_service": {
+        "title": "Online stores – service sales",
+        "body": "Active online stores for SEO, GEO and Shopify services."
+      },
+      "local_service": {
+        "title": "Local businesses – service sales",
+        "body": "Clinics, salons, restaurants and other businesses that need a website or SEO."
+      },
+      "import": {
+        "title": "Paste a domain list",
+        "body": "Add a list of stores you already have. No search, no cost."
+      }
+    },
+    "whereTitle": "Who and where?",
+    "scope": {
+      "country": "Whole country",
+      "place": "One city"
+    },
+    "country": "Country",
+    "countries": {
+      "US": "United States",
+      "TR": "Türkiye"
+    },
+    "countryHint": "The whole country is searched area by area, biggest metros first, and no area is searched twice.",
+    "sector": "Sector",
+    "need": "Need (optional)",
+    "niche": "Niche keywords (optional)",
+    "nicheHint": "Separate with commas, e.g. skincare, candles. Leave empty for every store in the country.",
+    "advanced": "Advanced settings",
+    "targetTitle": "How many people can you write to each week?",
+    "target": "Weekly target of ready leads",
+    "targetHint": "The finder keeps searching until this many leads have an email and haven't been written to yet, and never pulls more than that.",
+    "weekly": "Refill automatically every week",
+    "create": "Start campaign",
+    "created": "Campaign started: {{added}} new leads added, reading their sites now.",
+    "costNote": "Pulling leads uses a few DataForSEO credits; reading sites and checking emails is free."
+  },
+  "prior": {
+    "contacted": "Written to {{when}}",
+    "contactedOther": "Written to from another project {{when}}",
+    "suppressed": "Do not contact",
+    "confirmTitle": "You've written to this business before",
+    "confirmBody": "An email went to this business {{when}}. Write again anyway?",
+    "confirmSuppressed": "This business is on the do-not-contact list. Write anyway?",
+    "send": "Write anyway"
+  },
+  "suppress": {
+    "action": "Never contact",
+    "done": "{{count}} leads blocked; these businesses won't be added to new campaigns either."
   }
 }

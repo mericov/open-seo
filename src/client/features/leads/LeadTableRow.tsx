@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 import { SafeExternalLink } from "@/client/components/SafeExternalLink";
 import { Badge } from "@/client/components/ui/badge";
 import { TableCell, TableRow } from "@/client/components/ui/table";
-import { ScoreBadge } from "@/client/features/leads/leadBadges";
+import {
+  PriorContactBadge,
+  ScoreBadge,
+} from "@/client/features/leads/leadBadges";
 import { LeadFindings } from "@/client/features/leads/LeadFindings";
 import type { LeadRow } from "@/client/features/leads/leadQueries";
 import { formatRelativeTime } from "@/client/lib/relative-time";
@@ -53,6 +56,7 @@ export function LeadTableRow({
           >
             {t(`reachability.${lead.reachability}`)}
           </Badge>
+          <PriorContactBadge prior={lead.priorContact} />
           <LeadFindings lead={lead} />
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
             {lead.website ? (

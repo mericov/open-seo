@@ -9,7 +9,6 @@ import { LeadOutreachService } from "@/server/features/leads/services/LeadOutrea
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
-  leadCategoryQuerySchema,
   leadLocationQuerySchema,
   generateFirstLinesSchema,
   importStoresSchema,
@@ -25,18 +24,9 @@ import {
   setLeadScheduleSchema,
   setLeadStatusSchema,
   listLeadSearchesSchema,
-  startLeadSearchSchema,
-  startStoreSearchSchema,
   createLeadCampaignSchema,
   suppressLeadsSchema,
 } from "@/types/schemas/leads";
-
-export const listLeadCategories = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(leadCategoryQuerySchema)
-  .handler(async ({ data }) =>
-    LeadFinderService.listCategories(data.query, 20),
-  );
 
 export const findLeadLocations = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
@@ -47,28 +37,7 @@ export const listLeadSearches = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(listLeadSearchesSchema)
   .handler(async ({ context }) =>
-    LeadFinderService.listSearches(context.projectId),
-  );
-
-export const startLeadSearch = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(startLeadSearchSchema)
-  .handler(async ({ data, context }) =>
-    LeadFinderService.startSearch(
-      {
-        projectId: context.projectId,
-        category: data.category,
-        categoryGroup: data.categoryGroup,
-        needFilter: data.needFilter,
-        nameQuery: data.nameQuery,
-        location: data.location,
-        place: data.place,
-        radiusKm: data.radiusKm,
-        limit: data.limit,
-        minRating: data.minRating,
-      },
-      context,
-    ),
+    CampaignService.listSearches(context.projectId),
   );
 
 export const createLeadCampaign = createServerFn({ method: "POST" })
@@ -86,23 +55,6 @@ export const suppressLeads = createServerFn({ method: "POST" })
       context.projectId,
       context.organizationId,
       data.leadIds,
-    ),
-  );
-
-export const startStoreSearch = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(startStoreSearchSchema)
-  .handler(async ({ data, context }) =>
-    StoreFinderService.startStoreSearch(
-      {
-        projectId: context.projectId,
-        technology: data.technology,
-        keywords: data.keywords,
-        countryCode: data.countryCode,
-        maxRank: data.maxRank,
-        limit: data.limit,
-      },
-      context,
     ),
   );
 
@@ -128,7 +80,7 @@ export const getLeadSearch = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(leadSearchIdSchema)
   .handler(async ({ data, context }) =>
-    LeadFinderService.getSearchDetail(
+    CampaignService.getSearchDetail(
       context.projectId,
       context.organizationId,
       data.searchId,

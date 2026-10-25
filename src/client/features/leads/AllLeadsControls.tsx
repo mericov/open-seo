@@ -1,4 +1,5 @@
 import {
+  Ban,
   ChevronDown,
   EyeOff,
   Mail,
@@ -6,6 +7,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
 import {
@@ -22,6 +24,7 @@ import {
   SelectValue,
 } from "@/client/components/ui/select";
 import { StatusLabel } from "@/client/features/leads/leadBadges";
+import { leadSearchesOptions } from "@/client/features/leads/leadQueries";
 import {
   LEAD_OUTREACH_STATUSES,
   type LeadOutreachStatus,
@@ -34,6 +37,8 @@ export function BulkBar({
   onWriteLines,
   hiding,
   onHide,
+  suppressing,
+  onSuppress,
   rescanning,
   onRescan,
   onStatus,
@@ -45,6 +50,8 @@ export function BulkBar({
   onWriteLines: () => void;
   hiding: boolean;
   onHide: () => void;
+  suppressing: boolean;
+  onSuppress: () => void;
   rescanning: boolean;
   onRescan: () => void;
   onStatus: (status: LeadOutreachStatus) => void;
@@ -106,6 +113,16 @@ export function BulkBar({
         size="sm"
         variant="ghost"
         className="rounded-full"
+        pending={suppressing}
+        onClick={onSuppress}
+      >
+        <Ban data-icon="inline-start" />
+        {t("suppress.action")}
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        className="rounded-full"
         pending={rescanning}
         onClick={onRescan}
       >
@@ -155,5 +172,32 @@ export function FilterSelect<T extends string>({
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+export function CampaignFilter({
+  projectId,
+  value,
+  onChange,
+}: {
+  projectId: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const { t } = useTranslation("leads");
+  const campaignsQuery = useQuery(leadSearchesOptions(projectId));
+  const labels = new Map(
+    (campaignsQuery.data ?? []).map((search) => [search.id, search.label]),
+  );
+  if (labels.size === 0) return null;
+  return (
+    <FilterSelect
+      value={value}
+      options={["any", ...labels.keys()]}
+      label={(option) =>
+        option === "any" ? t("all.campaignAll") : (labels.get(option) ?? option)
+      }
+      onChange={onChange}
+    />
   );
 }

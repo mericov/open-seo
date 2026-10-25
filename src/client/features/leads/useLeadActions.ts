@@ -9,9 +9,13 @@ import {
   rescanLeads,
   setLeadHidden,
   setLeadStatus,
+  suppressLeads,
 } from "@/serverFunctions/leads";
 import type { LeadOutreachStatus } from "@/shared/leadFindings";
-import { LEAD_RESCAN_MAX_IDS } from "@/types/schemas/leads";
+import {
+  LEAD_FIRST_LINE_MAX_IDS,
+  LEAD_RESCAN_MAX_IDS,
+} from "@/types/schemas/leads";
 
 export function useLeadActions(projectId: string, onDone: () => void) {
   const { t } = useTranslation("leads");
@@ -56,6 +60,17 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     onError: (error) => toast.error(getStandardErrorMessage(error)),
   });
 
+  const suppress = useMutation({
+    mutationFn: (leadIds: string[]) =>
+      suppressLeads({ data: { projectId, leadIds } }),
+    onSuccess: async (result) => {
+      toast.success(t("suppress.done", { count: result.updated }));
+      onDone();
+      await refresh();
+    },
+    onError: (error) => toast.error(getStandardErrorMessage(error)),
+  });
+
   const rescan = useMutation({
     mutationFn: async (leadIds: string[]) => {
       const toastId = toast.loading(
@@ -81,5 +96,13 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     onSuccess: onDone,
   });
 
-  return { status, lines, hide, rescan };
+  const writeLines = (leadIds: string[]) => {
+    if (leadIds.length > LEAD_FIRST_LINE_MAX_IDS) {
+      toast.error(t("firstLine.tooMany", { max: LEAD_FIRST_LINE_MAX_IDS }));
+      return;
+    }
+    lines.mutate(leadIds);
+  };
+
+  return { status, lines, writeLines, hide, suppress, rescan };
 }

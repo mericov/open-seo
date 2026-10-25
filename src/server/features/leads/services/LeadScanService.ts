@@ -1,5 +1,6 @@
 import type { BillingCustomerContext } from "@/server/billing/subscription";
 import { AppError } from "@/server/lib/errors";
+import { CampaignRepository } from "@/server/features/leads/repositories/CampaignRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
 import {
   fetchAndSaveLocal,
@@ -119,7 +120,7 @@ async function readAreas(
 ) {
   const areas = leadAreasFor(search.countryCode);
   const progress = new Map(
-    (await LeadRepository.listAreas(search.id)).map((row) => [
+    (await CampaignRepository.listAreas(search.id)).map((row) => [
       row.areaCode,
       row,
     ]),
@@ -149,13 +150,13 @@ async function readAreas(
     const exhausted =
       result.returned < limit || nextOffset >= MAX_PROVIDER_OFFSET;
     if (exhausted) open--;
-    await LeadRepository.saveArea(search.id, area.code, {
+    await CampaignRepository.saveArea(search.id, area.code, {
       nextOffset: exhausted ? 0 : nextOffset,
       exhaustedAt: exhausted ? new Date().toISOString() : null,
       lastRunAt: new Date().toISOString(),
     });
   }
-  if (open === 0) await LeadRepository.resetAreas(search.id);
+  if (open === 0) await CampaignRepository.resetAreas(search.id);
   return { found, added };
 }
 

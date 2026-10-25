@@ -5,7 +5,6 @@ import {
   leadEmails,
   leadFindings,
   leads,
-  leadSearchAreas,
   leadSearches,
   leadSearchLeads,
   projects,
@@ -106,33 +105,6 @@ async function insertLeads(
     tx
       .insert(leads)
       .values({ ...row, projectId, searchId, createdAt: now, updatedAt: now })
-      .onConflictDoNothing(),
-  );
-}
-
-async function listLinkedLeadIds(searchId: string, leadIds: string[]) {
-  const linked = new Set<string>();
-  for (let i = 0; i < leadIds.length; i += KEY_CHUNK) {
-    const rows = await db
-      .select({ leadId: leadSearchLeads.leadId })
-      .from(leadSearchLeads)
-      .where(
-        and(
-          eq(leadSearchLeads.searchId, searchId),
-          inArray(leadSearchLeads.leadId, leadIds.slice(i, i + KEY_CHUNK)),
-        ),
-      );
-    for (const row of rows) linked.add(row.leadId);
-  }
-  return linked;
-}
-
-async function linkLeads(searchId: string, leadIds: string[]) {
-  const now = new Date().toISOString();
-  await executeInBatches(leadIds, (tx, leadId) =>
-    tx
-      .insert(leadSearchLeads)
-      .values({ id: crypto.randomUUID(), searchId, leadId, createdAt: now })
       .onConflictDoNothing(),
   );
 }
@@ -342,33 +314,6 @@ async function touchSearch(projectId: string, id: string) {
     .where(and(eq(leadSearches.projectId, projectId), eq(leadSearches.id, id)));
 }
 
-async function listAreas(searchId: string) {
-  return db
-    .select()
-    .from(leadSearchAreas)
-    .where(eq(leadSearchAreas.searchId, searchId));
-}
-
-async function saveArea(
-  searchId: string,
-  areaCode: string,
-  values: { nextOffset: number; exhaustedAt: string | null; lastRunAt: string },
-) {
-  await db
-    .insert(leadSearchAreas)
-    .values({ id: crypto.randomUUID(), searchId, areaCode, ...values })
-    .onConflictDoUpdate({
-      target: [leadSearchAreas.searchId, leadSearchAreas.areaCode],
-      set: values,
-    });
-}
-
-async function resetAreas(searchId: string) {
-  await db
-    .delete(leadSearchAreas)
-    .where(eq(leadSearchAreas.searchId, searchId));
-}
-
 async function listDueSearches(now: string, limit: number) {
   return db
     .select({ search: leadSearches, organizationId: projects.organizationId })
@@ -444,8 +389,6 @@ export const LeadRepository = {
   archiveSearch,
   findLeadIdsByKeys,
   insertLeads,
-  listLinkedLeadIds,
-  linkLeads,
   insertFoundEmails,
   listEmailsForLeads,
   listLeads,
@@ -457,9 +400,6 @@ export const LeadRepository = {
   saveEnrichment,
   touchSearch,
   updateSearch,
-  listAreas,
-  saveArea,
-  resetAreas,
   listDueSearches,
   claimDueSearch,
   findAutoRunSearchWithPending,

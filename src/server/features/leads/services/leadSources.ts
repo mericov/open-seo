@@ -4,6 +4,7 @@ import { createDataforseoClient } from "@/server/lib/dataforseo";
 import { isRecord } from "@/server/lib/dataforseo/envelope";
 import { classifyEmail } from "@/server/lib/leads/emailChecks";
 import { ContactRegistryRepository } from "@/server/features/leads/repositories/ContactRegistryRepository";
+import { CampaignRepository } from "@/server/features/leads/repositories/CampaignRepository";
 import { LeadRepository } from "@/server/features/leads/repositories/LeadRepository";
 import { ownDomain } from "@/shared/leads";
 import { FEW_REVIEWS_THRESHOLD, type LeadNeedFilter } from "@/shared/leadScan";
@@ -132,12 +133,12 @@ async function saveFoundLeads(target: SaveTarget, found: FoundLead[]) {
       })),
     ),
   );
-  const alreadyLinked = await LeadRepository.listLinkedLeadIds(
+  const alreadyLinked = await CampaignRepository.listLinkedLeadIds(
     target.searchId,
     known,
   );
   const newlyLinked = known.filter((id) => !alreadyLinked.has(id));
-  await LeadRepository.linkLeads(target.searchId, [
+  await CampaignRepository.linkLeads(target.searchId, [
     ...fresh.map((row) => row.id),
     ...newlyLinked,
   ]);

@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/client/components/EmptyState";
 import { PageHeader } from "@/client/components/PageHeader";
 import { QueryError } from "@/client/components/QueryState";
 import { SkeletonPage } from "@/client/components/SkeletonPresets";
 import { Badge } from "@/client/components/ui/badge";
+import { Button } from "@/client/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/client/components/ui/tabs";
 import { leadSearchesOptions } from "@/client/features/leads/leadQueries";
 import { formatRelativeTime } from "@/client/lib/relative-time";
 import { AllLeadsView } from "@/client/features/leads/AllLeadsView";
-import { LocalSearchForm } from "@/client/features/leads/LocalSearchForm";
-import { StoreSearchForm } from "@/client/features/leads/StoreSearchForm";
+import { CampaignWizard } from "@/client/features/leads/CampaignWizard";
 import { cn } from "cn";
 
 export function LeadFinderPage({
@@ -21,7 +21,7 @@ export function LeadFinderPage({
   view,
 }: {
   projectId: string;
-  view: "searches" | "all";
+  view: "campaigns" | "all";
 }) {
   const { t } = useTranslation("leads");
   const navigate = useNavigate();
@@ -41,48 +41,44 @@ export function LeadFinderPage({
             void navigate({
               to: "/p/$projectId/leads",
               params: { projectId },
-              search: value === "all" ? { view: "all" } : {},
+              search: value === "campaigns" ? { view: "campaigns" } : {},
             })
           }
         >
           <TabsList variant="line">
-            <TabsTrigger value="searches">{t("views.searches")}</TabsTrigger>
             <TabsTrigger value="all">{t("views.all")}</TabsTrigger>
+            <TabsTrigger value="campaigns">{t("views.campaigns")}</TabsTrigger>
           </TabsList>
         </Tabs>
         {view === "all" ? (
           <AllLeadsView projectId={projectId} />
         ) : (
-          <SearchesView projectId={projectId} />
+          <CampaignsView projectId={projectId} />
         )}
       </div>
     </div>
   );
 }
 
-function SearchesView({ projectId }: { projectId: string }) {
+function CampaignsView({ projectId }: { projectId: string }) {
   const { t } = useTranslation("leads");
   const searchesQuery = useQuery(leadSearchesOptions(projectId));
-  const [source, setSource] = useState<"local" | "shopify">("local");
+  const [creating, setCreating] = useState(false);
+  const isEmpty = searchesQuery.data?.length === 0;
 
   return (
     <>
-      <div className="space-y-3">
-        <Tabs
-          value={source}
-          onValueChange={(value) => setSource(value as "local" | "shopify")}
-        >
-          <TabsList>
-            <TabsTrigger value="local">{t("sources.local")}</TabsTrigger>
-            <TabsTrigger value="shopify">{t("sources.shopify")}</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        {source === "local" ? (
-          <LocalSearchForm projectId={projectId} />
-        ) : (
-          <StoreSearchForm projectId={projectId} />
-        )}
-      </div>
+      {creating || isEmpty ? (
+        <CampaignWizard
+          projectId={projectId}
+          onCancel={isEmpty ? undefined : () => setCreating(false)}
+        />
+      ) : (
+        <Button onClick={() => setCreating(true)}>
+          <Plus data-icon="inline-start" />
+          {t("campaign.new")}
+        </Button>
+      )}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground">
           {t("list.title")}

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { ChevronDown, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ConfirmDialog } from "@/client/components/ConfirmDialog";
 import { Button } from "@/client/components/ui/button";
+import { formatRelativeTime } from "@/client/lib/relative-time";
 import { reportUrlFor } from "@/client/features/leads/ReportButton";
 import {
   DropdownMenu,
@@ -37,8 +40,10 @@ export function MailButton({
   onOpened: () => void;
 }) {
   const { t } = useTranslation("leads");
+  const [confirming, setConfirming] = useState<MailTemplate | null>(null);
   const email = lead.primaryEmail;
   if (!email) return null;
+  const prior = lead.priorContact;
 
   const saved: MailTemplate[] = templates.length ? templates : SAMPLE_TEMPLATES;
   const groups = [
@@ -47,7 +52,7 @@ export function MailButton({
   ].filter((group) => group.length > 0);
   const choices = groups.flat();
 
-  const open = (template: MailTemplate) => {
+  const send = (template: MailTemplate) => {
     const values = leadTemplateValues(
       lead,
       template.language,
@@ -72,51 +77,82 @@ export function MailButton({
     }
     onOpened();
   };
+  const open = (template: MailTemplate) => {
+    if (prior) setConfirming(template);
+    else send(template);
+  };
+  const confirmDialog = confirming ? (
+    <ConfirmDialog
+      title={t("prior.confirmTitle")}
+      confirmLabel={t("prior.send")}
+      onConfirm={() => {
+        setConfirming(null);
+        send(confirming);
+      }}
+      onClose={() => setConfirming(null)}
+    >
+      {prior?.suppressed
+        ? t("prior.confirmSuppressed")
+        : t("prior.confirmBody", {
+            when: prior?.contactedAt
+              ? formatRelativeTime(prior.contactedAt)
+              : "",
+          })}
+    </ConfirmDialog>
+  ) : null;
 
   if (choices.length === 1) {
     return (
-      <Button
-        size="sm"
-        variant="outline"
-        className="rounded-full"
-        onClick={() => open(choices[0])}
-      >
-        <Mail data-icon="inline-start" />
-        {t("templates.send")}
-      </Button>
+      <>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full"
+          onClick={() => open(choices[0])}
+        >
+          <Mail data-icon="inline-start" />
+          {t("templates.send")}
+        </Button>
+        {confirmDialog}
+      </>
     );
   }
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button size="sm" variant="outline" className="rounded-full" />}
-      >
-        <Mail data-icon="inline-start" />
-        {t("templates.send")}
-        <ChevronDown data-icon="inline-end" className="opacity-60" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72">
-        {groups.map((group, index) => (
-          <DropdownMenuGroup key={group[0].language}>
-            {index > 0 ? <DropdownMenuSeparator /> : null}
-            <DropdownMenuLabel>
-              {t("templates.language")}: {group[0].language.toUpperCase()}
-            </DropdownMenuLabel>
-            {group.map((template) => (
-              <DropdownMenuItem
-                key={template.id ?? template.name}
-                onClick={() => open(template)}
-                className="flex-col items-start gap-0.5"
-              >
-                <span>{template.name}</span>
-                <span className="line-clamp-1 text-xs text-muted-foreground">
-                  {template.subject}
-                </span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button size="sm" variant="outline" className="rounded-full" />
+          }
+        >
+          <Mail data-icon="inline-start" />
+          {t("templates.send")}
+          <ChevronDown data-icon="inline-end" className="opacity-60" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-72">
+          {groups.map((group, index) => (
+            <DropdownMenuGroup key={group[0].language}>
+              {index > 0 ? <DropdownMenuSeparator /> : null}
+              <DropdownMenuLabel>
+                {t("templates.language")}: {group[0].language.toUpperCase()}
+              </DropdownMenuLabel>
+              {group.map((template) => (
+                <DropdownMenuItem
+                  key={template.id ?? template.name}
+                  onClick={() => open(template)}
+                  className="flex-col items-start gap-0.5"
+                >
+                  <span>{template.name}</span>
+                  <span className="line-clamp-1 text-xs text-muted-foreground">
+                    {template.subject}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {confirmDialog}
+    </>
   );
 }

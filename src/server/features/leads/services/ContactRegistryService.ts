@@ -3,7 +3,7 @@ import { LeadListRepository } from "@/server/features/leads/repositories/LeadLis
 import { contactKeyFor } from "@/shared/leads";
 import type { LeadOutreachStatus } from "@/shared/leadFindings";
 
-export type PriorContact = {
+type PriorContact = {
   contactedAt: string | null;
   otherProject: boolean;
   suppressed: boolean;
