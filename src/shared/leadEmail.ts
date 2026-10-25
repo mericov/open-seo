@@ -22,13 +22,13 @@ const REPORT_OFFER: Record<
 > = {
   en: {
     ready: (link) =>
-      `These are just the top three. The full audit covers many more findings like these, with screenshots, what each one costs you and what changes once it's fixed: ${link}`,
+      `These are just the top three. The full audit covers many more findings like these, with screenshots, what each one costs you and what changes once it's fixed:\n${link}`,
     later:
       "I can send you the full audit this week, with what each issue costs you and what changes once it's fixed. No charge, no call needed.",
   },
   tr: {
     ready: (link) =>
-      `Bunlar yalnızca öne çıkan üçü. Raporun tamamında bunlar gibi çok sayıda tespiti; ekran görüntüleriyle, her birinin size neye mal olduğu ve çözülünce ne değişeceğiyle birlikte görebilirsiniz: ${link}`,
+      `Bunlar yalnızca öne çıkan üçü. Raporun tamamında bunlar gibi çok sayıda tespiti; ekran görüntüleriyle, her birinin size neye mal olduğu ve çözülünce ne değişeceğiyle birlikte görebilirsiniz:\n${link}`,
     later:
       "İsterseniz raporun tamamını bu hafta gönderebilirim; her sorunun neye mal olduğunu ve çözülünce ne değişeceğini gösteriyor. Ücretsiz, görüşme gerektirmiyor.",
   },
@@ -59,7 +59,8 @@ export const SAMPLE_TEMPLATES: {
       "{{website}} için kısa bir ön denetim yaptım. Öne çıkan üç şey:",
       "{{top_issues}}",
       "",
-      "{{report_offer}}",
+      "Bunlar yalnızca öne çıkan üçü. Raporun tamamında bunlar gibi çok sayıda tespiti; ekran görüntüleriyle, her birinin size neye mal olduğu ve çözülünce ne değişeceğiyle birlikte görebilirsiniz:",
+      "{{report_link}}",
       "",
       "Takıldığınız bir madde olursa anlatırım; kendiniz uğraşmak istemezseniz sizin için çözebilirim de. 10 yılı aşkın süredir dijital pazarlama ve Shopify üzerine çalışıyorum.",
       "",
@@ -83,7 +84,8 @@ export const SAMPLE_TEMPLATES: {
       "I ran a quick audit of {{website}}. Three things stood out:",
       "{{top_issues}}",
       "",
-      "{{report_offer}}",
+      "These are just the top three. The full audit covers many more findings like these, with screenshots, what each one costs you and what changes once it's fixed:",
+      "{{report_link}}",
       "",
       "Happy to walk you through any of it, or fix it for you if you'd rather hand it off. I've spent 10+ years in marketing and the last six building and growing Shopify stores.",
       "",
