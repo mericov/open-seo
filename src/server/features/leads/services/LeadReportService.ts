@@ -93,7 +93,7 @@ async function render(request: Request, token: string): Promise<Response> {
     headers: {
       "content-type": "text/html; charset=utf-8",
       "content-security-policy":
-        "sandbox allow-popups allow-modals; default-src 'none'; style-src 'unsafe-inline'; img-src https: data:; font-src https: data:",
+        "sandbox allow-popups allow-popups-to-escape-sandbox allow-modals; default-src 'none'; style-src 'unsafe-inline'; img-src https: data:; font-src https: data:",
       "x-robots-tag": "noindex, nofollow",
       "referrer-policy": "no-referrer",
       "cache-control": "private, max-age=300",
