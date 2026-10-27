@@ -95,14 +95,16 @@ export function LeadTemplatesSheet({
       await invalidate();
     },
   });
+  const templates = templatesQuery.data ?? [];
+  const missingSamples = SAMPLE_TEMPLATES.filter(
+    (sample) => !templates.some((template) => template.name === sample.name),
+  );
   const addSamples = async () => {
-    for (const sample of SAMPLE_TEMPLATES) {
+    for (const sample of missingSamples) {
       await saveLeadTemplate({ data: { projectId, ...sample } });
     }
     await invalidate();
   };
-
-  const templates = templatesQuery.data ?? [];
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -170,14 +172,27 @@ export function LeadTemplatesSheet({
                   </div>
                 ))
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setDraft(EMPTY_DRAFT)}
-              >
-                <Plus data-icon="inline-start" />
-                {t("templates.new")}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDraft(EMPTY_DRAFT)}
+                >
+                  <Plus data-icon="inline-start" />
+                  {t("templates.new")}
+                </Button>
+                {templates.length > 0 && missingSamples.length > 0 ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void addSamples()}
+                  >
+                    {t("templates.addMissingSamples", {
+                      count: missingSamples.length,
+                    })}
+                  </Button>
+                ) : null}
+              </div>
             </div>
           )}
         </div>

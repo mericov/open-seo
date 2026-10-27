@@ -300,6 +300,7 @@
     },
     "empty": "No templates yet. Start with the Turkish and English samples: a first email and two follow-ups. Edit them in your own voice; a business address is required in US cold emails.",
     "addSamples": "Add sample templates",
+    "addMissingSamples": "Add new samples ({{count}})",
     "new": "New template",
     "delete": "Delete template",
     "saved": "Template saved",
@@ -315,7 +316,8 @@
       "top_gap": "The biggest gap in plain words",
       "report_offer": "The report sentence: the link when a report exists, otherwise an offer to send one",
       "report_link": "Just the report link",
-      "top_issues": "The three biggest gaps as a bulleted list"
+      "top_issues": "The three biggest gaps as a bulleted list",
+      "more_issues": "How many findings there are besides the biggest gap"
     },
     "save": "Save",
     "cancel": "Cancel",

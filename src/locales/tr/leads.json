@@ -300,6 +300,7 @@
     },
     "empty": "Henüz şablon yok. Türkçe ve İngilizce örneklerle başla: ilk mail ve iki takip maili. Kendi üslubuna göre düzenle; ABD'ye giden maillerde şirket adresi zorunlu.",
     "addSamples": "Örnek şablonları ekle",
+    "addMissingSamples": "Yeni örnekleri ekle ({{count}})",
     "new": "Yeni şablon",
     "delete": "Şablonu sil",
     "saved": "Şablon kaydedildi",
@@ -315,7 +316,8 @@
       "top_gap": "En büyük eksik, sade bir dille",
       "report_offer": "Rapor cümlesi: rapor varsa linki, yoksa rapor gönderme teklifi",
       "report_link": "Sadece rapor linki",
-      "top_issues": "En önemli üç eksik, madde madde"
+      "top_issues": "En önemli üç eksik, madde madde",
+      "more_issues": "En büyük eksik dışında kalan tespit sayısı"
     },
     "save": "Kaydet",
     "cancel": "Vazgeç",
