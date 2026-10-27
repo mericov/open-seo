@@ -149,6 +149,7 @@ export const {
   leadEmails,
   leadFindings,
   leadEmailTemplates,
+  leadFindingPhrases,
   leadSearchLeads,
   leadSearchAreas,
   contactRegistry,

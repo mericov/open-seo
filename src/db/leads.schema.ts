@@ -225,6 +225,32 @@ export const leadEmailTemplates = sqliteTable(
   (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
 );
 
+export const leadFindingPhrases = sqliteTable(
+  "lead_finding_phrases",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    language: text("language", { enum: ["tr", "en"] }).notNull(),
+    text: text("text").notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("lead_finding_phrases_project_code_language_idx").on(
+      table.projectId,
+      table.code,
+      table.language,
+    ),
+  ],
+);
+
 // A campaign (stored as a lead search) links every lead it found, including
 // leads an earlier campaign of the project already holds. The lead's own
 // search_id stays the campaign that found it first.

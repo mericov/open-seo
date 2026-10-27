@@ -30,6 +30,29 @@ it("fills a template from the lead and builds a ready-to-send Gmail draft", () =
   expect(url.searchParams.get("body")).toBe(body);
 });
 
+it("uses the project's own finding sentence in place of the default", () => {
+  const values = leadTemplateValues(
+    {
+      name: "Kadıköy Diş",
+      firstLine: null,
+      website: null,
+      domain: "kadikoydis.com.tr",
+      findings: ["no_blog", "stale_blog"],
+    },
+    "tr",
+    null,
+    {
+      no_blog: "düzenli bir blogunuzun olmaması",
+      stale_blog: "son yazı {detail}",
+    },
+  );
+
+  expect(values.top_gap).toBe("düzenli bir blogunuzun olmaması");
+  expect(values.top_issues).toBe(
+    "- Düzenli bir blogunuzun olmaması\n- Son yazı",
+  );
+});
+
 it("links the report in the offer sentence once a report exists", () => {
   const lead = {
     name: "Kadıköy Diş",

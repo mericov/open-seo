@@ -112,6 +112,13 @@ export const leadIdSchema = z.object({
   leadId: z.string().min(1),
 });
 
+export const saveLeadFindingPhraseSchema = z.object({
+  ...projectIdShape,
+  code: z.enum(LEAD_FINDING_CODES),
+  language: z.enum(["tr", "en"]),
+  text: z.string().trim().max(300),
+});
+
 export const leadTemplateIdSchema = z.object({
   ...projectIdShape,
   templateId: z.string().min(1),

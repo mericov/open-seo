@@ -290,6 +290,14 @@
     "edit": "İlk cümleyi düzenle",
     "tooMany": "Tek seferde en fazla {{max}} lead seçebilirsin."
   },
+  "phrases": {
+    "title": "Tespit cümleleri",
+    "description": "Maillerde lead'in eksiklerini anlatan cümleler. Kendi üslubunla değiştir; {detail} yazdığın yere sayı veya tarih gibi ayrıntı gelir. Cümleler tek başına okunabilir olmalı, çünkü madde listesinde de kullanılıyor.",
+    "search": "Tespit ara",
+    "edited": "Düzenlendi",
+    "reset": "Varsayılana dön",
+    "saved": "Cümle kaydedildi"
+  },
   "templates": {
     "title": "Mail şablonları",
     "description": "Şablonlar her lead'in adını, ilk cümlesini, sitesini ve en büyük eksiğini doldurur. Mail, uygulamanda gönderilmeye hazır açılır.",

@@ -290,6 +290,14 @@
     "edit": "Edit first line",
     "tooMany": "Select up to {{max}} leads at a time."
   },
+  "phrases": {
+    "title": "Finding sentences",
+    "description": "The sentences your emails use to describe each lead's gaps. Rewrite them in your own voice; {detail} is replaced with a number or date where one exists. Keep each one readable on its own, since it is also used in bullet lists.",
+    "search": "Search findings",
+    "edited": "Edited",
+    "reset": "Reset to default",
+    "saved": "Sentence saved"
+  },
   "templates": {
     "title": "Email templates",
     "description": "Templates fill in each lead's name, first line, website and biggest gap. The email opens ready to send in your mail app.",

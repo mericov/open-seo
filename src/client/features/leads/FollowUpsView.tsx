@@ -12,7 +12,6 @@ import { localToday } from "@/client/features/leads/LeadNote";
 import { MailButton } from "@/client/features/leads/MailButton";
 import {
   leadFollowUpsOptions,
-  leadTemplatesOptions,
   type LeadFollowUp,
 } from "@/client/features/leads/leadQueries";
 import { useLeadActions } from "@/client/features/leads/useLeadActions";
@@ -30,7 +29,6 @@ export function FollowUpsView({ projectId }: { projectId: string }) {
   const { t } = useTranslation("leads");
   const today = localToday();
   const followUpsQuery = useQuery(leadFollowUpsOptions(projectId, today));
-  const templatesQuery = useQuery(leadTemplatesOptions(projectId));
   const [mailClient] = useMailClient();
   const actions = useLeadActions(projectId, () => {});
 
@@ -65,7 +63,7 @@ export function FollowUpsView({ projectId }: { projectId: string }) {
               key={item.lead.id}
               item={item}
               today={today}
-              templates={templatesQuery.data ?? []}
+              projectId={projectId}
               mailClient={mailClient}
               onSent={() =>
                 actions.recordMail.mutate(
@@ -92,7 +90,7 @@ export function FollowUpsView({ projectId }: { projectId: string }) {
 function FollowUpRow({
   item,
   today,
-  templates,
+  projectId,
   mailClient,
   onSent,
   onReplied,
@@ -101,7 +99,7 @@ function FollowUpRow({
 }: {
   item: LeadFollowUp;
   today: string;
-  templates: Parameters<typeof MailButton>[0]["templates"];
+  projectId: string;
   mailClient: Parameters<typeof MailButton>[0]["mailClient"];
   onSent: () => void;
   onReplied: () => void;
@@ -158,10 +156,10 @@ function FollowUpRow({
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
         <MailButton
+          projectId={projectId}
           lead={lead}
           step={step}
           label={t("followUps.send")}
-          templates={templates}
           mailClient={mailClient}
           onOpened={onSent}
         />

@@ -205,6 +205,28 @@ export const leadEmailTemplates = pgTable(
   (table) => [index("lead_email_templates_project_idx").on(table.projectId)],
 );
 
+export const leadFindingPhrases = pgTable(
+  "lead_finding_phrases",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    code: text("code", { enum: LEAD_FINDING_CODES }).notNull(),
+    language: text("language", { enum: ["tr", "en"] }).notNull(),
+    text: text("text").notNull(),
+    createdAt: text("created_at").notNull().default(isoNow),
+    updatedAt: text("updated_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("lead_finding_phrases_project_code_language_idx").on(
+      table.projectId,
+      table.code,
+      table.language,
+    ),
+  ],
+);
+
 export const leadSearchLeads = pgTable(
   "lead_search_leads",
   {

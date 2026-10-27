@@ -4,6 +4,7 @@ import { LeadFinderService } from "@/server/features/leads/services/LeadFinderSe
 import { LeadFirstLineService } from "@/server/features/leads/services/LeadFirstLineService";
 import { LeadReportService } from "@/server/features/leads/services/LeadReportService";
 import { LeadScanService } from "@/server/features/leads/services/LeadScanService";
+import { LeadPhraseRepository } from "@/server/features/leads/repositories/LeadPhraseRepository";
 import { LeadTemplateRepository } from "@/server/features/leads/repositories/LeadTemplateRepository";
 import { LeadOutreachService } from "@/server/features/leads/services/LeadOutreachService";
 import { StoreFinderService } from "@/server/features/leads/services/StoreFinderService";
@@ -20,6 +21,7 @@ import {
   recordLeadMailSchema,
   saveLeadReportSchema,
   saveLeadTemplateSchema,
+  saveLeadFindingPhraseSchema,
   listProjectLeadsSchema,
   rescanLeadsSchema,
   setLeadHiddenSchema,
@@ -235,6 +237,30 @@ export const deleteLeadTemplate = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     LeadTemplateRepository.remove(context.projectId, data.templateId),
   );
+
+export const listLeadFindingPhrases = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(listLeadSearchesSchema)
+  .handler(async ({ context }) => LeadPhraseRepository.list(context.projectId));
+
+export const saveLeadFindingPhrase = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(saveLeadFindingPhraseSchema)
+  .handler(async ({ data, context }) => {
+    if (data.text) {
+      await LeadPhraseRepository.save(context.projectId, {
+        code: data.code,
+        language: data.language,
+        text: data.text,
+      });
+    } else {
+      await LeadPhraseRepository.remove(
+        context.projectId,
+        data.code,
+        data.language,
+      );
+    }
+  });
 
 export const setLeadHidden = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)

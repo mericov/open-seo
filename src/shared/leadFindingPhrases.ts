@@ -174,27 +174,33 @@ const TR: Phrases = {
   no_kvkk: "sitenizde KVKK aydınlatma metni bulamadım",
 };
 
-const PHRASES = { en: EN, tr: TR };
+export const DEFAULT_FINDING_PHRASES = { en: EN, tr: TR };
+
+export type FindingPhraseOverrides = Partial<Record<LeadFindingCode, string>>;
 
 export function findingPhrase(
   code: LeadFindingCode,
   language: "en" | "tr",
   detail?: string | null,
+  overrides: FindingPhraseOverrides = {},
 ): string {
-  const phrase = PHRASES[language][code];
+  const phrase = overrides[code] ?? DEFAULT_FINDING_PHRASES[language][code];
   return detail
     ? phrase.replace("{detail}", detail)
-    : phrase.replace(/\s*\([^)]*\{detail\}[^)]*\)/, "");
+    : phrase
+        .replace(/\s*\([^)]*\{detail\}[^)]*\)/, "")
+        .replace(/\s*\{detail\}/, "");
 }
 
 export function findingBullets(
   codes: readonly LeadFindingCode[],
   language: "en" | "tr",
   details: Partial<Record<LeadFindingCode, string>> = {},
+  overrides: FindingPhraseOverrides = {},
 ): string {
   return codes
     .map((code) => {
-      const phrase = findingPhrase(code, language, details[code]);
+      const phrase = findingPhrase(code, language, details[code], overrides);
       return `- ${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`;
     })
     .join("\n");

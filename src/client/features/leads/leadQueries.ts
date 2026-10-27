@@ -3,6 +3,7 @@ import {
   getLeadSearch,
   listLeadSearches,
   listLeadFollowUps,
+  listLeadFindingPhrases,
   listLeadTemplates,
   listProjectLeads,
 } from "@/serverFunctions/leads";
@@ -36,6 +37,13 @@ export function leadTemplatesOptions(projectId: string) {
   return queryOptions({
     queryKey: [...leadsQueryKey(projectId), "templates"],
     queryFn: () => listLeadTemplates({ data: { projectId } }),
+  });
+}
+
+export function leadFindingPhrasesOptions(projectId: string) {
+  return queryOptions({
+    queryKey: [...leadsQueryKey(projectId), "phrases"],
+    queryFn: () => listLeadFindingPhrases({ data: { projectId } }),
   });
 }
 

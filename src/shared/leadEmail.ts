@@ -1,4 +1,8 @@
-import { findingBullets, findingPhrase } from "@/shared/leadFindingPhrases";
+import {
+  findingBullets,
+  findingPhrase,
+  type FindingPhraseOverrides,
+} from "@/shared/leadFindingPhrases";
 import type { LeadFindingCode } from "@/shared/leadFindings";
 import type { LeadMailStep } from "@/shared/leadFollowUp";
 
@@ -205,7 +209,7 @@ export const SAMPLE_TEMPLATES: {
     body: [
       "Merhaba {{name}} ekibi,",
       "",
-      "{{website}} için kısa bir SEO raporu hazırladım. En dikkat çekeni: {{top_gap}}.",
+      "{{website}} için kısa bir SEO raporu hazırladım. En dikkat çekeni şu: {{top_gap}}.",
       "",
       "Raporda bunun gibi {{more_issues}} tespit daha var, ekran görüntüleriyle. Göndereyim mi?",
       "",
@@ -333,6 +337,7 @@ export function leadTemplateValues(
   },
   language: LeadEmailLanguage,
   reportUrl: string | null = null,
+  overrides: FindingPhraseOverrides = {},
 ): Record<(typeof LEAD_TEMPLATE_VARIABLES)[number], string> {
   const topGap = lead.findings[0];
   return {
@@ -344,12 +349,18 @@ export function leadTemplateValues(
     first_line: lead.firstLine ?? FALLBACK_FIRST_LINE[language],
     website: lead.domain ?? lead.website ?? "",
     top_gap: topGap
-      ? findingPhrase(topGap, language, lead.findingDetails?.[topGap])
+      ? findingPhrase(
+          topGap,
+          language,
+          lead.findingDetails?.[topGap],
+          overrides,
+        )
       : "",
     top_issues: findingBullets(
       lead.findings.slice(0, 3),
       language,
       lead.findingDetails,
+      overrides,
     ),
     more_issues: String(Math.max(lead.findings.length - 1, 0)),
   };

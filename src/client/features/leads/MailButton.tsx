@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ConfirmDialog } from "@/client/components/ConfirmDialog";
@@ -14,9 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/client/components/ui/dropdown-menu";
-import type {
-  LeadTemplate,
-  ProjectLeadRow,
+import {
+  leadFindingPhrasesOptions,
+  leadTemplatesOptions,
+  type LeadTemplate,
+  type ProjectLeadRow,
 } from "@/client/features/leads/leadQueries";
 import {
   composeUrl,
@@ -30,15 +33,15 @@ import type { LeadMailStep } from "@/shared/leadFollowUp";
 type MailTemplate = Omit<LeadTemplate, "id"> & { id?: string };
 
 export function MailButton({
+  projectId,
   lead,
-  templates,
   mailClient,
   onOpened,
   step = 1,
   label,
 }: {
+  projectId: string;
   lead: ProjectLeadRow;
-  templates: LeadTemplate[];
   mailClient: LeadMailClient;
   onOpened: () => void;
   step?: LeadMailStep;
@@ -46,6 +49,8 @@ export function MailButton({
 }) {
   const { t } = useTranslation("leads");
   const [confirming, setConfirming] = useState<MailTemplate | null>(null);
+  const templates = useQuery(leadTemplatesOptions(projectId)).data ?? [];
+  const phrases = useQuery(leadFindingPhrasesOptions(projectId)).data ?? [];
   const email = lead.primaryEmail;
   if (!email) return null;
   const prior = step === 1 ? lead.priorContact : null;
@@ -65,6 +70,11 @@ export function MailButton({
       lead,
       template.language,
       reportUrlFor(lead.reportToken),
+      Object.fromEntries(
+        phrases
+          .filter((phrase) => phrase.language === template.language)
+          .map((phrase) => [phrase.code, phrase.text]),
+      ),
     );
     const url = composeUrl(mailClient, {
       to: email,

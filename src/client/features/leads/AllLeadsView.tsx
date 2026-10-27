@@ -10,6 +10,7 @@ import { Button } from "@/client/components/ui/button";
 import { Checkbox } from "@/client/components/ui/checkbox";
 import { Switch } from "@/client/components/ui/switch";
 import { AllLeadsRow } from "@/client/features/leads/AllLeadsRow";
+import { LeadPhrasesButton } from "@/client/features/leads/LeadPhrasesSheet";
 import { LeadTemplatesSheet } from "@/client/features/leads/LeadTemplatesSheet";
 import { localToday } from "@/client/features/leads/LeadNote";
 import { MailButton } from "@/client/features/leads/MailButton";
@@ -22,7 +23,6 @@ import {
   FilterSelect,
 } from "@/client/features/leads/AllLeadsControls";
 import {
-  leadTemplatesOptions,
   projectLeadsOptions,
   type ProjectLeadFilters,
 } from "@/client/features/leads/leadQueries";
@@ -68,7 +68,6 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
     pageSize: PAGE_SIZE,
   };
   const leadsQuery = useQuery(projectLeadsOptions(projectId, filters));
-  const templatesQuery = useQuery(leadTemplatesOptions(projectId));
   const [mailClient, setMailClient] = useMailClient();
   const [templatesOpen, setTemplatesOpen] = useState(false);
 
@@ -143,6 +142,7 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
               <Mail data-icon="inline-start" />
               {t("templates.title")}
             </Button>
+            <LeadPhrasesButton projectId={projectId} />
             <ExportMenu
               actions={["csv", "sheets", "copy-json"]}
               onExport={(format) => void onExport(format)}
@@ -278,8 +278,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
                       <>
                         <ReportButton projectId={projectId} lead={lead} />
                         <MailButton
+                          projectId={projectId}
                           lead={lead}
-                          templates={templatesQuery.data ?? []}
                           mailClient={mailClient}
                           onOpened={() => {
                             if (lead.followUpStep === 0) {
