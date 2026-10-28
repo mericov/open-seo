@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/client/components/ui/button";
 import { Field, FieldLabel } from "@/client/components/ui/field";
@@ -19,39 +20,24 @@ import {
   publishDraftToShopify,
 } from "@/serverFunctions/shopify";
 
-export function ShopifyPublishSection({
-  projectId,
-  draftId,
-  onPublished,
-}: {
-  projectId: string;
-  draftId: string;
-  onPublished: () => Promise<void>;
-}) {
+function useShopifyDraftPublish(
+  projectId: string,
+  draftId: string,
+  onPublished: () => Promise<unknown>,
+) {
   const { t } = useTranslation("shopify");
+  const queryClient = useQueryClient();
+  const stateKey = [...shopifyQueryKey(projectId), "publish", draftId];
   const stateQuery = useQuery({
-    queryKey: [...shopifyQueryKey(projectId), "publish", draftId],
+    queryKey: stateKey,
     queryFn: () =>
       getShopifyDraftPublishState({ data: { projectId, draftId } }),
   });
-  const state = stateQuery.data;
-  const [pickedBlogId, setPickedBlogId] = useState<string | null>(null);
-
-  const blogs = state?.connected ? state.blogs : [];
-  const blogId =
-    pickedBlogId ??
-    (state?.connected ? (state.article?.blogId ?? blogs[0]?.id) : undefined) ??
-    null;
 
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (blogId: string | undefined) =>
       publishDraftToShopify({
-        data: {
-          projectId,
-          draftId,
-          blogId: blogId ?? undefined,
-          publish: true,
-        },
+        data: { projectId, draftId, blogId, publish: true },
       }),
     meta: { errorToast: false },
     onSuccess: async (response) => {
@@ -59,15 +45,72 @@ export function ShopifyPublishSection({
         toast.error(response.message);
         return;
       }
-      toast.success(t("publish.success"));
-      await onPublished();
+      toast.success(t("publish.success"), {
+        description: response.result.url,
+      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: stateKey }),
+        onPublished(),
+      ]);
     },
     onError: (error) => toast.error(getStandardErrorMessage(error)),
   });
 
+  return {
+    stateQuery,
+    pending: mutation.isPending,
+    publish: (blogId?: string) => mutation.mutate(blogId),
+  };
+}
+
+export function ShopifyPublishButton({
+  projectId,
+  draftId,
+  onPublished,
+}: {
+  projectId: string;
+  draftId: string;
+  onPublished: () => Promise<unknown>;
+}) {
+  const { t } = useTranslation("shopify");
+  const { stateQuery, pending, publish } = useShopifyDraftPublish(
+    projectId,
+    draftId,
+    onPublished,
+  );
+  const state = stateQuery.data;
+  if (!state?.connected || state.blogs.length === 0) return null;
+  return (
+    <Button size="sm" pending={pending} onClick={() => publish()}>
+      <ShoppingBag data-icon="inline-start" />
+      {state.article ? t("publish.update") : t("publish.submit")}
+    </Button>
+  );
+}
+
+export function ShopifyPublishSection({
+  projectId,
+  draftId,
+  onPublished,
+}: {
+  projectId: string;
+  draftId: string;
+  onPublished: () => Promise<unknown>;
+}) {
+  const { t } = useTranslation("shopify");
+  const { stateQuery, pending, publish } = useShopifyDraftPublish(
+    projectId,
+    draftId,
+    onPublished,
+  );
+  const state = stateQuery.data;
+  const [pickedBlogId, setPickedBlogId] = useState<string | null>(null);
+
   if (stateQuery.isPending) return <Skeleton className="h-28" />;
   if (!state?.connected) return null;
 
+  const blogs = state.blogs;
+  const blogId = pickedBlogId ?? state.article?.blogId ?? blogs[0]?.id ?? null;
   const items = blogs.map((blog) => ({ value: blog.id, label: blog.title }));
 
   return (
@@ -112,8 +155,8 @@ export function ShopifyPublishSection({
           ) : null}
           <Button
             className="w-full"
-            pending={mutation.isPending}
-            onClick={() => mutation.mutate()}
+            pending={pending}
+            onClick={() => publish(blogId ?? undefined)}
           >
             {state.article ? t("publish.update") : t("publish.submit")}
           </Button>

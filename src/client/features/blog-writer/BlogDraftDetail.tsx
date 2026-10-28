@@ -29,6 +29,8 @@ import {
   type BlogDraft,
 } from "@/client/features/blog-writer/blogWriterQueries";
 import { deleteBlogDraft } from "@/serverFunctions/blogDrafts";
+import { blogTrackingQueryKey } from "@/client/features/blog-tracking/blogTrackingQueries";
+import { ShopifyPublishButton } from "@/client/features/shopify/ShopifyPublishSection";
 
 const PREVIEW_STYLES = `
   body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #1f2328; line-height: 1.7; max-width: 720px; margin: 0 auto; padding: 24px; }
@@ -157,8 +159,22 @@ function DraftBody({
         }
         actions={
           <>
+            <ShopifyPublishButton
+              projectId={projectId}
+              draftId={draft.id}
+              onPublished={() =>
+                Promise.all([
+                  queryClient.invalidateQueries({
+                    queryKey: blogWriterQueryKey(projectId),
+                  }),
+                  queryClient.invalidateQueries({
+                    queryKey: blogTrackingQueryKey(projectId),
+                  }),
+                ])
+              }
+            />
             <CopyButton
-              variant="default"
+              variant="outline"
               size="sm"
               value={draft.publishHtml}
               label={t("detail.copyHtml")}

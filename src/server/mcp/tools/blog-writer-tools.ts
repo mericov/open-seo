@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BlogDraftService } from "@/server/features/blog-writer/services/BlogDraftService";
+import { ShopifyService } from "@/server/features/shopify/services/ShopifyService";
 import { buildProjectMeta } from "@/server/mcp/context";
 import { mcpResponse } from "@/server/mcp/formatters";
 import {
@@ -59,7 +60,13 @@ export const startBlogPostTool = {
   },
   handler: withMcpProjectAuth(
     async (args: z.infer<z.ZodObject<typeof startInputSchema>>, context) => {
-      const brief = await BlogDraftService.getStartBrief(args.projectId);
+      const [brief, shopify] = await Promise.all([
+        BlogDraftService.getStartBrief(args.projectId),
+        ShopifyService.getConnection(args.projectId),
+      ]);
+      const publishing = shopify.connected
+        ? `Shopify is connected (${shopify.shopName ?? shopify.shopDomain}). Follow Step 8: publish the post live with publish_blog_to_shopify right after Step 7, without asking.`
+        : "Shopify is not connected for this project. Skip Step 8 and give the user the draft link to copy the HTML.";
       const striking = brief.searchConsole.connected
         ? brief.searchConsole.rows.length > 0
           ? brief.searchConsole.rows
@@ -110,6 +117,8 @@ export const startBlogPostTool = {
         targeted,
         "# Recent post formats (pick a different opener, body shape and table)",
         formats,
+        "# Publishing",
+        publishing,
       ].join("\n\n");
       return mcpResponse({
         text,
@@ -125,6 +134,7 @@ export const startBlogPostTool = {
           savedKeywords: brief.savedKeywords,
           alreadyTargeted: brief.alreadyTargeted,
           recentFormats: brief.recentFormats,
+          shopifyConnected: shopify.connected,
         },
       });
     },

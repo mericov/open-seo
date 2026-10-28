@@ -62,7 +62,10 @@ Alt text (all 20):
 - 8–15 words describing what is actually in the photo, written the way a person would describe it to someone who can't see it. Use the keyword naturally in two or three alts at most, never "image of" or "picture of".
 - Vary how alts start and how they're built; ten alts that all open with "A ..." or end with the keyword read as machine-written. Every alt must be unique (it becomes the file name).
 
-Calling save_blog_images again replaces the earlier placement without duplicating images. Tell the user how many images went into the post and that the full set (files named by alt text, plus a CSV with URLs and credits) is on the draft page, ready to upload to their CMS before swapping the URLs.
+Calling save_blog_images again replaces the earlier placement without duplicating images. Tell the user how many images went into the post. If Shopify is not connected, also tell them the full set (files named by alt text, plus a CSV with URLs and credits) is on the draft page, ready to upload to their CMS before swapping the URLs.
+
+## Step 8 — Publish to Shopify
+Only when the "Publishing" section below says Shopify is connected. Right after Step 7, call publish_blog_to_shopify with the draftId. Don't ask first: the user wants every finished post live. It publishes the article as visible, uploads every image to Shopify Files and swaps the URLs, and sets the featured image, SEO title, meta description, handle and excerpt. It also adds the post to Blog Tracking. Before calling it, make sure the draft has metaTitle, metaDescription, slug and excerpt, and that Step 7 placed the images. Give the user the live URL from the result. If it fails, show the error and say what to fix (for example a missing scope or no blog in the store).
 
 ## Style and anti-AI rules
 Readers and search engines notice templated AI writing. Write like an experienced person at the brand who has an opinion.
@@ -94,4 +97,4 @@ Before saving, reread the draft and fix: repeated sentence openings, triads, ban
 Ask the user to paste the post's current HTML (Shopify: Show HTML) and keep the original text word for word. Add the new sections, update title, meta, links and image alt text, keep the same slug, and apply the same link, Sources, product image and Step 7 image rules.
 
 ## Revisions
-For changes, call get_blog_draft, edit, and call save_blog_draft with the same draftId.`;
+For changes, call get_blog_draft, edit, and call save_blog_draft with the same draftId. If the post is already on Shopify (or Shopify is connected), call publish_blog_to_shopify again afterwards: it updates the same article instead of creating a new one.`;
