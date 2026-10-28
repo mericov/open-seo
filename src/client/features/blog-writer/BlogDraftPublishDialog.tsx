@@ -17,6 +17,7 @@ import {
   type BlogDraft,
 } from "@/client/features/blog-writer/blogWriterQueries";
 import { publishBlogDraft } from "@/serverFunctions/blogDrafts";
+import { ShopifyPublishSection } from "@/client/features/shopify/ShopifyPublishSection";
 
 export function BlogDraftPublishDialog({
   projectId,
@@ -38,6 +39,16 @@ export function BlogDraftPublishDialog({
         : ""),
   );
 
+  const refreshDrafts = () =>
+    Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: blogWriterQueryKey(projectId),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: blogTrackingQueryKey(projectId),
+      }),
+    ]);
+
   const mutation = useMutation({
     mutationFn: () =>
       publishBlogDraft({
@@ -45,14 +56,7 @@ export function BlogDraftPublishDialog({
       }),
     meta: { errorToast: false },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: blogWriterQueryKey(projectId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: blogTrackingQueryKey(projectId),
-        }),
-      ]);
+      await refreshDrafts();
       toast.success(t("detail.published"));
       onClose();
     },
@@ -82,6 +86,14 @@ export function BlogDraftPublishDialog({
         </>
       }
     >
+      <ShopifyPublishSection
+        projectId={projectId}
+        draftId={draft.id}
+        onPublished={async () => {
+          await refreshDrafts();
+          onClose();
+        }}
+      />
       <Field>
         <FieldLabel htmlFor="draft-published-url">
           {t("detail.publishUrl")}

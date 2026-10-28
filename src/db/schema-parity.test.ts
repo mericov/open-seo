@@ -21,6 +21,7 @@ import * as sqliteLeads from "./leads.schema";
 import * as sqliteDigitalPr from "./digital-pr.schema";
 import * as sqliteInboundLeads from "./inbound-leads.schema";
 import * as sqliteTrafficHistory from "./traffic-history.schema";
+import * as sqliteShopify from "./shopify.schema";
 import * as pgApp from "./pg/app.schema";
 import * as pgProjectContext from "./pg/project-context.schema";
 import * as pgReports from "./pg/reports.schema";
@@ -37,6 +38,7 @@ import * as pgLeads from "./pg/leads.schema";
 import * as pgDigitalPr from "./pg/digital-pr.schema";
 import * as pgInboundLeads from "./pg/inbound-leads.schema";
 import * as pgTrafficHistory from "./pg/traffic-history.schema";
+import * as pgShopify from "./pg/shopify.schema";
 
 // Guards the ONE structural artifact `db:generate` does not regenerate: the
 // hand-written Postgres schema. The provider-aware `db`/`@/db/schema` barrel
@@ -174,6 +176,7 @@ const sqliteAppTables = tablesFrom(
   sqliteDigitalPr,
   sqliteInboundLeads,
   sqliteTrafficHistory,
+  sqliteShopify,
 );
 const pgAppTables = tablesFrom(
   pgApp,
@@ -191,6 +194,7 @@ const pgAppTables = tablesFrom(
   pgDigitalPr,
   pgInboundLeads,
   pgTrafficHistory,
+  pgShopify,
 );
 const sqliteAuthTables = tablesFrom(sqliteAuth);
 const pgAuthTables = tablesFrom(pgAuth);

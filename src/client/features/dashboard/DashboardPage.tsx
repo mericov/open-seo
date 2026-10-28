@@ -30,6 +30,7 @@ import {
 import { Ga4Card } from "@/client/features/dashboard/Ga4Card";
 import { BlogTrackingCard } from "@/client/features/blog-tracking/BlogTrackingCard";
 import { WorkspaceMergeBanner } from "@/client/features/dashboard/WorkspaceMergeBanner";
+import { ShopifyDashboardCard } from "@/client/features/shopify/ShopifyDashboardCard";
 import { QueryError } from "@/client/components/QueryState";
 import {
   getDashboardActivation,
@@ -194,6 +195,8 @@ export function DashboardPage({
         </div>
 
         <WorkspaceMergeBanner />
+
+        <ShopifyDashboardCard projectId={projectId} />
 
         {activationQuery.isError ? (
           <QueryError

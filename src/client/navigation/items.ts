@@ -16,6 +16,7 @@ import {
   PenLine,
   Search,
   Send,
+  ShoppingBag,
   Sparkles,
   TrendingUp,
   Users,
@@ -61,6 +62,11 @@ const projectNavItems = [
     to: "/p/$projectId/blog-writer" as const,
     label: "nav:items.blogWriter" as const,
     icon: PenLine,
+  },
+  {
+    to: "/p/$projectId/shopify" as const,
+    label: "nav:items.shopify" as const,
+    icon: ShoppingBag,
   },
   {
     to: "/p/$projectId/inbound-leads" as const,
@@ -192,6 +198,7 @@ export function getProjectNavGroups(projectId: string) {
         byPath("/p/$projectId/rank-tracking"),
         byPath("/p/$projectId/blog-tracking"),
         byPath("/p/$projectId/blog-writer"),
+        byPath("/p/$projectId/shopify"),
         byPath("/p/$projectId/saved"),
         byPath("/p/$projectId/audit"),
       ],
