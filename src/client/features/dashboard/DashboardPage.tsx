@@ -28,6 +28,7 @@ import {
   GscCard,
 } from "@/client/features/dashboard/DashboardCards";
 import { Ga4Card } from "@/client/features/dashboard/Ga4Card";
+import { BlogTrackingCard } from "@/client/features/blog-tracking/BlogTrackingCard";
 import { WorkspaceMergeBanner } from "@/client/features/dashboard/WorkspaceMergeBanner";
 import { QueryError } from "@/client/components/QueryState";
 import {
@@ -121,6 +122,11 @@ export function DashboardPage({
           siteUrl={activation.gsc.siteUrl}
         />
       ),
+    },
+    {
+      key: "blogTracking",
+      hasData: gscConnected,
+      node: <BlogTrackingCard projectId={projectId} />,
     },
     ...(ga4Connected || !activation.ga4.cardDismissedAt
       ? [

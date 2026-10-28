@@ -1,6 +1,7 @@
 import { sort } from "remeda";
 import { useTranslation } from "react-i18next";
 import { postLabel } from "@/client/features/blog-tracking/BlogPostTableRow";
+import { PriorityReason } from "@/client/features/blog-tracking/BlogTrackingCard";
 import { WeeklyClicksChart } from "@/client/features/blog-tracking/WeeklyClicksChart";
 import type {
   BlogPostRow,
@@ -91,22 +92,7 @@ export function PageSummary({
                     >
                       {postLabel(post)}
                     </button>
-                    <span className="shrink-0 text-xs text-muted-foreground">
-                      {(post.previous?.clicks ?? 0) >
-                      (post.current?.clicks ?? 0)
-                        ? t("priority.lost", {
-                            clicks: formatNumber(
-                              (post.previous?.clicks ?? 0) -
-                                (post.current?.clicks ?? 0),
-                            ),
-                          })
-                        : t("priority.close", {
-                            position: formatNumber(
-                              post.current?.position ?? 0,
-                              { maximumFractionDigits: 1 },
-                            ),
-                          })}
-                    </span>
+                    <PriorityReason post={post} />
                   </li>
                 ))}
               </ol>

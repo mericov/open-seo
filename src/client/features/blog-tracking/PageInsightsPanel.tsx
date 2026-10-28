@@ -6,6 +6,7 @@ import { Spinner } from "@/client/components/Spinner";
 import { Button } from "@/client/components/ui/button";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import { WeeklyClicksChart } from "@/client/features/blog-tracking/WeeklyClicksChart";
+import { RewritePromptButton } from "@/client/features/blog-tracking/RewritePromptButton";
 import {
   AdviceBlock,
   ChecksList,
@@ -120,6 +121,14 @@ export function PageInsightsPanel({
                           }),
                           impressions: formatNumber(row.impressions),
                         })}
+                  {row.searchVolume !== null ? (
+                    <span className="text-muted-foreground">
+                      {" · "}
+                      {t("opportunity.volume", {
+                        volume: formatNumber(row.searchVolume),
+                      })}
+                    </span>
+                  ) : null}
                 </TodoItem>
               ))}
               {post.competing.map((item) => (
@@ -208,19 +217,27 @@ export function PageInsightsPanel({
               {isBlog ? t("advice.hintBlog") : t("advice.hintCategory")}
             </p>
           )}
-          <Button
-            size="sm"
-            variant={insights.advice ? "outline" : "default"}
-            disabled={adviceMutation.isPending}
-            onClick={() => adviceMutation.mutate()}
-          >
-            {adviceMutation.isPending ? (
-              <Spinner size="sm" />
-            ) : (
-              <Sparkles data-icon="inline-start" />
-            )}
-            {insights.advice ? t("advice.regenerate") : t("advice.generate")}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant={insights.advice ? "outline" : "default"}
+              disabled={adviceMutation.isPending}
+              onClick={() => adviceMutation.mutate()}
+            >
+              {adviceMutation.isPending ? (
+                <Spinner size="sm" />
+              ) : (
+                <Sparkles data-icon="inline-start" />
+              )}
+              {insights.advice ? t("advice.regenerate") : t("advice.generate")}
+            </Button>
+            <RewritePromptButton
+              projectId={projectId}
+              id={post.id}
+              dateRange={dateRange}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{t("rewrite.hint")}</p>
         </Section>
       </div>
     </div>

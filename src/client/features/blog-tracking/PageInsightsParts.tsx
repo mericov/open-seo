@@ -62,36 +62,49 @@ export function KeywordTable({
         <thead>
           <tr className="text-left text-xs text-muted-foreground">
             <th className="py-1 font-medium">{t("queries.query")}</th>
-            <th className="py-1 text-right font-medium">
+            <th
+              className="py-1 pl-2 text-right font-medium"
+              title={t("queries.volumeHint")}
+            >
+              {t("queries.volume")}
+            </th>
+            <th className="py-1 pl-2 text-right font-medium">
               {t("columns.clicks")}
             </th>
-            <th className="py-1 text-right font-medium">±</th>
-            <th className="py-1 text-right font-medium">
+            <th className="py-1 pl-2 text-right font-medium">±</th>
+            <th className="py-1 pl-2 text-right font-medium">
               {t("columns.impressions")}
             </th>
-            <th className="py-1 text-right font-medium">
+            <th className="py-1 pl-2 text-right font-medium">
               {t("columns.position")}
             </th>
-            <th className="py-1 text-right font-medium">±</th>
+            <th className="py-1 pl-2 text-right font-medium">±</th>
           </tr>
         </thead>
         <tbody>
           {keywords.map((row) => (
             <tr key={row.query} className="border-t border-border/60">
               <td className="py-1.5 pr-3">{row.query}</td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-2 text-right tabular-nums">
+                {row.searchVolume === null ? (
+                  <span className="text-muted-foreground">–</span>
+                ) : (
+                  formatNumber(row.searchVolume)
+                )}
+              </td>
+              <td className="py-1.5 pl-2 text-right tabular-nums">
                 {formatNumber(row.clicks)}
               </td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-2 text-right tabular-nums">
                 <Delta current={row.clicks} previous={row.previousClicks} />
               </td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-2 text-right tabular-nums">
                 {formatNumber(row.impressions)}
               </td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-2 text-right tabular-nums">
                 {formatNumber(row.position, { maximumFractionDigits: 1 })}
               </td>
-              <td className="py-1.5 text-right tabular-nums">
+              <td className="py-1.5 pl-2 text-right tabular-nums">
                 <Delta
                   current={row.position}
                   previous={row.previousPosition}

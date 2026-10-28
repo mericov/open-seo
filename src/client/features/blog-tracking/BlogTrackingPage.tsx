@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   keepPreviousData,
   useMutation,
@@ -51,6 +51,14 @@ import {
   type BlogTrackingView,
 } from "@/types/schemas/blog-tracking";
 
+function scrollToRow(id: string) {
+  requestAnimationFrame(() =>
+    document
+      .getElementById(`page-row-${id}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+  );
+}
+
 function isView(value: unknown): value is BlogTrackingView {
   return (BLOG_TRACKING_VIEWS as readonly unknown[]).includes(value);
 }
@@ -63,12 +71,14 @@ export function BlogTrackingPage({
   projectId,
   dateRange,
   view,
+  openId,
   onDateRangeChange,
   onViewChange,
 }: {
   projectId: string;
   dateRange: BlogTrackingDateRange;
   view: BlogTrackingView;
+  openId: string | null;
   onDateRangeChange: (range: BlogTrackingDateRange) => void;
   onViewChange: (view: BlogTrackingView) => void;
 }) {
@@ -77,13 +87,22 @@ export function BlogTrackingPage({
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<BlogPostRow | null>(null);
   const [removing, setRemoving] = useState<BlogPostRow | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(openId);
+  const openPost = (id: string) => {
+    setExpanded(id);
+    scrollToRow(id);
+  };
 
   const reportQuery = useQuery({
     ...blogTrackingReportOptions(projectId, dateRange),
     placeholderData: keepPreviousData,
   });
   const report = reportQuery.data;
+  const reportLoaded = report !== undefined;
+
+  useEffect(() => {
+    if (openId && reportLoaded) scrollToRow(openId);
+  }, [openId, reportLoaded]);
 
   const removal = useMutation({
     mutationFn: (post: BlogPostRow) =>
@@ -236,7 +255,7 @@ export function BlogTrackingPage({
                   kind={kind}
                   posts={posts}
                   trend={trend}
-                  onOpen={setExpanded}
+                  onOpen={openPost}
                 />
 
                 {posts.length === 0 ? (

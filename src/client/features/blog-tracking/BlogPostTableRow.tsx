@@ -68,7 +68,7 @@ export function BlogPostTableRow({
   const { t } = useTranslation("blogTracking");
   return (
     <>
-      <TableRow>
+      <TableRow id={`page-row-${post.id}`} className="scroll-mt-4">
         <TableCell>
           <Button
             variant="ghost"

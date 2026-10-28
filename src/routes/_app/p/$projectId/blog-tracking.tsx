@@ -16,6 +16,7 @@ const searchSchema = z.object({
     .default("last_28_days")
     .catch("last_28_days"),
   view: z.enum(BLOG_TRACKING_VIEWS).default("blog").catch("blog"),
+  open: z.string().min(1).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/_app/p/$projectId/blog-tracking")({
@@ -28,13 +29,14 @@ export const Route = createFileRoute("/_app/p/$projectId/blog-tracking")({
 
 function BlogTrackingRoute() {
   const { projectId } = Route.useParams();
-  const { range, view } = Route.useSearch();
+  const { range, view, open } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   return (
     <BlogTrackingPage
       projectId={projectId}
       dateRange={range}
       view={view}
+      openId={open ?? null}
       onDateRangeChange={(next) => {
         void navigate({
           search: (prev) => ({ ...prev, range: next }),

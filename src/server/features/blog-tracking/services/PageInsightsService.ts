@@ -25,6 +25,8 @@ import { BlogPostRepository } from "@/server/features/blog-tracking/repositories
 import { PageTrackingRepository } from "@/server/features/blog-tracking/repositories/PageTrackingRepository";
 import { normalizePageUrl } from "@/server/features/blog-tracking/services/blogTrackingReport";
 import { addDays } from "@/server/features/blog-tracking/services/blogAlerts";
+import { keywordVolumes } from "@/server/features/blog-tracking/services/keywordVolumes";
+import { buildRewritePrompt } from "@/server/features/blog-tracking/services/rewritePrompt";
 import {
   fetchHtml,
   linkSuggestions,
@@ -152,6 +154,7 @@ async function collectInsights(
   projectId: string,
   postId: string,
   dateRange: BlogTrackingDateRange,
+  customer: BillingCustomerContext | null,
 ) {
   const post = await BlogPostRepository.get(projectId, postId);
   if (!post) throw new AppError("NOT_FOUND", "This page is not tracked.");
@@ -176,14 +179,30 @@ async function collectInsights(
   const checks: PageCheck[] = page ? [...page.checks] : [];
   if (indexed !== null)
     checks.push({ id: "indexed", ok: indexed, value: null });
-  const links = await linkSuggestions(projectId, post, page, keywords);
+  const shown = (keywords ?? []).slice(0, KEYWORDS_SHOWN);
+  const opportunities = keywordOpportunities(
+    keywords ?? [],
+    page ? page.placement : null,
+  );
+  const [links, volumes] = await Promise.all([
+    linkSuggestions(projectId, post, page, keywords),
+    keywordVolumes(
+      projectId,
+      [...shown, ...opportunities].map((row) => row.query),
+      customer,
+    ),
+  ]);
+  const withVolume = <T extends { query: string }>(row: T) => ({
+    ...row,
+    searchVolume: volumes.get(row.query) ?? null,
+  });
   const storedAdvice = advice
     ? pageAdviceSchema.safeParse(JSON.parse(advice.adviceJson))
     : null;
   return {
     post,
     page,
-    keywords,
+    html,
     result: {
       connected: keywords !== null,
       pageReachable: page !== null,
@@ -204,11 +223,8 @@ async function collectInsights(
         })),
         (a, b) => a.weekStart.localeCompare(b.weekStart),
       ),
-      keywords: (keywords ?? []).slice(0, KEYWORDS_SHOWN),
-      opportunities: keywordOpportunities(
-        keywords ?? [],
-        page ? page.placement : null,
-      ),
+      keywords: shown.map(withVolume),
+      opportunities: opportunities.map(withVolume),
       checks,
       links,
       advice:
@@ -223,8 +239,9 @@ async function getInsights(
   projectId: string,
   postId: string,
   dateRange: BlogTrackingDateRange,
+  customer: BillingCustomerContext,
 ) {
-  return (await collectInsights(projectId, postId, dateRange)).result;
+  return (await collectInsights(projectId, postId, dateRange, customer)).result;
 }
 
 const SYSTEM_PROMPT = [
@@ -266,6 +283,7 @@ async function generateAdvice(
     projectId,
     postId,
     dateRange,
+    null,
   );
   const response = await generateText({
     model: buildChatAgentModel(apiKey, modelId, "low"),
@@ -315,4 +333,31 @@ async function generateAdvice(
   return { ...parsed.data, createdAt };
 }
 
-export const PageInsightsService = { getInsights, generateAdvice };
+async function getRewritePrompt(
+  projectId: string,
+  postId: string,
+  dateRange: BlogTrackingDateRange,
+  language: "tr" | "en",
+) {
+  const { post, page, html, result } = await collectInsights(
+    projectId,
+    postId,
+    dateRange,
+    null,
+  );
+  return {
+    prompt: buildRewritePrompt({
+      language,
+      post,
+      page,
+      html,
+      insights: result,
+    }),
+  };
+}
+
+export const PageInsightsService = {
+  getInsights,
+  generateAdvice,
+  getRewritePrompt,
+};

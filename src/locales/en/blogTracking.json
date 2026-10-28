@@ -65,7 +65,9 @@
     "title": "Keywords bringing clicks and impressions (vs previous period)",
     "empty": "No search queries for this post in this period.",
     "query": "Query",
-    "newKeyword": "new"
+    "newKeyword": "new",
+    "volume": "Volume",
+    "volumeHint": "Estimated monthly Google searches. Unknown ones show as –."
   },
   "add": {
     "title": "Add blog posts",
@@ -140,7 +142,8 @@
     "addToHeadings": "\"{{query}}\" ranks {{position}} with {{impressions}} impressions but isn't in the title or subheadings. Add it to the title or an H2.",
     "expand": "\"{{query}}\" ranks {{position}} ({{impressions}} impressions). Expand the section on it to reach the top 3.",
     "lowCtr": "\"{{query}}\" ranks {{position}} but gets few clicks. Rewrite the title and meta description to earn the click.",
-    "competing": "Another page on your site competes for \"{{query}}\": {{url}}. Pick the one to rank, link to it from the other, or separate their topics."
+    "competing": "Another page on your site competes for \"{{query}}\": {{url}}. Pick the one to rank, link to it from the other, or separate their topics.",
+    "volume": "{{volume}} searches/month"
   },
   "checks": {
     "score": "{{passed}}/{{total}} checks passed",
@@ -220,5 +223,24 @@
       "no_impressions": "No Google impressions in the last 4 weeks.",
       "rising": "Clicks {{previous}} → {{current}}. Look for follow-up content ideas."
     }
+  },
+  "rewrite": {
+    "button": "Copy prompt for Claude",
+    "hint": "Copies the current content, keyword data and every suggestion on this page as one prompt. Paste it into Claude to update the page. Free.",
+    "title": "Rewrite prompt for Claude",
+    "description": "The prompt was copied to your clipboard. If not, use the button below, then paste it into Claude.",
+    "copied": "Prompt copied, paste it into Claude",
+    "close": "Close"
+  },
+  "card": {
+    "title": "Blog and category tracking",
+    "viewAll": "View all",
+    "clicks28": "clicks, last 28 days",
+    "alerts_one": "{{count}} alert",
+    "alerts_other": "{{count}} alerts",
+    "aiSessions_one": "{{count}} visit from AI",
+    "aiSessions_other": "{{count}} visits from AI",
+    "empty": "No pages tracked yet. Press \"Check now\" in Blog Tracking.",
+    "noPriority": "No page needs an urgent update right now."
   }
 }

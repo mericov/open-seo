@@ -24,7 +24,12 @@ export const getPageInsights = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
   .validator(pageInsightsSchema)
   .handler(async ({ data, context }) =>
-    PageInsightsService.getInsights(context.projectId, data.id, data.dateRange),
+    PageInsightsService.getInsights(
+      context.projectId,
+      data.id,
+      data.dateRange,
+      context,
+    ),
   );
 
 export const generatePageAdvice = createServerFn({ method: "POST" })
@@ -37,6 +42,18 @@ export const generatePageAdvice = createServerFn({ method: "POST" })
       data.dateRange,
       data.language,
       context,
+    ),
+  );
+
+export const getPageRewritePrompt = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(pageAdviceRequestSchema)
+  .handler(async ({ data, context }) =>
+    PageInsightsService.getRewritePrompt(
+      context.projectId,
+      data.id,
+      data.dateRange,
+      data.language,
     ),
   );
 

@@ -10,6 +10,7 @@ import {
   projectPageAlerts,
   projectPageWeeklyStats,
   gscConnections,
+  keywordMetrics,
 } from "@/db/schema";
 import type { PageAlertKind } from "@/shared/pageTracking";
 
@@ -261,6 +262,36 @@ async function listAiCitations(projectId: string, domains: string[]) {
     .limit(5000);
 }
 
+async function listKeywordVolumes(params: {
+  projectId: string;
+  keywords: string[];
+  locationCode: number;
+  languageCode: string;
+  since: string;
+}) {
+  if (params.keywords.length === 0) return [];
+  const results = await Promise.all(
+    chunk(params.keywords, KEYS_PER_SELECT).map((keywordChunk) =>
+      db
+        .select({
+          keyword: keywordMetrics.keyword,
+          searchVolume: keywordMetrics.searchVolume,
+        })
+        .from(keywordMetrics)
+        .where(
+          and(
+            eq(keywordMetrics.projectId, params.projectId),
+            eq(keywordMetrics.locationCode, params.locationCode),
+            eq(keywordMetrics.languageCode, params.languageCode),
+            inArray(keywordMetrics.keyword, keywordChunk),
+            gte(keywordMetrics.fetchedAt, params.since),
+          ),
+        ),
+    ),
+  );
+  return results.flat();
+}
+
 export const PageTrackingRepository = {
   listConnectedProjectIds,
   latestWeek,
@@ -274,4 +305,5 @@ export const PageTrackingRepository = {
   getAdvice,
   saveAdvice,
   listAiCitations,
+  listKeywordVolumes,
 };

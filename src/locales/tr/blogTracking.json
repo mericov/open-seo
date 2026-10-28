@@ -65,7 +65,9 @@
     "title": "Tıklama ve gösterim getiren keyword'ler (önceki döneme göre)",
     "empty": "Bu dönemde bu yazı için arama sorgusu yok.",
     "query": "Sorgu",
-    "newKeyword": "yeni"
+    "newKeyword": "yeni",
+    "volume": "Hacim",
+    "volumeHint": "Aylık tahmini Google arama hacmi. Bilinmeyenler – olarak görünür."
   },
   "add": {
     "title": "Blog yazısı ekle",
@@ -140,7 +142,8 @@
     "addToHeadings": "\"{{query}}\" {{position}}. sırada ve {{impressions}} gösterim alıyor ama başlıkta ya da ara başlıklarda geçmiyor. Başlığa veya bir H2'ye ekleyin.",
     "expand": "\"{{query}}\" {{position}}. sırada ({{impressions}} gösterim). Bu konuyu anlatan bölümü genişletin, ilk 3'e girebilir.",
     "lowCtr": "\"{{query}}\" {{position}}. sırada ama az tıklanıyor. Başlığı ve meta description'ı daha çekici yazın.",
-    "competing": "\"{{query}}\" için sitenizde başka bir sayfa da yarışıyor: {{url}}. Hangisi öne çıkacaksa diğerinden ona link verin ya da içerikleri ayırın."
+    "competing": "\"{{query}}\" için sitenizde başka bir sayfa da yarışıyor: {{url}}. Hangisi öne çıkacaksa diğerinden ona link verin ya da içerikleri ayırın.",
+    "volume": "aylık {{volume}} arama"
   },
   "checks": {
     "score": "{{passed}}/{{total}} kontrol geçti",
@@ -220,5 +223,24 @@
       "no_impressions": "Son 4 haftada Google'da hiç gösterim almadı.",
       "rising": "Tıklama {{previous}} → {{current}}. Bu yazıdan yeni içerik fikirleri çıkarın."
     }
+  },
+  "rewrite": {
+    "button": "Claude için prompt kopyala",
+    "hint": "Mevcut içeriği, keyword verilerini ve bu sayfadaki tüm önerileri tek bir prompt halinde kopyalar. Claude'a yapıştırıp yazıyı güncelletebilirsiniz. Ücretsizdir.",
+    "title": "Claude için yeniden yazım prompt'u",
+    "description": "Prompt panoya kopyalandı. Kopyalanmadıysa aşağıdaki butonu kullanın, sonra Claude'a yapıştırın.",
+    "copied": "Prompt kopyalandı, Claude'a yapıştırabilirsiniz",
+    "close": "Kapat"
+  },
+  "card": {
+    "title": "Blog ve kategori takibi",
+    "viewAll": "Tümünü gör",
+    "clicks28": "tıklama, son 28 gün",
+    "alerts_one": "{{count}} alarm",
+    "alerts_other": "{{count}} alarm",
+    "aiSessions_one": "AI'dan {{count}} ziyaret",
+    "aiSessions_other": "AI'dan {{count}} ziyaret",
+    "empty": "Henüz takip edilen sayfa yok. Blog Takibi'nde \"Şimdi kontrol et\"e basın.",
+    "noPriority": "Şu an acil güncelleme gerektiren sayfa yok."
   }
 }
