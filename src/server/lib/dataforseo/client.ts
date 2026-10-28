@@ -86,7 +86,7 @@ export { mapDataforseoPathToCreditFeature };
  * spend to its own feature). The extra field is ignored by the fetchers, which
  * read named fields rather than spreading the input.
  */
-function meter<I, T>(
+export function meter<I, T>(
   customer: BillingCustomerContext,
   fetcher: (input: I) => Promise<DataforseoApiResponse<T>>,
   estimateRawUsd: (input: I) => number,

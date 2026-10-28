@@ -17,6 +17,11 @@ import {
 } from "@/server/lib/dataforseo/backlinks";
 import { fetchBulkTrafficEstimation } from "@/server/lib/dataforseo/traffic";
 import {
+  fetchDomainRankByLocation,
+  fetchHistoricalRankOverview,
+} from "@/server/lib/dataforseo/traffic-history";
+import { estimateHistoricalRankUsd } from "@/shared/trafficHistory";
+import {
   fetchDomainRankOverview,
   fetchKeywordIdeas,
   fetchKeywordOverview,
@@ -270,6 +275,12 @@ export const dataforseoPricing = {
       labsUsd(input.limit),
     ),
     relevantPages: priced(fetchRelevantPages, (input) => labsUsd(input.limit)),
+    historicalRankOverview: priced(fetchHistoricalRankOverview, (input) =>
+      estimateHistoricalRankUsd(input.expectedMonths),
+    ),
+    rankByLocation: priced(fetchDomainRankByLocation, (input) =>
+      labsUsd(input.limit),
+    ),
   },
   serp: {
     live: priced(fetchLiveSerp, (input) =>

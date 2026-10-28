@@ -16,3 +16,4 @@ export * from "../ai-visibility.schema";
 export * from "../leads.schema";
 export * from "../digital-pr.schema";
 export * from "../inbound-leads.schema";
+export * from "../traffic-history.schema";

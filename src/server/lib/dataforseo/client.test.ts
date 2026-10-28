@@ -116,6 +116,10 @@ vi.mock("@/server/lib/dataforseo/backlinks", () => ({
 vi.mock("@/server/lib/dataforseo/traffic", () => ({
   fetchBulkTrafficEstimation: vi.fn(),
 }));
+vi.mock("@/server/lib/dataforseo/traffic-history", () => ({
+  fetchHistoricalRankOverview: vi.fn(),
+  fetchDomainRankByLocation: vi.fn(),
+}));
 vi.mock("@/server/lib/dataforseo/lighthouse", () => ({
   fetchLighthouseResult: vi.fn(),
 }));

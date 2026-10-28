@@ -351,6 +351,13 @@
       "when": 1793113826075,
       "tag": "0049_special_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1793178920185,
+      "tag": "0050_traffic_history",
+      "breakpoints": true
     }
   ]
 }

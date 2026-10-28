@@ -1,0 +1,90 @@
+{
+  "title": "Traffic history",
+  "subtitle": "Monthly organic and paid (Google Ads) traffic for this domain.",
+  "lastFetched": "Last fetched {{time}}",
+  "refresh": "Refresh",
+  "refreshUpToDate": "Up to date. New monthly data arrives next month.",
+  "refreshCooldown": "Refreshed in the last 24 hours. Try again tomorrow.",
+  "refreshed": "Traffic history updated.",
+  "loadingAuto": "Loading the last 6 months of traffic history…",
+  "noDataForCountry": "No traffic history saved for {{country}} yet.",
+  "fetchCountry": "Get traffic history",
+  "fetchCost": "Last 6 months · estimated cost {{cost}}",
+  "noMonths": "DataForSEO has no traffic data for this domain in {{country}}.",
+  "estimatedNote": "Traffic values are DataForSEO estimates, not measured visits. They cover the whole domain including subdomains.",
+  "cards": {
+    "organicTraffic": "Organic Traffic",
+    "paidTraffic": "Paid Traffic",
+    "organicKeywords": "Organic Keywords",
+    "paidKeywords": "Paid Keywords",
+    "referringDomains": "Ref. Domains",
+    "backlinks": "Backlinks",
+    "domainRank": "Domain Rank",
+    "domainRankHelp": "DataForSEO's 0-100 domain strength score, the closest match to Authority Score.",
+    "vsPrevious": "vs {{month}}",
+    "notAvailable": "Not available"
+  },
+  "ranges": {
+    "1m": "1M",
+    "6m": "6M",
+    "1y": "1Y",
+    "2y": "2Y",
+    "all": "All time"
+  },
+  "extend": {
+    "title": "Only {{from}} onward is saved for this country.",
+    "description": "Older months are fetched once and saved. They are never fetched again.",
+    "2y": "Get last 2 years",
+    "all": "Get full history",
+    "cost": "Estimated cost {{cost}}",
+    "done": "Older months saved."
+  },
+  "traffic": {
+    "title": "Traffic",
+    "organic": "Organic Traffic",
+    "paid": "Paid Traffic",
+    "export": "Export",
+    "empty": "No traffic data in this range."
+  },
+  "keywords": {
+    "title": "Keywords",
+    "organic": "Organic",
+    "paid": "Paid",
+    "groups": {
+      "top3": "Top 3",
+      "pos4to10": "4-10",
+      "pos11to20": "11-20",
+      "pos21to50": "21-50",
+      "pos51to100": "51-100"
+    }
+  },
+  "countries": {
+    "title": "Distribution by Country",
+    "country": "Country",
+    "traffic": "Traffic",
+    "keywords": "Keywords",
+    "empty": "No country data saved.",
+    "showAll": "Show all ({{count}})",
+    "showLess": "Show less"
+  },
+  "serp": {
+    "title": "SERP Positions Distribution",
+    "subtitle": "Organic keywords, {{month}}",
+    "empty": "No position data yet."
+  },
+  "notes": {
+    "title": "Notes",
+    "add": "Add note",
+    "month": "Month",
+    "body": "Note",
+    "placeholder": "e.g. Site migration, Google core update",
+    "save": "Save note",
+    "saved": "Note saved.",
+    "delete": "Delete note",
+    "deleted": "Note deleted.",
+    "empty": "No notes yet. Notes show up as markers on the traffic chart."
+  },
+  "csv": {
+    "month": "Month"
+  }
+}

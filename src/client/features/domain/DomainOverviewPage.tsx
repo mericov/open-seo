@@ -29,6 +29,7 @@ import { QueryError } from "@/client/components/QueryState";
 import { DomainSearchCard } from "@/client/features/domain/components/DomainSearchCard";
 import { KeywordsTab } from "@/client/features/domain/components/KeywordsTab";
 import { PagesTab } from "@/client/features/domain/components/PagesTab";
+import { TrafficHistorySection } from "@/client/features/traffic-history/TrafficHistorySection";
 import { HelpLabel } from "@/client/components/HelpLabel";
 import { MetricsTable } from "@/client/components/MetricsTable";
 import { SearchTabStrip } from "@/client/features/search-tabs/SearchTabStrip";
@@ -700,6 +701,15 @@ export function DomainOverviewPage({
                 )}
               </div>
             </Card>
+
+            {state.overview.hasData ? (
+              <TrafficHistorySection
+                key={`${state.overview.domain}|${routeState.locationCode}`}
+                projectId={projectId}
+                domain={state.overview.domain}
+                defaultLocationCode={routeState.locationCode}
+              />
+            ) : null}
           </>
         )}
       </div>

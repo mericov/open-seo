@@ -1,0 +1,90 @@
+{
+  "title": "Trafik geçmişi",
+  "subtitle": "Bu domainin aylık organik ve ücretli (Google Ads) trafiği.",
+  "lastFetched": "Son çekilme: {{time}}",
+  "refresh": "Yenile",
+  "refreshUpToDate": "Veriler güncel. Yeni ayın verisi gelecek ay gelir.",
+  "refreshCooldown": "Son 24 saat içinde yenilendi. Yarın tekrar deneyin.",
+  "refreshed": "Trafik geçmişi güncellendi.",
+  "loadingAuto": "Son 6 ayın trafik geçmişi getiriliyor…",
+  "noDataForCountry": "{{country}} için henüz kayıtlı trafik geçmişi yok.",
+  "fetchCountry": "Trafik geçmişini getir",
+  "fetchCost": "Son 6 ay · tahmini maliyet {{cost}}",
+  "noMonths": "DataForSEO'da bu domainin {{country}} için trafik verisi yok.",
+  "estimatedNote": "Trafik değerleri DataForSEO tahminidir, ölçülmüş ziyaret sayısı değildir. Subdomainler dahil tüm domaini kapsar.",
+  "cards": {
+    "organicTraffic": "Organik Trafik",
+    "paidTraffic": "Ücretli Trafik",
+    "organicKeywords": "Organik Keyword",
+    "paidKeywords": "Ücretli Keyword",
+    "referringDomains": "Ref. Domain",
+    "backlinks": "Backlink",
+    "domainRank": "Domain Rank",
+    "domainRankHelp": "DataForSEO'nun 0-100 arası domain gücü puanı. Authority Score'a en yakın karşılık.",
+    "vsPrevious": "{{month}} ayına göre",
+    "notAvailable": "Veri yok"
+  },
+  "ranges": {
+    "1m": "1A",
+    "6m": "6A",
+    "1y": "1Y",
+    "2y": "2Y",
+    "all": "Tüm zamanlar"
+  },
+  "extend": {
+    "title": "Bu ülke için sadece {{from}} sonrası kayıtlı.",
+    "description": "Eski aylar bir kez çekilip kaydedilir, bir daha çekilmez.",
+    "2y": "Son 2 yılı getir",
+    "all": "Tüm geçmişi getir",
+    "cost": "Tahmini maliyet {{cost}}",
+    "done": "Eski aylar kaydedildi."
+  },
+  "traffic": {
+    "title": "Trafik",
+    "organic": "Organik Trafik",
+    "paid": "Ücretli Trafik",
+    "export": "Dışa aktar",
+    "empty": "Bu aralıkta trafik verisi yok."
+  },
+  "keywords": {
+    "title": "Keyword'ler",
+    "organic": "Organik",
+    "paid": "Ücretli",
+    "groups": {
+      "top3": "İlk 3",
+      "pos4to10": "4-10",
+      "pos11to20": "11-20",
+      "pos21to50": "21-50",
+      "pos51to100": "51-100"
+    }
+  },
+  "countries": {
+    "title": "Ülkelere göre dağılım",
+    "country": "Ülke",
+    "traffic": "Trafik",
+    "keywords": "Keyword",
+    "empty": "Kayıtlı ülke verisi yok.",
+    "showAll": "Tümünü göster ({{count}})",
+    "showLess": "Daha az göster"
+  },
+  "serp": {
+    "title": "SERP pozisyon dağılımı",
+    "subtitle": "Organik keyword'ler, {{month}}",
+    "empty": "Henüz pozisyon verisi yok."
+  },
+  "notes": {
+    "title": "Notlar",
+    "add": "Not ekle",
+    "month": "Ay",
+    "body": "Not",
+    "placeholder": "örn. Site taşıma, Google core update",
+    "save": "Notu kaydet",
+    "saved": "Not kaydedildi.",
+    "delete": "Notu sil",
+    "deleted": "Not silindi.",
+    "empty": "Henüz not yok. Notlar trafik grafiğinde işaret olarak görünür."
+  },
+  "csv": {
+    "month": "Ay"
+  }
+}
