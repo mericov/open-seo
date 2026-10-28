@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   ArrowLeftRight,
   Check,
+  ChevronRight,
   CircleHelp,
   CreditCard,
   LogOut,
@@ -42,8 +43,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSkeleton,
+  SidebarMenuSub,
   useSidebar,
 } from "@/client/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/client/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -111,6 +118,53 @@ function SidebarNavLink({
         </Link>
       )}
     </SidebarMenuItem>
+  );
+}
+
+function SidebarNavFolder({
+  icon: Icon,
+  label,
+  items,
+  placeholder,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  items: NonNullable<
+    ReturnType<typeof getProjectNavGroups>[number]["folder"]
+  >["items"];
+  placeholder: boolean;
+}) {
+  const { t } = useTranslation(["common", "nav"]);
+  const matchRoute = useMatchRoute();
+  const hasActiveChild = items.some((item) =>
+    Boolean(matchRoute({ ...item, fuzzy: true })),
+  );
+  return (
+    <Collapsible defaultOpen={hasActiveChild} render={<SidebarMenuItem />}>
+      <CollapsibleTrigger
+        render={<SidebarMenuButton className={`group ${navButtonClass}`} />}
+      >
+        <Icon className="size-4" />
+        <span>{label}</span>
+        <ChevronRight className="ml-auto size-4 transition-transform group-data-[panel-open]:rotate-90" />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <SidebarMenuSub className="mr-0 pr-0">
+          {items.map((item) => {
+            const { icon, label: itemLabel, ...linkProps } = item;
+            return (
+              <SidebarNavLink
+                key={linkProps.to}
+                icon={icon}
+                label={t(itemLabel)}
+                linkProps={linkProps}
+                placeholder={placeholder}
+              />
+            );
+          })}
+        </SidebarMenuSub>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -193,6 +247,14 @@ export function Sidebar({
                         />
                       );
                     })}
+                    {"folder" in group && group.folder ? (
+                      <SidebarNavFolder
+                        icon={group.folder.icon}
+                        label={t(group.folder.label)}
+                        items={group.folder.items}
+                        placeholder={navPlaceholder}
+                      />
+                    ) : null}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

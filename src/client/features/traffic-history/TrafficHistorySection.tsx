@@ -53,12 +53,14 @@ type Props = {
   projectId: string;
   domain: string;
   defaultLocationCode: number;
+  autoFetch?: boolean;
 };
 
 export function TrafficHistorySection({
   projectId,
   domain,
   defaultLocationCode,
+  autoFetch = true,
 }: Props) {
   const { t } = useTranslation("trafficHistory");
   const queryClient = useQueryClient();
@@ -131,7 +133,10 @@ export function TrafficHistorySection({
   });
 
   const needsAutoFetch =
-    view != null && view.fetch == null && locationCode === defaultLocationCode;
+    autoFetch &&
+    view != null &&
+    view.fetch == null &&
+    locationCode === defaultLocationCode;
   useEffect(() => {
     if (!needsAutoFetch || autoRequested.current) return;
     autoRequested.current = true;

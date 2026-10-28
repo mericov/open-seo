@@ -16,6 +16,7 @@ import {
   PenLine,
   Search,
   Send,
+  Sparkles,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -184,14 +185,6 @@ export function getProjectNavGroups(projectId: string) {
       ],
     },
     {
-      label: "nav:groups.aiVisibility" as const,
-      items: [
-        byPath("/p/$projectId/ai-visibility/research"),
-        byPath("/p/$projectId/prompt-explorer"),
-        byPath("/p/$projectId/ai-visibility"),
-      ],
-    },
-    {
       label: "nav:groups.mySite" as const,
       items: [
         byPath("/p/$projectId/inbound-leads"),
@@ -210,6 +203,15 @@ export function getProjectNavGroups(projectId: string) {
         byPath("/p/$projectId/context"),
         aiNavItem,
       ],
+      folder: {
+        label: "nav:groups.aiVisibility" as const,
+        icon: Sparkles,
+        items: [
+          byPath("/p/$projectId/ai-visibility/research"),
+          byPath("/p/$projectId/prompt-explorer"),
+          byPath("/p/$projectId/ai-visibility"),
+        ],
+      },
     },
   ];
 }

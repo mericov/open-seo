@@ -242,7 +242,9 @@ export async function auditSite(input: {
     /\/blogs\/[^/]+\/[^/]+/.test(path),
   );
   const hasAboutPage = pagePaths.some((path) =>
-    /about|hakkimizda|hakkimda|our-story|hikayemiz|who-we-are|biz-kimiz|\/author\//.test(path),
+    /about|hakkimizda|hakkimda|our-story|hikayemiz|who-we-are|biz-kimiz|\/author\//.test(
+      path,
+    ),
   );
 
   const findings: LeadFinding[] = [

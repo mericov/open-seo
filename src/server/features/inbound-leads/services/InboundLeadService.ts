@@ -59,8 +59,7 @@ async function handleIngest(request: Request): Promise<Response> {
 
   const candidates = await InboundLeadRepository.findProjectsByDomain(domain);
   const project =
-    candidates.find((row) => row.languageCode === lead.locale) ??
-    candidates[0];
+    candidates.find((row) => row.languageCode === lead.locale) ?? candidates[0];
   if (!project) return Response.json({ ok: false }, { status: 404 });
 
   const values: InboundLeadInsert = {

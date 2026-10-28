@@ -39,7 +39,9 @@ function whatsappLink(phone: string) {
 }
 
 function formatDate(value: string, locale: string) {
-  const date = new Date(value.includes("T") ? value : `${value.replace(" ", "T")}Z`);
+  const date = new Date(
+    value.includes("T") ? value : `${value.replace(" ", "T")}Z`,
+  );
   return Number.isNaN(date.getTime())
     ? value
     : date.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
@@ -76,7 +78,9 @@ export function InboundLeadCard({
               {lead.name || lead.email || lead.phone || t("unnamed")}
             </span>
             {lead.verdict !== "ok" ? (
-              <Badge variant={lead.verdict === "spam" ? "destructive" : "secondary"}>
+              <Badge
+                variant={lead.verdict === "spam" ? "destructive" : "secondary"}
+              >
                 {t(`verdict.${lead.verdict}`)}
               </Badge>
             ) : null}
@@ -116,14 +120,20 @@ export function InboundLeadCard({
 
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
         {lead.email ? (
-          <a className="inline-flex items-center gap-1.5 hover:underline" href={`mailto:${lead.email}`}>
+          <a
+            className="inline-flex items-center gap-1.5 hover:underline"
+            href={`mailto:${lead.email}`}
+          >
             <Mail className="size-3.5 text-muted-foreground" />
             {lead.email}
           </a>
         ) : null}
         {lead.phone ? (
           <>
-            <a className="inline-flex items-center gap-1.5 hover:underline" href={`tel:${lead.phone}`}>
+            <a
+              className="inline-flex items-center gap-1.5 hover:underline"
+              href={`tel:${lead.phone}`}
+            >
               <Phone className="size-3.5 text-muted-foreground" />
               {lead.phone}
             </a>
@@ -197,18 +207,33 @@ export function InboundLeadCard({
           {lead.note ? t("editNote") : t("addNote")}
         </Button>
         {lead.verdict === "spam" ? (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onVerdict("ok")}>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => onVerdict("ok")}
+          >
             <ShieldCheck className="size-3.5" />
             {t("notSpam")}
           </Button>
         ) : (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onVerdict("spam")}>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => onVerdict("spam")}
+          >
             <ShieldAlert className="size-3.5" />
             {t("markSpam")}
           </Button>
         )}
         {lead.verdict === "suspicious" ? (
-          <Button size="sm" variant="ghost" disabled={busy} onClick={() => onVerdict("ok")}>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => onVerdict("ok")}
+          >
             <ShieldCheck className="size-3.5" />
             {t("markReal")}
           </Button>

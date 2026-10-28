@@ -17,7 +17,12 @@ import type { z } from "zod";
 import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { sort } from "remeda";
-import { DashboardOnboarding } from "./DashboardOnboarding";
+import { TrafficHistorySection } from "@/client/features/traffic-history/TrafficHistorySection";
+import { useProjectMarket } from "@/client/features/projects/useProjectMarket";
+import {
+  DEFAULT_LOCATION_CODE,
+  isLabsLocationCode,
+} from "@/client/features/keywords/locations";
 import {
   AuditHealthCard,
   GscCard,
@@ -50,6 +55,8 @@ export function DashboardPage({
     refetchInterval: (query) =>
       query.state.data?.audit?.status === "running" ? 3000 : false,
   });
+
+  const projectMarket = useProjectMarket(projectId);
 
   const activation = activationQuery.data;
   const overview = overviewQuery.data;
@@ -200,11 +207,19 @@ export function DashboardPage({
           />
         ) : null}
 
-        <DashboardOnboarding
-          key={projectId}
-          projectId={projectId}
-          activation={activation}
-        />
+        {activation.domain && projectMarket ? (
+          <TrafficHistorySection
+            key={`${projectId}|${activation.domain}`}
+            projectId={projectId}
+            domain={activation.domain}
+            defaultLocationCode={
+              isLabsLocationCode(projectMarket.locationCode)
+                ? projectMarket.locationCode
+                : DEFAULT_LOCATION_CODE
+            }
+            autoFetch={false}
+          />
+        ) : null}
 
         <Tabs
           value={tab}

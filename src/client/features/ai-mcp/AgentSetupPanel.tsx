@@ -2,11 +2,6 @@ import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { CopyButton } from "@/client/components/CopyButton";
 
-export function AgentSetupDescription() {
-  const { t } = useTranslation("onboarding");
-  return t("agent.description");
-}
-
 export function AgentSetupPanel({
   prompt,
   onCopy,

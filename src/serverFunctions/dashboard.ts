@@ -7,8 +7,6 @@ import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   dashboardProjectInputSchema,
   dashboardBacklinksInputSchema,
-  dashboardStepClickSchema,
-  dashboardStepDismissalSchema,
 } from "@/types/schemas/dashboard";
 
 export const getDashboardActivation = createServerFn({ method: "POST" })
@@ -33,14 +31,6 @@ export const getDashboardOverview = createServerFn({ method: "POST" })
     }),
   );
 
-export const markDashboardStepClicked = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(dashboardStepClickSchema)
-  .handler(async ({ context, data }) => {
-    await ActivationRepository.markStepClicked(context.projectId, data.step);
-    return { ok: true as const };
-  });
-
 // Hides only the optional GA4 pitch on this project's dashboard. The
 // integration remains available in Project Settings and a later connection
 // makes the dashboard card visible again.
@@ -50,19 +40,6 @@ export const dismissDashboardGa4Card = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await ActivationRepository.markGa4CardDismissed(context.projectId);
     return { ok: true as const };
-  });
-
-export const setDashboardStepDismissed = createServerFn({ method: "POST" })
-  .middleware(requireProjectContext)
-  .validator(dashboardStepDismissalSchema)
-  .handler(async ({ context, data }) => {
-    await DashboardService.setStepDismissed(
-      context.userId,
-      context.projectId,
-      data.step,
-      data.dismissed,
-    );
-    return { ok: true };
   });
 
 export const getDashboardKeywords = createServerFn({ method: "POST" })

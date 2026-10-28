@@ -7,7 +7,7 @@ import { getIssueTypePageCountsForAudit } from "@/server/features/audit/reposito
 import { Ga4ConnectionRepository } from "@/server/features/ga4/repositories/Ga4ConnectionRepository";
 import { GscConnectionRepository } from "@/server/features/gsc/repositories/GscConnectionRepository";
 
-export type DashboardActivation = {
+type DashboardActivation = {
   domain: string | null;
   ga4: {
     connected: boolean;
