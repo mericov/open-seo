@@ -114,6 +114,19 @@ async function countSavedKeywords(projectId: string) {
   return result?.value ?? 0;
 }
 
+async function listSavedKeywordNames(projectId: string, locationCode: number) {
+  const rows = await db
+    .select({ keyword: savedKeywords.keyword })
+    .from(savedKeywords)
+    .where(
+      and(
+        eq(savedKeywords.projectId, projectId),
+        eq(savedKeywords.locationCode, locationCode),
+      ),
+    );
+  return rows.map((row) => row.keyword);
+}
+
 async function saveKeywordsToProject(params: {
   projectId: string;
   keywords: string[];
@@ -364,6 +377,7 @@ async function removeSavedKeywords(
 export const KeywordResearchRepository = {
   upsertKeywordMetric,
   countSavedKeywords,
+  listSavedKeywordNames,
   saveKeywordsToProject,
   listSavedKeywordsByProject,
   addTagsToSavedKeywords: SavedKeywordTagsRepository.addTagsToSavedKeywords,

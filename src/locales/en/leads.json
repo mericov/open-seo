@@ -370,10 +370,18 @@
     "ready": "Report ready. Its link is added to emails as {{report_offer}}.",
     "timeout": "The report took too long. Try again.",
     "failed": "Couldn't create the report.",
-    "hint": "Opens the site in the background and builds the client report with the SEO & GEO extension.",
-    "needsExtension": "Install or update the SEO & GEO extension (4.1+) to create reports.",
+    "hint": "Builds the client report on the server from the latest site scan. No extension needed.",
     "viewsShort_one": "Report opened once",
-    "viewsShort_other": "Report opened {{count}}×"
+    "viewsShort_other": "Report opened {{count}}×",
+    "notScanned": "This lead hasn't been scanned yet. Scan it first, then create the report.",
+    "bulk": "Create reports",
+    "progress": "Creating reports {{done}}/{{total}}…",
+    "bulkDone_one": "1 report ready",
+    "bulkDone_other": "{{count}} reports ready",
+    "bulkDoneSkipped_one": "1 report ready, {{skipped}} skipped (not scanned yet)",
+    "bulkDoneSkipped_other": "{{count}} reports ready, {{skipped}} skipped (not scanned yet)",
+    "extension": "Detailed report (extension)",
+    "extensionHint": "Detailed report with the SEO & GEO extension. Opens the site in your browser, so keep this tab open."
   },
   "findingWhy": {
     "no_website": "Customers who find them on Maps have nowhere to read more, compare or buy, so they go to a competitor with a site.",
@@ -571,5 +579,14 @@
     "skipped": "No more follow-ups for this lead",
     "markedReplied": "Marked as replied",
     "sent": "Follow-up recorded"
+  },
+  "serverReport": {
+    "title": "Website audit for {{name}}",
+    "health": "Site health",
+    "intro": "We scanned the site and found {{count}} things worth fixing. They're grouped below, most urgent first.",
+    "noIssues": "We scanned the site and found no major issues. Nice work.",
+    "why": "Why it matters:",
+    "ctaTitle": "Want help fixing these?",
+    "ctaBody": "Reply to the email this report came with and we'll walk you through a plan."
   }
 }

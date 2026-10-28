@@ -1,6 +1,10 @@
 import { env } from "cloudflare:workers";
 import { AppError } from "@/server/lib/errors";
 import { LeadListRepository } from "@/server/features/leads/repositories/LeadListRepository";
+import { LeadReportRepository } from "@/server/features/leads/repositories/LeadReportRepository";
+import { leadReportHtml } from "@/server/features/leads/services/leadReportHtml";
+import { leadEmailLanguage } from "@/shared/leadEmail";
+import { findingsForLead } from "@/shared/leadFindings";
 
 const LEGACY_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32}$/;
 const SLUG_TOKEN_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -67,6 +71,29 @@ async function save(projectId: string, leadId: string, html: string) {
   return { token };
 }
 
+const REPORTABLE_STATUSES = new Set(["done", "no_website"]);
+
+async function generate(projectId: string, leadIds: string[]) {
+  const [rows, findings] = await Promise.all([
+    LeadReportRepository.listForReports(projectId, leadIds),
+    LeadListRepository.listFindings(leadIds),
+  ]);
+  const ready = rows.filter((row) =>
+    REPORTABLE_STATUSES.has(row.enrichmentStatus),
+  );
+  for (const row of ready) {
+    const html = leadReportHtml({
+      name: row.name,
+      website: row.website,
+      language: leadEmailLanguage(row),
+      score: row.opportunityScore,
+      ...findingsForLead(findings, row.id),
+    });
+    await save(projectId, row.id, html);
+  }
+  return { created: ready.length, skipped: leadIds.length - ready.length };
+}
+
 function notFound() {
   return new Response("Not found", {
     status: 404,
@@ -101,4 +128,4 @@ async function render(request: Request, token: string): Promise<Response> {
   });
 }
 
-export const LeadReportService = { save, render };
+export const LeadReportService = { save, generate, render };

@@ -1,10 +1,13 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
 } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getSavedKeywordNames } from "@/serverFunctions/keywords";
 import {
   useKeywordControlsForm,
   type KeywordControlsValues,
@@ -196,6 +199,28 @@ export function useKeywordResearchController(
     setSerpPage,
   ]);
 
+  const [hideSaved, setHideSaved] = useState(false);
+  const savedNamesQuery = useQuery({
+    queryKey: [
+      "savedKeywords",
+      input.projectId,
+      "names",
+      displayedLocationCode,
+    ],
+    queryFn: () =>
+      getSavedKeywordNames({
+        data: {
+          projectId: input.projectId,
+          locationCode: displayedLocationCode,
+        },
+      }),
+    enabled: hasSearched,
+  });
+  const savedKeywords = useMemo(
+    () => new Set(savedNamesQuery.data ?? []),
+    [savedNamesQuery.data],
+  );
+
   const { filteredRows, activeFilterCount } = useKeywordFiltering({
     groupKeywords,
     rows,
@@ -203,6 +228,8 @@ export function useKeywordResearchController(
     filters: filterValues,
     sortField: input.sortField,
     sortDir: input.sortDir,
+    savedKeywords,
+    hideSaved,
   });
 
   const { showApproximateMatchNotice, overviewKeyword } =
@@ -271,6 +298,9 @@ export function useKeywordResearchController(
     handleSaveKeywords,
     handleSearchSubmit,
     hasSearched,
+    hideSaved,
+    setHideSaved,
+    savedKeywords,
     history,
     historyLoaded,
     isLoading,

@@ -80,8 +80,7 @@ export function KeywordResearchPage(input: Props) {
   );
 
   const urlInput = useMemo<KeywordSearchTabInput | null>(() => {
-    const keywords = parseKeywordInput(input.keywordInput);
-    const keyword = keywords[0];
+    const keyword = parseKeywordInput(input.keywordInput).join(", ");
     if (!keyword) return null;
     return {
       type: "keyword",
@@ -138,21 +137,19 @@ export function KeywordResearchPage(input: Props) {
       const keywords = parseKeywordInput(value.keyword);
       if (keywords.length === 0) return;
 
-      const inputs: KeywordSearchTabInput[] = keywords.map((keyword) => ({
+      const tabInput: KeywordSearchTabInput = {
         type: "keyword",
-        keyword,
+        keyword: keywords.join(", "),
         locationCode: value.locationCode,
         locationName: value.locationName,
         resultLimit: value.resultLimit,
         mode: value.mode,
         clickstream: value.clickstream,
         groupKeywords: value.groupKeywords,
-      }));
+      };
 
-      for (const tabInput of inputs) {
-        searchTabs.openTab(tabInput);
-      }
-      navigateToKeywordInput(inputs.at(-1) ?? null);
+      searchTabs.openTab(tabInput);
+      navigateToKeywordInput(tabInput);
     },
     [navigateToKeywordInput, searchTabs],
   );

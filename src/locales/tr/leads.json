@@ -370,10 +370,18 @@
     "ready": "Rapor hazır. Linki maillere {{report_offer}} alanıyla eklenir.",
     "timeout": "Rapor çok uzun sürdü. Tekrar dene.",
     "failed": "Rapor oluşturulamadı.",
-    "hint": "Siteyi arka planda açar ve SEO & GEO eklentisiyle müşteri raporunu hazırlar.",
-    "needsExtension": "Rapor için SEO & GEO eklentisini kur veya güncelle (4.1+).",
+    "hint": "Müşteri raporunu son site taramasından sunucuda hazırlar. Eklenti gerekmez.",
     "viewsShort_one": "Rapor 1 kez açıldı",
-    "viewsShort_other": "Rapor {{count}} kez açıldı"
+    "viewsShort_other": "Rapor {{count}} kez açıldı",
+    "notScanned": "Bu lead henüz taranmadı. Önce tara, sonra raporu oluştur.",
+    "bulk": "Rapor oluştur",
+    "progress": "Raporlar hazırlanıyor {{done}}/{{total}}…",
+    "bulkDone_one": "1 rapor hazır",
+    "bulkDone_other": "{{count}} rapor hazır",
+    "bulkDoneSkipped_one": "1 rapor hazır, {{skipped}} lead atlandı (henüz taranmadı)",
+    "bulkDoneSkipped_other": "{{count}} rapor hazır, {{skipped}} lead atlandı (henüz taranmadı)",
+    "extension": "Detaylı rapor (eklenti)",
+    "extensionHint": "SEO & GEO eklentisiyle detaylı rapor. Siteyi tarayıcında açar, bu sekme açık kalmalı."
   },
   "findingWhy": {
     "no_website": "Haritada bulan müşterinin daha fazla bilgi alacağı veya satın alacağı bir yer yok, sitesi olan rakibe gidiyor.",
@@ -571,5 +579,14 @@
     "skipped": "Bu lead'e takip gönderilmeyecek",
     "markedReplied": "Yanıt verdi olarak işaretlendi",
     "sent": "Takip maili kaydedildi"
+  },
+  "serverReport": {
+    "title": "{{name}} için site analizi",
+    "health": "Site sağlığı",
+    "intro": "Siteyi taradık ve düzeltilmeye değer {{count}} nokta bulduk. Aşağıda en acil olandan başlayarak gruplandı.",
+    "noIssues": "Siteyi taradık, büyük bir sorun görünmüyor. Tebrikler.",
+    "why": "Neden önemli:",
+    "ctaTitle": "Bunları birlikte düzeltelim mi?",
+    "ctaBody": "Bu raporun geldiği maile yanıt verin, size adım adım bir plan çıkaralım."
   }
 }

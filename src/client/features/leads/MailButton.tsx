@@ -51,8 +51,7 @@ export function MailButton({
   const [confirming, setConfirming] = useState<MailTemplate | null>(null);
   const templates = useQuery(leadTemplatesOptions(projectId)).data ?? [];
   const phrases = useQuery(leadFindingPhrasesOptions(projectId)).data ?? [];
-  const email = lead.primaryEmail;
-  if (!email) return null;
+  const email = lead.primaryEmail ?? "";
   const prior = step === 1 ? lead.priorContact : null;
 
   const forStep = templates.filter((template) => template.step === step);

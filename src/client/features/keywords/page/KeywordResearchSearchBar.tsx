@@ -1,4 +1,5 @@
 import { Info, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { getFieldError } from "@/client/lib/forms";
 import { MAX_KEYWORDS_PER_SUBMIT } from "@/client/features/keywords/keywordResearchTypes";
 import { isLabsLocationCode } from "@/client/features/keywords/locations";
@@ -27,6 +28,7 @@ function getTextareaRows(value: string): number {
 
 export function KeywordResearchSearchBar({ controller }: Props) {
   const { controlsForm, handleSearchSubmit } = controller;
+  const { t } = useTranslation();
 
   return (
     // The city field opens an absolute menu below the row, so the card must
@@ -116,9 +118,16 @@ export function KeywordResearchSearchBar({ controller }: Props) {
           {(field) => {
             const keywordError = getFieldError(field.state.meta.errors);
 
-            return keywordError ? (
-              <p role="alert" className="text-sm text-destructive">
-                {keywordError}
+            if (keywordError) {
+              return (
+                <p role="alert" className="text-sm text-destructive">
+                  {keywordError}
+                </p>
+              );
+            }
+            return /[\n,]/.test(field.state.value.trim()) ? (
+              <p className="text-xs text-muted-foreground">
+                {t("keywordResearch.multiSeedHint")}
               </p>
             ) : null;
           }}

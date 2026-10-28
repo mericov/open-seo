@@ -130,6 +130,11 @@ export const saveLeadReportSchema = z.object({
   html: z.string().min(100).max(3_000_000),
 });
 
+export const generateLeadReportsSchema = z.object({
+  ...projectIdShape,
+  leadIds: z.array(z.string().min(1)).min(1).max(50),
+});
+
 export const setLeadScheduleSchema = z.object({
   ...projectIdShape,
   searchId: z.string().min(1),

@@ -1,4 +1,6 @@
-import { FileDown, Save, Sheet } from "lucide-react";
+import { Eye, EyeOff, FileDown, Save, Sheet } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/client/components/ui/button";
 import {
   lastTwelveMonths,
   MONTH_SHORT_LABELS,
@@ -123,6 +125,7 @@ function TableCard({ controller }: Props) {
   const { page, pageSize, pageRange, pageRows, setPage, setPageSize } =
     useKeywordResearchPagination(filteredRows);
   const keywordCount = filteredRows.length;
+  const { t } = useTranslation();
 
   const keywordCountLabel =
     selectedKeywordRows.length > 0
@@ -172,6 +175,7 @@ function TableCard({ controller }: Props) {
         isFiltered={activeFilterCount > 0}
         resetFilters={controller.resetFilters}
         handleRowClick={controller.handleRowClick}
+        savedKeywords={controller.savedKeywords}
         toolbar={
           <>
             <DataTableToolbar
@@ -190,6 +194,21 @@ function TableCard({ controller }: Props) {
                   controller.setShowFilters((current) => !current)
                 }
               />
+              {controller.savedKeywords.size > 0 ? (
+                <Button
+                  size="sm"
+                  variant={controller.hideSaved ? "secondary" : "outline"}
+                  aria-pressed={controller.hideSaved}
+                  onClick={() => controller.setHideSaved((current) => !current)}
+                >
+                  {controller.hideSaved ? (
+                    <EyeOff data-icon="inline-start" />
+                  ) : (
+                    <Eye data-icon="inline-start" />
+                  )}
+                  {t("keywordResearch.hideSaved")}
+                </Button>
+              ) : null}
               <span className="text-xs text-muted-foreground md:text-sm">
                 {keywordCountLabel}
               </span>

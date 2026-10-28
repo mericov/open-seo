@@ -20,6 +20,7 @@ import {
   listLeadFollowUpsSchema,
   recordLeadMailSchema,
   saveLeadReportSchema,
+  generateLeadReportsSchema,
   saveLeadTemplateSchema,
   saveLeadFindingPhraseSchema,
   listProjectLeadsSchema,
@@ -292,4 +293,11 @@ export const saveLeadReport = createServerFn({ method: "POST" })
   .validator(saveLeadReportSchema)
   .handler(async ({ data, context }) =>
     LeadReportService.save(context.projectId, data.leadId, data.html),
+  );
+
+export const generateLeadReports = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(generateLeadReportsSchema)
+  .handler(async ({ data, context }) =>
+    LeadReportService.generate(context.projectId, data.leadIds),
   );

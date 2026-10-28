@@ -232,7 +232,13 @@ const keywordSortFields = [
   "cpc",
   "competition",
   "keywordDifficulty",
+  "opportunity",
 ] as const;
+
+export const savedKeywordNamesSchema = z.object({
+  projectId: z.string().min(1),
+  locationCode: z.number().int().positive(),
+});
 
 const keywordModes = ["auto", "related", "suggestions", "ideas"] as const;
 

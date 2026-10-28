@@ -2,6 +2,7 @@ import {
   Ban,
   ChevronDown,
   EyeOff,
+  FileText,
   Mail,
   RefreshCw,
   Sparkles,
@@ -41,6 +42,8 @@ export function BulkBar({
   onSuppress,
   rescanning,
   onRescan,
+  reporting,
+  onReports,
   onStatus,
   onClear,
 }: {
@@ -54,6 +57,8 @@ export function BulkBar({
   onSuppress: () => void;
   rescanning: boolean;
   onRescan: () => void;
+  reporting: boolean;
+  onReports: () => void;
   onStatus: (status: LeadOutreachStatus) => void;
   onClear: () => void;
 }) {
@@ -81,6 +86,16 @@ export function BulkBar({
       >
         <Sparkles data-icon="inline-start" />
         {t("firstLine.write")}
+      </Button>
+      <Button
+        size="sm"
+        variant="outline"
+        className="rounded-full"
+        pending={reporting}
+        onClick={onReports}
+      >
+        <FileText data-icon="inline-start" />
+        {t("report.bulk")}
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger

@@ -344,6 +344,8 @@ export function AllLeadsView({ projectId }: { projectId: string }) {
         <BulkBar
           rescanning={actions.rescan.isPending}
           onRescan={() => actions.rescan.mutate([...selected])}
+          reporting={actions.reports.isPending}
+          onReports={() => actions.reports.mutate([...selected])}
           suppressing={actions.suppress.isPending}
           onSuppress={() => actions.suppress.mutate([...selected])}
           hiding={actions.hide.isPending}

@@ -6,6 +6,7 @@ import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import { chunk } from "remeda";
 import {
   generateLeadFirstLines,
+  generateLeadReports,
   recordLeadMail,
   rescanLeads,
   stopLeadFollowUp,
@@ -19,6 +20,8 @@ import {
   LEAD_FIRST_LINE_MAX_IDS,
   LEAD_RESCAN_MAX_IDS,
 } from "@/types/schemas/leads";
+
+const LEAD_REPORT_BATCH = 20;
 
 export function useLeadActions(projectId: string, onDone: () => void) {
   const { t } = useTranslation("leads");
@@ -99,6 +102,42 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     onSuccess: onDone,
   });
 
+  const reports = useMutation({
+    mutationFn: async (leadIds: string[]) => {
+      const toastId = toast.loading(
+        t("report.progress", { done: 0, total: leadIds.length }),
+      );
+      let done = 0;
+      let created = 0;
+      let skipped = 0;
+      try {
+        for (const ids of chunk(leadIds, LEAD_REPORT_BATCH)) {
+          const result = await generateLeadReports({
+            data: { projectId, leadIds: ids },
+          });
+          done += ids.length;
+          created += result.created;
+          skipped += result.skipped;
+          toast.loading(t("report.progress", { done, total: leadIds.length }), {
+            id: toastId,
+          });
+        }
+        toast.success(
+          skipped
+            ? t("report.bulkDoneSkipped", { count: created, skipped })
+            : t("report.bulkDone", { count: created }),
+          { id: toastId },
+        );
+      } catch (error) {
+        toast.error(`${t("report.failed")} ${getStandardErrorMessage(error)}`, {
+          id: toastId,
+        });
+      }
+      await refresh();
+    },
+    onSuccess: onDone,
+  });
+
   const writeLines = (leadIds: string[]) => {
     if (leadIds.length > LEAD_FIRST_LINE_MAX_IDS) {
       toast.error(t("firstLine.tooMany", { max: LEAD_FIRST_LINE_MAX_IDS }));
@@ -131,6 +170,7 @@ export function useLeadActions(projectId: string, onDone: () => void) {
     hide,
     suppress,
     rescan,
+    reports,
     recordMail,
     stopFollowUp,
   };

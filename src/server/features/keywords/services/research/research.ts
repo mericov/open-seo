@@ -268,6 +268,10 @@ export async function research(
     throw new AppError("VALIDATION_ERROR");
   }
 
+  if (uniqueKeywords.length > 1 && !input.locationName) {
+    return researchSeeds(input, uniqueKeywords, billingCustomer, creditFeature);
+  }
+
   const seedKeyword = uniqueKeywords[0];
   const provider = getKeywordDataProvider(input.locationCode);
   // Labs source modes, clickstream, and synonym filtering don't exist for
@@ -333,6 +337,42 @@ export async function research(
     void persistRows(effectiveInput, result.rows);
 
   return result;
+}
+
+async function researchSeeds(
+  input: ResolvedResearchKeywordsInput,
+  seeds: string[],
+  billingCustomer: BillingCustomerContext,
+  creditFeature?: CreditFeature,
+): Promise<ResearchResult> {
+  const settled = await Promise.allSettled(
+    seeds.map((seed) =>
+      research({ ...input, keywords: [seed] }, billingCustomer, creditFeature),
+    ),
+  );
+  const results = settled.flatMap((entry) =>
+    entry.status === "fulfilled" ? [entry.value] : [],
+  );
+  const failed = settled.find((entry) => entry.status === "rejected");
+  if (results.length === 0 && failed) throw failed.reason;
+
+  const rows: EnrichedKeyword[] = [];
+  const seen = new Set<string>();
+  const longest = Math.max(...results.map((result) => result.rows.length));
+  for (let i = 0; i < longest; i++) {
+    for (const result of results) {
+      const row = result.rows[i];
+      if (!row || seen.has(row.keyword)) continue;
+      seen.add(row.keyword);
+      rows.push(row);
+    }
+  }
+  const sources = new Set(results.map((result) => result.source));
+  return {
+    rows,
+    source: sources.size === 1 ? results[0].source : "blended",
+    usedFallback: results.some((result) => result.usedFallback),
+  };
 }
 
 /**

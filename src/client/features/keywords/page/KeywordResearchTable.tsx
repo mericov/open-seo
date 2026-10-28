@@ -21,6 +21,9 @@ import { ScoreBadge } from "@/client/components/table/ScoreBadge";
 import { formatNumber } from "@/client/features/keywords/utils";
 import type { KeywordResearchDisplayRow } from "@/client/features/keywords/groupSharedVolumeRows";
 import type { KeywordResearchRow } from "@/types/keywords";
+import { useTranslation } from "react-i18next";
+import { Badge } from "@/client/components/ui/badge";
+import { keywordOpportunity } from "@/shared/keywordOpportunity";
 
 type Props = {
   filteredRows: KeywordResearchDisplayRow[];
@@ -35,9 +38,17 @@ type Props = {
   handleRowClick: (row: KeywordResearchRow) => void;
   toolbar: ReactNode;
   footer: ReactNode;
+  savedKeywords: Set<string>;
 };
 
 const keywordColumnHelper = createColumnHelper<KeywordResearchDisplayRow>();
+
+const opportunityClass = (score: number) =>
+  score >= 60
+    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+    : score >= 40
+      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+      : "bg-muted text-muted-foreground";
 
 export function KeywordResearchTable({
   filteredRows,
@@ -52,7 +63,9 @@ export function KeywordResearchTable({
   handleRowClick,
   toolbar,
   footer,
+  savedKeywords,
 }: Props) {
+  const { t } = useTranslation();
   const selectAnchorRef = useSelectionAnchor();
   const rowSelection = useMemo<RowSelectionState>(
     () =>
@@ -89,6 +102,15 @@ export function KeywordResearchTable({
                   : row.original.keyword
               }
             >
+              {savedKeywords.has(row.original.keyword) ? (
+                <Badge
+                  variant="secondary"
+                  className="mr-1.5 align-middle normal-case"
+                  title={t("keywordResearch.savedHint")}
+                >
+                  {t("keywordResearch.saved")}
+                </Badge>
+              ) : null}
               {row.original.keyword}
             </span>
           </div>
@@ -168,6 +190,28 @@ export function KeywordResearchTable({
         cell: ({ getValue }) => <ScoreBadge value={getValue()} />,
         meta: { headerClassName: "text-right", cellClassName: "text-right" },
       }),
+      keywordColumnHelper.display({
+        id: "opportunity",
+        header: () => (
+          <SortableHeader
+            column={sortColumn("opportunity")}
+            label={t("keywordResearch.opportunity")}
+            helpText={t("keywordResearch.opportunityHelp")}
+            align="right"
+          />
+        ),
+        cell: ({ row }) => {
+          const score = keywordOpportunity(row.original);
+          return (
+            <span
+              className={`inline-block min-w-9 rounded-full px-2 py-0.5 text-center text-xs font-medium tabular-nums ${opportunityClass(score)}`}
+            >
+              {score}
+            </span>
+          );
+        },
+        meta: { headerClassName: "text-right", cellClassName: "text-right" },
+      }),
       keywordColumnHelper.accessor("intent", {
         header: "Intent",
         cell: ({ getValue }) => <IntentBadge intent={getValue()} />,
@@ -177,7 +221,7 @@ export function KeywordResearchTable({
         },
       }),
     ];
-  }, [selectAnchorRef, sortDir, sortField, toggleSort]);
+  }, [savedKeywords, selectAnchorRef, sortDir, sortField, t, toggleSort]);
   const table = useDataTable({
     data: filteredRows,
     columns,

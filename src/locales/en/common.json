@@ -136,5 +136,13 @@
       "subdomains": "The domain plus all its subdomains"
     }
   },
-  "copyFailed": "Could not copy to clipboard"
+  "copyFailed": "Could not copy to clipboard",
+  "keywordResearch": {
+    "saved": "Saved",
+    "savedHint": "Already in your saved keywords",
+    "hideSaved": "Hide saved",
+    "opportunity": "Opportunity",
+    "opportunityHelp": "0-100. Higher means a better bet: decent volume, low difficulty, buyer intent and a CPC that shows commercial value.",
+    "multiSeedHint": "Add up to 5 keywords. Each one is searched and the results are merged into one list without duplicates."
+  }
 }

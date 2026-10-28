@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Eye, ExternalLink, FileText, RefreshCw } from "lucide-react";
+import { Eye, ExternalLink, FileText, Puzzle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/client/components/ui/button";
@@ -9,7 +9,7 @@ import {
   type ProjectLeadRow,
 } from "@/client/features/leads/leadQueries";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
-import { saveLeadReport } from "@/serverFunctions/leads";
+import { generateLeadReports, saveLeadReport } from "@/serverFunctions/leads";
 import { LEAD_REPORT_PATH } from "@/shared/leadEmail";
 
 const REPORT_TIMEOUT_MS = 180_000;
@@ -116,28 +116,45 @@ export function ReportButton({
   const queryClient = useQueryClient();
   const version = useExtensionVersion();
 
+  const onReady = async () => {
+    toast.success(t("report.ready"));
+    await queryClient.invalidateQueries({
+      queryKey: leadsQueryKey(projectId),
+    });
+  };
+  const onFailed = (error: Error) =>
+    toast.error(
+      error.message === "timeout"
+        ? t("report.timeout")
+        : error.message === "not-scanned"
+          ? t("report.notScanned")
+          : `${t("report.failed")} ${getStandardErrorMessage(error)}`,
+    );
+
   const mutation = useMutation({
+    mutationFn: async () => {
+      const result = await generateLeadReports({
+        data: { projectId, leadIds: [lead.id] },
+      });
+      if (result.created === 0) throw new Error("not-scanned");
+    },
+    onSuccess: onReady,
+    onError: onFailed,
+  });
+
+  const extension = useMutation({
     mutationFn: async () => {
       if (!lead.website) throw new Error("no-website");
       const html = await requestReport(lead.website, lead.language);
       return saveLeadReport({ data: { projectId, leadId: lead.id, html } });
     },
-    onSuccess: async () => {
-      toast.success(t("report.ready"));
-      await queryClient.invalidateQueries({
-        queryKey: leadsQueryKey(projectId),
-      });
-    },
-    onError: (error) =>
-      toast.error(
-        error instanceof Error && error.message === "timeout"
-          ? t("report.timeout")
-          : `${t("report.failed")} ${getStandardErrorMessage(error)}`,
-      ),
+    onSuccess: onReady,
+    onError: onFailed,
   });
 
   if (!lead.website) return null;
   const url = reportUrlFor(lead.reportToken);
+  const busy = mutation.isPending || extension.isPending;
 
   return (
     <div className="flex shrink-0 items-center gap-1">
@@ -161,13 +178,9 @@ export function ReportButton({
           size="icon-sm"
           variant="ghost"
           className="rounded-full"
-          disabled={!version}
+          disabled={busy}
           aria-label={t("report.refresh")}
-          title={
-            version
-              ? `${t("report.refresh")} · ${t("report.hint")}`
-              : t("report.needsExtension")
-          }
+          title={`${t("report.refresh")} · ${t("report.hint")}`}
           pending={mutation.isPending}
           onClick={() => mutation.mutate()}
         >
@@ -178,8 +191,8 @@ export function ReportButton({
           size="sm"
           variant="ghost"
           className="rounded-full"
-          disabled={!version}
-          title={version ? t("report.hint") : t("report.needsExtension")}
+          disabled={busy}
+          title={t("report.hint")}
           pending={mutation.isPending}
           onClick={() => mutation.mutate()}
         >
@@ -187,6 +200,20 @@ export function ReportButton({
           {t("report.create")}
         </Button>
       )}
+      {version ? (
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          className="rounded-full"
+          disabled={busy}
+          aria-label={t("report.extension")}
+          title={t("report.extensionHint")}
+          pending={extension.isPending}
+          onClick={() => extension.mutate()}
+        >
+          <Puzzle />
+        </Button>
+      ) : null}
     </div>
   );
 }

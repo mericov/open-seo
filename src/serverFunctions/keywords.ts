@@ -7,6 +7,7 @@ import {
   exportSavedKeywordsSchema,
   removeSavedKeywordsSchema,
   refreshSavedKeywordMetricsSchema,
+  savedKeywordNamesSchema,
   serpAnalysisSchema,
   updateSavedKeywordTagSchema,
   updateSavedKeywordTagsSchema,
@@ -50,6 +51,16 @@ export const saveKeywords = createServerFn({ method: "POST" })
       projectId: context.projectId,
     });
   });
+
+export const getSavedKeywordNames = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(savedKeywordNamesSchema)
+  .handler(async ({ data, context }) =>
+    KeywordResearchService.listSavedKeywordNames(
+      context.projectId,
+      data.locationCode,
+    ),
+  );
 
 export const getSavedKeywords = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)

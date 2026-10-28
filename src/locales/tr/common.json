@@ -136,5 +136,13 @@
       "subdomains": "Domain ve tüm alt domain'leri"
     }
   },
-  "copyFailed": "Panoya kopyalanamadı"
+  "copyFailed": "Panoya kopyalanamadı",
+  "keywordResearch": {
+    "saved": "Kayıtlı",
+    "savedHint": "Kaydettiğin keyword'ler arasında zaten var",
+    "hideSaved": "Kayıtlıları gizle",
+    "opportunity": "Fırsat",
+    "opportunityHelp": "0-100. Yüksek puan daha iyi fırsat demek: makul hacim, düşük zorluk, satın alma niyeti ve ticari değer gösteren CPC.",
+    "multiSeedHint": "En fazla 5 keyword yazabilirsin. Her biri ayrı aranır, sonuçlar tekrarsız tek listede birleşir."
+  }
 }
