@@ -32,7 +32,7 @@ type BlogPostReportRow = StoredBlogPost & {
   status: BlogPostStatus;
 };
 
-function normalizePageUrl(url: string): string {
+export function normalizePageUrl(url: string): string {
   try {
     const parsed = new URL(url);
     const path = parsed.pathname.replace(/\/+$/, "") || "/";
@@ -42,7 +42,7 @@ function normalizePageUrl(url: string): string {
   }
 }
 
-function toMetricsByUrl(rows: GscSearchAnalyticsRow[]) {
+export function toMetricsByUrl(rows: GscSearchAnalyticsRow[]) {
   const totals = new Map<
     string,
     { clicks: number; impressions: number; weightedPosition: number }

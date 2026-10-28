@@ -1,10 +1,17 @@
 import { z } from "zod";
+import { TRACKED_PAGE_KINDS } from "@/shared/pageTracking";
 
 export const BLOG_TRACKING_RANGES = [
+  "last_7_days",
   "last_28_days",
   "last_3_months",
   "last_6_months",
+  "last_12_months",
 ] as const;
+
+export const BLOG_TRACKING_VIEWS = ["blog", "category", "alerts"] as const;
+
+export type BlogTrackingView = (typeof BLOG_TRACKING_VIEWS)[number];
 
 export type BlogTrackingDateRange = (typeof BLOG_TRACKING_RANGES)[number];
 
@@ -51,11 +58,22 @@ export const blogTrackingReportSchema = z.object({
   dateRange: z.enum(BLOG_TRACKING_RANGES).default("last_28_days"),
 });
 
-export const blogPostQueriesSchema = z.object({
+export const pageInsightsSchema = z.object({
   ...projectIdShape,
-  url: z.string().trim().min(1).max(2048),
+  id: z.string().min(1),
   dateRange: z.enum(BLOG_TRACKING_RANGES).default("last_28_days"),
 });
+
+export const pageAdviceRequestSchema = pageInsightsSchema.extend({
+  language: z.enum(["tr", "en"]).default("en"),
+});
+
+export const markPageAlertsSeenSchema = z.object({
+  ...projectIdShape,
+  ids: z.array(z.string().min(1)).min(1).max(300),
+});
+
+export const runPageCheckSchema = z.object(projectIdShape);
 
 export const addBlogPostsSchema = z.object({
   ...projectIdShape,
@@ -66,6 +84,7 @@ export const addBlogPostsSchema = z.object({
         title: optionalText(300),
         targetKeyword: optionalText(200),
         publishedAt: optionalDate,
+        kind: z.enum(TRACKED_PAGE_KINDS).default("blog"),
       }),
     )
     .min(1)

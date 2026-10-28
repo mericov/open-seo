@@ -21,6 +21,7 @@ import {
 } from "@/client/features/blog-tracking/blogTrackingQueries";
 import { formatNumber } from "@/i18n/format";
 import { addBlogPosts } from "@/serverFunctions/blogTracking";
+import type { TrackedPageKind } from "@/shared/pageTracking";
 
 type ParsedPost = { url: string; targetKeyword?: string };
 
@@ -48,10 +49,12 @@ function parseLines(text: string) {
 
 export function AddBlogPostsDialog({
   projectId,
+  kind,
   suggestions,
   onClose,
 }: {
   projectId: string;
+  kind: TrackedPageKind;
   suggestions: BlogSuggestion[];
   onClose: () => void;
 }) {
@@ -71,7 +74,10 @@ export function AddBlogPostsDialog({
   ];
 
   const mutation = useMutation({
-    mutationFn: () => addBlogPosts({ data: { projectId, posts } }),
+    mutationFn: () =>
+      addBlogPosts({
+        data: { projectId, posts: posts.map((post) => ({ ...post, kind })) },
+      }),
     meta: { errorToast: false },
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({
@@ -114,16 +120,26 @@ export function AddBlogPostsDialog({
     >
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{t("add.title")}</DialogTitle>
-          <DialogDescription>{t("add.urlsHint")}</DialogDescription>
+          <DialogTitle>
+            {t(kind === "blog" ? "add.title" : "add.categoryTitle")}
+          </DialogTitle>
+          <DialogDescription>
+            {t(kind === "blog" ? "add.urlsHint" : "add.categoryUrlsHint")}
+          </DialogDescription>
         </DialogHeader>
         <Field>
-          <FieldLabel htmlFor="blog-post-urls">{t("add.urlsLabel")}</FieldLabel>
+          <FieldLabel htmlFor="blog-post-urls">
+            {t(kind === "blog" ? "add.urlsLabel" : "add.categoryUrlsLabel")}
+          </FieldLabel>
           <Textarea
             id="blog-post-urls"
             rows={5}
             value={text}
-            placeholder={t("add.urlsPlaceholder")}
+            placeholder={t(
+              kind === "blog"
+                ? "add.urlsPlaceholder"
+                : "add.categoryUrlsPlaceholder",
+            )}
             onChange={(event) => setText(event.target.value)}
             className="font-mono text-xs"
           />
@@ -196,7 +212,9 @@ export function AddBlogPostsDialog({
             pending={mutation.isPending}
             disabled={posts.length === 0}
           >
-            {t("add.submit", { count: posts.length })}
+            {t(kind === "blog" ? "add.submit" : "add.categorySubmit", {
+              count: posts.length,
+            })}
           </Button>
         </DialogFooter>
       </DialogContent>

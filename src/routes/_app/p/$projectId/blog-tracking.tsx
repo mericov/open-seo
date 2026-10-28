@@ -5,33 +5,47 @@ import {
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { BlogTrackingPage } from "@/client/features/blog-tracking/BlogTrackingPage";
-import { BLOG_TRACKING_RANGES } from "@/types/schemas/blog-tracking";
+import {
+  BLOG_TRACKING_RANGES,
+  BLOG_TRACKING_VIEWS,
+} from "@/types/schemas/blog-tracking";
 
 const searchSchema = z.object({
   range: z
     .enum(BLOG_TRACKING_RANGES)
     .default("last_28_days")
     .catch("last_28_days"),
+  view: z.enum(BLOG_TRACKING_VIEWS).default("blog").catch("blog"),
 });
 
 export const Route = createFileRoute("/_app/p/$projectId/blog-tracking")({
   validateSearch: searchSchema,
   search: {
-    middlewares: [stripSearchParams({ range: "last_28_days" })],
+    middlewares: [stripSearchParams({ range: "last_28_days", view: "blog" })],
   },
   component: BlogTrackingRoute,
 });
 
 function BlogTrackingRoute() {
   const { projectId } = Route.useParams();
-  const { range } = Route.useSearch();
+  const { range, view } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   return (
     <BlogTrackingPage
       projectId={projectId}
       dateRange={range}
+      view={view}
       onDateRangeChange={(next) => {
-        void navigate({ search: { range: next }, replace: true });
+        void navigate({
+          search: (prev) => ({ ...prev, range: next }),
+          replace: true,
+        });
+      }}
+      onViewChange={(next) => {
+        void navigate({
+          search: (prev) => ({ ...prev, view: next }),
+          replace: true,
+        });
       }}
     />
   );

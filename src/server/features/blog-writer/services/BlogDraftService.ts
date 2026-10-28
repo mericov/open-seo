@@ -342,6 +342,7 @@ async function markPublished(
       title: draft.title,
       targetKeyword: draft.targetKeyword,
       publishedAt: new Date().toISOString().slice(0, 10),
+      kind: "blog",
     },
   ]);
   return { ok: true as const };

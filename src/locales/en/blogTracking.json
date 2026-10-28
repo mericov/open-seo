@@ -1,11 +1,13 @@
 {
   "title": "Blog Tracking",
-  "description": "Follow every post's clicks, impressions and ranking from Google Search Console, and spot the ones that need a refresh.",
+  "description": "Follow clicks, keywords and rankings for your blog posts and category pages from Search Console. Every page is checked weekly, drops raise alerts, and each page gets an SEO and GEO to-do list.",
   "addPosts": "Add posts",
   "ranges": {
+    "last_7_days": "Last 7 days",
     "last_28_days": "Last 28 days",
     "last_3_months": "Last 3 months",
-    "last_6_months": "Last 6 months"
+    "last_6_months": "Last 6 months",
+    "last_12_months": "Last 12 months"
   },
   "rangeLabel": "Date range",
   "connectHint": "Connect Google Search Console to see each post's traffic. You can add posts now; their data appears once Search Console is connected.",
@@ -14,7 +16,9 @@
     "total": "Tracked posts",
     "clicks": "Clicks",
     "rising": "Rising",
-    "declining": "Need a refresh"
+    "declining": "Need a refresh",
+    "totalCategories": "Tracked categories",
+    "aiSessions": "Visits from AI"
   },
   "status": {
     "new": "New",
@@ -32,31 +36,36 @@
     "ctr": "CTR",
     "position": "Avg. position",
     "targetKeyword": "Target keyword",
-    "actions": "Actions"
+    "actions": "Actions",
+    "category": "Category",
+    "ai": "AI"
   },
   "noTarget": "Not set",
   "notRanking": "Not ranking",
   "positionValue": "#{{position}}",
   "empty": {
     "title": "No posts tracked yet",
-    "description": "Add your blog posts to follow their traffic and rankings over time."
+    "description": "Blog posts that get impressions in Search Console are added automatically by the weekly check. You can also add them by hand now.",
+    "categoryTitle": "No categories tracked yet",
+    "categoryDescription": "Category pages that get impressions in Search Console are added automatically by the weekly check. You can also add them by hand now."
   },
   "row": {
-    "showQueries": "Show queries",
-    "hideQueries": "Hide queries",
+    "showQueries": "Show details",
+    "hideQueries": "Hide details",
     "edit": "Edit",
     "remove": "Remove",
-    "removeConfirm": "Remove this post from tracking?",
-    "removed": "Post removed from tracking",
+    "removeConfirm": "Stop tracking this page? It won't be added back automatically.",
+    "removed": "Page removed from tracking",
     "openPost": "Open post",
-    "actionsFor": "Actions for {{title}}"
+    "actionsFor": "Actions for {{title}}",
+    "auto": "auto",
+    "aiTitle": "{{sessions}} visits from AI, cited {{citations}} times in AI answers"
   },
   "queries": {
-    "title": "Top queries for this post",
-    "loading": "Loading queries…",
+    "title": "Keywords bringing clicks and impressions (vs previous period)",
     "empty": "No search queries for this post in this period.",
-    "failed": "Couldn't load queries.",
-    "query": "Query"
+    "query": "Query",
+    "newKeyword": "new"
   },
   "add": {
     "title": "Add blog posts",
@@ -72,7 +81,13 @@
     "nothingToAdd": "Enter at least one URL or pick a suggested page.",
     "invalidLines": "Some lines aren't valid URLs: {{lines}}",
     "added_one": "{{count}} post added",
-    "added_other": "{{count}} posts added"
+    "added_other": "{{count}} posts added",
+    "categoryTitle": "Add category pages",
+    "categoryUrlsHint": "One category URL per line. Optionally add the target keyword after a comma: https://site.com/collections/tote-bags, tote bags",
+    "categoryUrlsLabel": "Category URLs",
+    "categoryUrlsPlaceholder": "https://example.com/collections/category\nhttps://example.com/collections/other-category, target keyword",
+    "categorySubmit_one": "Add {{count}} category",
+    "categorySubmit_other": "Add {{count}} categories"
   },
   "edit": {
     "title": "Edit post",
@@ -83,5 +98,127 @@
     "publishedAtLabel": "Published on",
     "publishedAtHint": "Posts published in the last 30 days are marked as new.",
     "saved": "Post updated"
+  },
+  "addCategories": "Add categories",
+  "views": {
+    "blog": "Blog posts",
+    "category": "Categories",
+    "alerts": "Alerts"
+  },
+  "check": {
+    "run": "Check now",
+    "done": "Check finished, data is up to date.",
+    "partial": "Loading past weeks. The rest finishes on the next check, or press it again.",
+    "lastWeek": "Last weekly check: week of {{week}}. Pages are checked automatically every week.",
+    "never": "No weekly check yet. If Search Console is connected the first one runs tonight, or press \"Check now\"."
+  },
+  "trend": {
+    "title": "Weekly clicks (last 12 months)",
+    "weekOf": "Week of {{week}}"
+  },
+  "priority": {
+    "title": "Update these first",
+    "lost": "lost {{clicks}} clicks",
+    "close": "position {{position}}, close to top 3"
+  },
+  "insights": {
+    "loading": "Reviewing the page…",
+    "failed": "Couldn't load page details.",
+    "weekly": "Weekly clicks",
+    "noHistory": "Weekly data appears after the first check.",
+    "keywordTodo": "Keyword to-dos",
+    "noOpportunities": "No standout keyword opportunity right now.",
+    "links": "Internal link suggestions",
+    "noLinks": "No good internal link suggestions for this page.",
+    "linkOut": "Link from this page to:",
+    "linkIn": "Link to this page from these posts:",
+    "seoChecks": "SEO check",
+    "geoChecks": "GEO check (AI search)",
+    "unreachable": "The page couldn't be opened, so page checks were skipped."
+  },
+  "opportunity": {
+    "addToHeadings": "\"{{query}}\" ranks {{position}} with {{impressions}} impressions but isn't in the title or subheadings. Add it to the title or an H2.",
+    "expand": "\"{{query}}\" ranks {{position}} ({{impressions}} impressions). Expand the section on it to reach the top 3.",
+    "lowCtr": "\"{{query}}\" ranks {{position}} but gets few clicks. Rewrite the title and meta description to earn the click.",
+    "competing": "Another page on your site competes for \"{{query}}\": {{url}}. Pick the one to rank, link to it from the other, or separate their topics."
+  },
+  "checks": {
+    "score": "{{passed}}/{{total}} checks passed",
+    "allGood": "All good.",
+    "title_length": "The title is {{value}} characters. Keep it between 30 and 65.",
+    "meta_description": "The meta description is {{value}} characters. Write a 70–160 character description that earns the click.",
+    "single_h1": "The page has {{value}} H1 headings. It should have exactly one.",
+    "article_schema": "No Article/BlogPosting schema. Add it so Google and AI assistants understand the post.",
+    "category_schema": "No CollectionPage, ItemList or BreadcrumbList schema. Add it to the category page.",
+    "image_alt": "{{value}} images have no alt text. Add short alt text describing each image.",
+    "word_count": "The page has {{value}} words, thin for the topic. Expand the content.",
+    "canonical": "The canonical tag is missing or points to another URL.",
+    "indexed": "Google doesn't seem to have indexed this page. Request indexing in Search Console.",
+    "faq": "No FAQ section. Add one to raise the chance of being quoted in AI answers.",
+    "question_headings": "{{value}} subheadings are phrased as questions. Use the questions people ask as H2/H3s.",
+    "lists_tables": "No lists or tables in the content. Give steps and comparisons as lists or tables; AI assistants quote them easily.",
+    "author": "No author shown. Name the author; it's a trust signal.",
+    "dates": "No publish or update date found. Show it on the page and in schema.",
+    "fresh": "The content hasn't been updated in {{value}} days. Refresh it and update the modified date.",
+    "citations": "{{value}} links to outside sources. Cite 2–3 trusted sources; AI assistants favor sourced content."
+  },
+  "linkKinds": {
+    "blog": "Post",
+    "category": "Category",
+    "product": "Product"
+  },
+  "geo": {
+    "aiSessions": "{{sessions}} visits from AI assistants this period: {{sources}}.",
+    "noAiSessions": "No visits from AI assistants this period (needs Google Analytics connected).",
+    "citations": "Cited {{count}} times in AI Visibility runs: {{engines}}.",
+    "noCitations": "Not cited as a source in AI Visibility runs yet."
+  },
+  "engines": {
+    "chatgpt": "ChatGPT",
+    "gemini": "Gemini",
+    "google_ai_overview": "Google AI Overview",
+    "claude": "Claude",
+    "perplexity": "Perplexity"
+  },
+  "advice": {
+    "title": "AI advice",
+    "hintBlog": "Get title, meta description, keyword, section, link and FAQ suggestions for this post. It's generated once when you press the button and saved.",
+    "hintCategory": "Get title, meta description, category copy, keyword and link suggestions for this category. It's generated once when you press the button and saved.",
+    "generate": "Get advice",
+    "regenerate": "Regenerate",
+    "titles": "Title ideas",
+    "metaDescriptions": "Meta description ideas",
+    "actions": "To-dos",
+    "faq": "Questions to answer",
+    "areas": {
+      "keywords": "Keyword",
+      "content": "Content",
+      "links": "Links",
+      "technical": "Technical",
+      "geo": "GEO"
+    }
+  },
+  "alerts": {
+    "emptyTitle": "No open alerts",
+    "emptyDescription": "Pages whose clicks drop, rankings slip or keywords are lost in the weekly check show up here.",
+    "hint": "The last 4 weeks are compared with the 4 weeks before.",
+    "markAll": "Mark all as seen",
+    "markSeen": "Seen",
+    "week": "Check for week of {{week}}",
+    "kinds": {
+      "clicks_drop": "Clicks dropped",
+      "position_drop": "Ranking dropped",
+      "keyword_lost": "Keyword lost",
+      "no_impressions": "Not showing",
+      "rising": "Rising"
+    },
+    "messages": {
+      "clicks_drop": "Clicks {{previous}} → {{current}}.",
+      "position_drop": "Average position {{previous}} → {{current}}.",
+      "keyword_lost": "\"{{query}}\" fell from position {{previous}} to {{current}}.",
+      "keyword_gone": "\"{{query}}\" no longer ranks (was position {{previous}}).",
+      "no_impressions": "No Google impressions in the last 4 weeks.",
+      "rising": "Clicks {{previous}} → {{current}}. Look for follow-up content ideas."
+    }
   }
 }

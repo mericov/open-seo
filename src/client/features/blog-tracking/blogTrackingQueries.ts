@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
-  getBlogPostQueries,
   getBlogTrackingReport,
+  getPageInsights,
 } from "@/serverFunctions/blogTracking";
 import type { BlogTrackingDateRange } from "@/types/schemas/blog-tracking";
 
@@ -20,14 +20,23 @@ export function blogTrackingReportOptions(
   });
 }
 
-export function blogPostQueriesOptions(
+export function pageInsightsQueryKey(
   projectId: string,
-  url: string,
+  id: string,
+  dateRange: BlogTrackingDateRange,
+) {
+  return [...blogTrackingQueryKey(projectId), "insights", id, dateRange];
+}
+
+export function pageInsightsOptions(
+  projectId: string,
+  id: string,
   dateRange: BlogTrackingDateRange,
 ) {
   return queryOptions({
-    queryKey: [...blogTrackingQueryKey(projectId), "queries", url, dateRange],
-    queryFn: () => getBlogPostQueries({ data: { projectId, url, dateRange } }),
+    queryKey: pageInsightsQueryKey(projectId, id, dateRange),
+    queryFn: () => getPageInsights({ data: { projectId, id, dateRange } }),
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -36,3 +45,5 @@ export type BlogTrackingReport = Awaited<
 >;
 export type BlogPostRow = BlogTrackingReport["posts"][number];
 export type BlogSuggestion = BlogTrackingReport["suggestions"][number];
+export type PageAlert = BlogTrackingReport["alerts"][number];
+export type PageInsights = Awaited<ReturnType<typeof getPageInsights>>;

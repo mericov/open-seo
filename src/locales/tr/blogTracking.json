@@ -1,11 +1,13 @@
 {
   "title": "Blog Takibi",
-  "description": "Her yazının tıklama, gösterim ve sıralamasını Google Search Console'dan takip edin, yenilenmesi gereken yazıları kolayca görün.",
+  "description": "Bloglarınızın ve kategori sayfalarınızın tıklama, keyword ve sıralamalarını Search Console'dan takip edin. Her hafta otomatik kontrol edilir, düşenler alarm verir, her sayfa için SEO ve GEO yapılacakları çıkar.",
   "addPosts": "Yazı ekle",
   "ranges": {
+    "last_7_days": "Son 7 gün",
     "last_28_days": "Son 28 gün",
     "last_3_months": "Son 3 ay",
-    "last_6_months": "Son 6 ay"
+    "last_6_months": "Son 6 ay",
+    "last_12_months": "Son 12 ay"
   },
   "rangeLabel": "Tarih aralığı",
   "connectHint": "Yazılarınızın trafiğini görmek için Google Search Console'u bağlayın. Yazılarınızı şimdiden ekleyebilirsiniz, Search Console bağlandığında verileri görünecek.",
@@ -14,7 +16,9 @@
     "total": "Takip edilen yazı",
     "clicks": "Tıklama",
     "rising": "Yükselişte",
-    "declining": "Yenilenmeli"
+    "declining": "Yenilenmeli",
+    "totalCategories": "Takip edilen kategori",
+    "aiSessions": "AI'dan gelen ziyaret"
   },
   "status": {
     "new": "Yeni",
@@ -32,31 +36,36 @@
     "ctr": "CTR",
     "position": "Ort. pozisyon",
     "targetKeyword": "Hedef keyword",
-    "actions": "İşlemler"
+    "actions": "İşlemler",
+    "category": "Kategori",
+    "ai": "AI"
   },
   "noTarget": "Belirlenmedi",
   "notRanking": "Sıralamada yok",
   "positionValue": "{{position}}. sıra",
   "empty": {
     "title": "Henüz takip edilen yazı yok",
-    "description": "Trafiklerini ve sıralamalarını zaman içinde izlemek için blog yazılarınızı ekleyin."
+    "description": "Search Console'da gösterim alan blog yazıları haftalık kontrolde otomatik eklenir. İsterseniz şimdi elle de ekleyebilirsiniz.",
+    "categoryTitle": "Henüz takip edilen kategori yok",
+    "categoryDescription": "Search Console'da gösterim alan kategori sayfaları haftalık kontrolde otomatik eklenir. İsterseniz şimdi elle de ekleyebilirsiniz."
   },
   "row": {
-    "showQueries": "Sorguları göster",
-    "hideQueries": "Sorguları gizle",
+    "showQueries": "Detayları göster",
+    "hideQueries": "Detayları gizle",
     "edit": "Düzenle",
     "remove": "Kaldır",
-    "removeConfirm": "Bu yazı takipten kaldırılsın mı?",
-    "removed": "Yazı takipten kaldırıldı",
+    "removeConfirm": "Bu sayfa takipten kaldırılsın mı? Otomatik olarak tekrar eklenmez.",
+    "removed": "Sayfa takipten kaldırıldı",
     "openPost": "Yazıyı aç",
-    "actionsFor": "{{title}} için işlemler"
+    "actionsFor": "{{title}} için işlemler",
+    "auto": "otomatik",
+    "aiTitle": "AI'dan {{sessions}} ziyaret, AI cevaplarında {{citations}} kez kaynak"
   },
   "queries": {
-    "title": "Bu yazının en çok trafik getiren sorguları",
-    "loading": "Sorgular yükleniyor…",
+    "title": "Tıklama ve gösterim getiren keyword'ler (önceki döneme göre)",
     "empty": "Bu dönemde bu yazı için arama sorgusu yok.",
-    "failed": "Sorgular yüklenemedi.",
-    "query": "Sorgu"
+    "query": "Sorgu",
+    "newKeyword": "yeni"
   },
   "add": {
     "title": "Blog yazısı ekle",
@@ -72,7 +81,13 @@
     "nothingToAdd": "En az bir adres girin veya önerilen bir sayfa seçin.",
     "invalidLines": "Bazı satırlar geçerli bir adres değil: {{lines}}",
     "added_one": "{{count}} yazı eklendi",
-    "added_other": "{{count}} yazı eklendi"
+    "added_other": "{{count}} yazı eklendi",
+    "categoryTitle": "Kategori sayfası ekle",
+    "categoryUrlsHint": "Her satıra bir kategori adresi. İsterseniz virgülden sonra hedef keyword'ü ekleyin: https://site.com/collections/bez-canta, bez çanta",
+    "categoryUrlsLabel": "Kategori adresleri",
+    "categoryUrlsPlaceholder": "https://ornek.com/collections/kategori\nhttps://ornek.com/collections/diger-kategori, hedef keyword",
+    "categorySubmit_one": "{{count}} kategori ekle",
+    "categorySubmit_other": "{{count}} kategori ekle"
   },
   "edit": {
     "title": "Yazıyı düzenle",
@@ -83,5 +98,127 @@
     "publishedAtLabel": "Yayın tarihi",
     "publishedAtHint": "Son 30 günde yayınlanan yazılar \"Yeni\" olarak işaretlenir.",
     "saved": "Yazı güncellendi"
+  },
+  "addCategories": "Kategori ekle",
+  "views": {
+    "blog": "Bloglar",
+    "category": "Kategoriler",
+    "alerts": "Alarmlar"
+  },
+  "check": {
+    "run": "Şimdi kontrol et",
+    "done": "Kontrol tamamlandı, veriler güncel.",
+    "partial": "Geçmiş veriler yükleniyor. Kalanı bir sonraki kontrolde tamamlanır, isterseniz tekrar basın.",
+    "lastWeek": "Son haftalık kontrol: {{week}} haftası. Sayfalar her hafta otomatik kontrol edilir.",
+    "never": "Henüz haftalık kontrol yapılmadı. Search Console bağlıysa ilk kontrol bu gece çalışır ya da \"Şimdi kontrol et\"e basabilirsiniz."
+  },
+  "trend": {
+    "title": "Haftalık tıklama (son 12 ay)",
+    "weekOf": "{{week}} haftası"
+  },
+  "priority": {
+    "title": "Önce bunları güncelle",
+    "lost": "{{clicks}} tıklama kaybı",
+    "close": "{{position}}. sırada, ilk 3'e yakın"
+  },
+  "insights": {
+    "loading": "Sayfa inceleniyor…",
+    "failed": "Sayfa detayları yüklenemedi.",
+    "weekly": "Haftalık tıklama",
+    "noHistory": "Haftalık veri ilk kontrolden sonra görünür.",
+    "keywordTodo": "Keyword yapılacakları",
+    "noOpportunities": "Şu an öne çıkan bir keyword fırsatı yok.",
+    "links": "İç link önerileri",
+    "noLinks": "Bu sayfa için uygun iç link önerisi bulunamadı.",
+    "linkOut": "Bu sayfadan şunlara link verin:",
+    "linkIn": "Şu bloglardan bu sayfaya link verin:",
+    "seoChecks": "SEO kontrolü",
+    "geoChecks": "GEO kontrolü (AI aramaları)",
+    "unreachable": "Sayfa açılamadı, bu yüzden sayfa kontrolleri yapılamadı."
+  },
+  "opportunity": {
+    "addToHeadings": "\"{{query}}\" {{position}}. sırada ve {{impressions}} gösterim alıyor ama başlıkta ya da ara başlıklarda geçmiyor. Başlığa veya bir H2'ye ekleyin.",
+    "expand": "\"{{query}}\" {{position}}. sırada ({{impressions}} gösterim). Bu konuyu anlatan bölümü genişletin, ilk 3'e girebilir.",
+    "lowCtr": "\"{{query}}\" {{position}}. sırada ama az tıklanıyor. Başlığı ve meta description'ı daha çekici yazın.",
+    "competing": "\"{{query}}\" için sitenizde başka bir sayfa da yarışıyor: {{url}}. Hangisi öne çıkacaksa diğerinden ona link verin ya da içerikleri ayırın."
+  },
+  "checks": {
+    "score": "{{passed}}/{{total}} kontrol geçti",
+    "allGood": "Her şey yolunda.",
+    "title_length": "Başlık {{value}} karakter. 30–65 karakter arasında olsun.",
+    "meta_description": "Meta description {{value}} karakter. 70–160 karakter arası, tıklamaya teşvik eden bir açıklama yazın.",
+    "single_h1": "Sayfada {{value}} adet H1 var. Tam olarak bir H1 olmalı.",
+    "article_schema": "Article/BlogPosting schema yok. Ekleyin, Google ve AI'lar yazıyı daha iyi anlar.",
+    "category_schema": "CollectionPage, ItemList veya BreadcrumbList schema yok. Kategori sayfasına ekleyin.",
+    "image_alt": "{{value}} görselde alt metin yok. Görseli anlatan kısa alt metinler ekleyin.",
+    "word_count": "Sayfada {{value}} kelime var, konuyu tam anlatmak için az. İçeriği genişletin.",
+    "canonical": "Canonical etiketi yok ya da başka bir adresi gösteriyor.",
+    "indexed": "Google bu sayfayı indekslememiş görünüyor. Search Console'dan indeksleme isteyin.",
+    "faq": "Sık sorulan sorular bölümü yok. FAQ ekleyin, AI cevaplarında alıntılanma şansı artar.",
+    "question_headings": "Soru şeklinde ara başlık {{value}} adet. İnsanların sorduğu soruları H2/H3 olarak kullanın.",
+    "lists_tables": "İçerikte liste veya tablo yok. Adımları ve karşılaştırmaları liste/tablo ile verin, AI'lar bunları kolay alıntılar.",
+    "author": "Yazar bilgisi yok. Yazarı adıyla gösterin, güven sinyali verir.",
+    "dates": "Yayın veya güncelleme tarihi bulunamadı. Tarihi sayfada ve schema'da gösterin.",
+    "fresh": "İçerik {{value}} gündür güncellenmemiş. Bilgileri tazeleyip güncelleme tarihini değiştirin.",
+    "citations": "Dış kaynak linki {{value}} adet. Güvenilir 2–3 kaynağa link verin, AI'lar kaynaklı içeriği tercih eder."
+  },
+  "linkKinds": {
+    "blog": "Blog",
+    "category": "Kategori",
+    "product": "Ürün"
+  },
+  "geo": {
+    "aiSessions": "Bu dönemde AI asistanlarından {{sessions}} ziyaret: {{sources}}.",
+    "noAiSessions": "Bu dönemde AI asistanlarından ziyaret görünmüyor (Google Analytics bağlı olmalı).",
+    "citations": "AI Visibility taramalarında {{count}} kez kaynak gösterildi: {{engines}}.",
+    "noCitations": "AI Visibility taramalarında henüz kaynak olarak gösterilmedi."
+  },
+  "engines": {
+    "chatgpt": "ChatGPT",
+    "gemini": "Gemini",
+    "google_ai_overview": "Google AI Overview",
+    "claude": "Claude",
+    "perplexity": "Perplexity"
+  },
+  "advice": {
+    "title": "Yapay zeka önerisi",
+    "hintBlog": "Bu yazı için başlık, meta description, eklenecek keyword'ler, bölümler, linkler ve FAQ önerileri yazdırın. Butona bastığınızda bir kez üretilir ve kaydedilir.",
+    "hintCategory": "Bu kategori için başlık, meta description, kategori metni, keyword'ler ve link önerileri yazdırın. Butona bastığınızda bir kez üretilir ve kaydedilir.",
+    "generate": "Öneri al",
+    "regenerate": "Yeniden oluştur",
+    "titles": "Başlık önerileri",
+    "metaDescriptions": "Meta description önerileri",
+    "actions": "Yapılacaklar",
+    "faq": "Cevaplanması gereken sorular",
+    "areas": {
+      "keywords": "Keyword",
+      "content": "İçerik",
+      "links": "Link",
+      "technical": "Teknik",
+      "geo": "GEO"
+    }
+  },
+  "alerts": {
+    "emptyTitle": "Açık alarm yok",
+    "emptyDescription": "Haftalık kontrolde tıklaması düşen, sıralaması kayan ya da keyword kaybeden sayfalar burada görünür.",
+    "hint": "Son 4 hafta, önceki 4 haftayla karşılaştırılır.",
+    "markAll": "Tümünü görüldü işaretle",
+    "markSeen": "Görüldü",
+    "week": "{{week}} haftası kontrolü",
+    "kinds": {
+      "clicks_drop": "Tıklama düştü",
+      "position_drop": "Sıralama düştü",
+      "keyword_lost": "Keyword kaybı",
+      "no_impressions": "Görünmüyor",
+      "rising": "Yükselişte"
+    },
+    "messages": {
+      "clicks_drop": "Tıklama {{previous}} → {{current}}.",
+      "position_drop": "Ortalama sıra {{previous}} → {{current}}.",
+      "keyword_lost": "\"{{query}}\" {{previous}}. sıradan {{current}}. sıraya düştü.",
+      "keyword_gone": "\"{{query}}\" artık sıralamada değil (önceden {{previous}}. sıradaydı).",
+      "no_impressions": "Son 4 haftada Google'da hiç gösterim almadı.",
+      "rising": "Tıklama {{previous}} → {{current}}. Bu yazıdan yeni içerik fikirleri çıkarın."
+    }
   }
 }

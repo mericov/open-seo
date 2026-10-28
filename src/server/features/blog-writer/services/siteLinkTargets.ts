@@ -34,7 +34,7 @@ const IGNORED_PATHS = [
   /^\/blogs\/[^/]+\/?$/i,
 ];
 
-function classify(pathname: string): LinkTargetKind | null {
+export function classifyPath(pathname: string): LinkTargetKind | null {
   if (
     pathname === "/" ||
     IGNORED_PATHS.some((pattern) => pattern.test(pathname))
@@ -49,7 +49,7 @@ function classify(pathname: string): LinkTargetKind | null {
   return "page";
 }
 
-function labelFor(pathname: string) {
+export function labelFor(pathname: string) {
   const last = pathname.replace(/\/+$/, "").split("/").pop() ?? pathname;
   let decoded = last;
   try {
@@ -98,7 +98,7 @@ export function groupLinkTargets(urls: string[], topic?: string) {
       continue;
     }
     const pathname = parsed.pathname;
-    const kind = classify(pathname);
+    const kind = classifyPath(pathname);
     if (!kind) continue;
     const url = `${parsed.origin}${pathname}`;
     if (seen.has(url)) continue;

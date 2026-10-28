@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { BlogTrackingService } from "@/server/features/blog-tracking/services/BlogTrackingService";
+import { PageInsightsService } from "@/server/features/blog-tracking/services/PageInsightsService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   addBlogPostsSchema,
-  blogPostQueriesSchema,
   blogTrackingReportSchema,
+  markPageAlertsSeenSchema,
+  pageAdviceRequestSchema,
+  pageInsightsSchema,
   removeBlogPostsSchema,
+  runPageCheckSchema,
   updateBlogPostSchema,
 } from "@/types/schemas/blog-tracking";
 
@@ -16,15 +20,38 @@ export const getBlogTrackingReport = createServerFn({ method: "POST" })
     BlogTrackingService.getReport(context.projectId, data.dateRange),
   );
 
-export const getBlogPostQueries = createServerFn({ method: "POST" })
+export const getPageInsights = createServerFn({ method: "POST" })
   .middleware(requireProjectContext)
-  .validator(blogPostQueriesSchema)
+  .validator(pageInsightsSchema)
   .handler(async ({ data, context }) =>
-    BlogTrackingService.getPostQueries(
+    PageInsightsService.getInsights(context.projectId, data.id, data.dateRange),
+  );
+
+export const generatePageAdvice = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(pageAdviceRequestSchema)
+  .handler(async ({ data, context }) =>
+    PageInsightsService.generateAdvice(
       context.projectId,
-      data.url,
+      data.id,
       data.dateRange,
+      data.language,
+      context,
     ),
+  );
+
+export const markPageAlertsSeen = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(markPageAlertsSeenSchema)
+  .handler(async ({ data, context }) =>
+    BlogTrackingService.markAlertsSeen(context.projectId, data.ids),
+  );
+
+export const runPageCheck = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(runPageCheckSchema)
+  .handler(async ({ context }) =>
+    BlogTrackingService.runCheckNow(context.projectId),
   );
 
 export const addBlogPosts = createServerFn({ method: "POST" })

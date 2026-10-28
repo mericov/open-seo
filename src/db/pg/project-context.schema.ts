@@ -4,10 +4,16 @@ import {
   integer,
   pgTable,
   primaryKey,
+  real,
   text,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { projects } from "./app.schema";
+import {
+  PAGE_ALERT_KINDS,
+  TRACKED_PAGE_KINDS,
+  TRACKED_PAGE_SOURCES,
+} from "@/shared/pageTracking";
 
 // Timestamps are stored as *text* (same column shape as the SQLite schema); see
 // the note in pg/app.schema.ts. `isoNow` matches `new Date().toISOString()` so
@@ -124,6 +130,11 @@ export const projectBlogPosts = pgTable(
     title: text("title"),
     targetKeyword: text("target_keyword"),
     publishedAt: text("published_at"),
+    kind: text("kind", { enum: TRACKED_PAGE_KINDS }).notNull().default("blog"),
+    source: text("source", { enum: TRACKED_PAGE_SOURCES })
+      .notNull()
+      .default("manual"),
+    archivedAt: text("archived_at"),
     createdAt: text("created_at").notNull().default(isoNow),
     updatedAt: text("updated_at").notNull().default(isoNow),
   },
@@ -134,6 +145,72 @@ export const projectBlogPosts = pgTable(
     ),
   ],
 );
+
+export const projectPageWeeklyStats = pgTable(
+  "project_page_weekly_stats",
+  {
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    pageKey: text("page_key").notNull(),
+    weekStart: text("week_start").notNull(),
+    clicks: integer("clicks").notNull(),
+    impressions: integer("impressions").notNull(),
+    position: real("position").notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.projectId, table.pageKey, table.weekStart],
+    }),
+    index("project_page_weekly_stats_project_week_idx").on(
+      table.projectId,
+      table.weekStart,
+    ),
+  ],
+);
+
+export const projectPageAlerts = pgTable(
+  "project_page_alerts",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    postId: text("post_id")
+      .notNull()
+      .references(() => projectBlogPosts.id, { onDelete: "cascade" }),
+    weekStart: text("week_start").notNull(),
+    kind: text("kind", { enum: PAGE_ALERT_KINDS }).notNull(),
+    query: text("query").notNull().default(""),
+    previousValue: real("previous_value").notNull(),
+    currentValue: real("current_value").notNull(),
+    seenAt: text("seen_at"),
+    createdAt: text("created_at").notNull().default(isoNow),
+  },
+  (table) => [
+    uniqueIndex("project_page_alerts_post_week_kind_idx").on(
+      table.postId,
+      table.weekStart,
+      table.kind,
+      table.query,
+    ),
+    index("project_page_alerts_project_week_idx").on(
+      table.projectId,
+      table.weekStart,
+    ),
+  ],
+);
+
+export const projectPageAdvice = pgTable("project_page_advice", {
+  postId: text("post_id")
+    .primaryKey()
+    .references(() => projectBlogPosts.id, { onDelete: "cascade" }),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  adviceJson: text("advice_json").notNull(),
+  createdAt: text("created_at").notNull().default(isoNow),
+});
 
 export const projectBlogDrafts = pgTable(
   "project_blog_drafts",

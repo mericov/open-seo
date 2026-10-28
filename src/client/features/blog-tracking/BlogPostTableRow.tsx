@@ -1,11 +1,11 @@
-import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
+import { Bot, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { RowActionsMenu } from "@/client/components/RowActionsMenu";
 import { Badge } from "@/client/components/ui/badge";
 import { Button } from "@/client/components/ui/button";
 import { DropdownMenuItem } from "@/client/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@/client/components/ui/table";
-import { BlogPostQueries } from "@/client/features/blog-tracking/BlogPostQueries";
+import { PageInsightsPanel } from "@/client/features/blog-tracking/PageInsightsPanel";
 import type { BlogPostRow } from "@/client/features/blog-tracking/blogTrackingQueries";
 import { formatNumber } from "@/i18n/format";
 import type {
@@ -24,7 +24,7 @@ const STATUS_VARIANTS: Record<
   no_data: "outline",
 };
 
-function postLabel(post: BlogPostRow) {
+export function postLabel(post: BlogPostRow) {
   if (post.title) return post.title;
   try {
     const { pathname } = new URL(post.url);
@@ -75,7 +75,6 @@ export function BlogPostTableRow({
             size="icon-xs"
             aria-expanded={isOpen}
             aria-label={isOpen ? t("row.hideQueries") : t("row.showQueries")}
-            disabled={!connected}
             onClick={onToggle}
           >
             {isOpen ? <ChevronDown /> : <ChevronRight />}
@@ -84,6 +83,11 @@ export function BlogPostTableRow({
         <TableCell className="max-w-80">
           <div className="flex items-center gap-1.5">
             <span className="truncate font-medium">{postLabel(post)}</span>
+            {post.source === "auto" ? (
+              <Badge variant="outline" size="sm">
+                {t("row.auto")}
+              </Badge>
+            ) : null}
             <a
               href={post.url}
               target="_blank"
@@ -127,6 +131,27 @@ export function BlogPostTableRow({
               })
             : "–"}
         </TableCell>
+        <TableCell className="text-right tabular-nums">
+          {post.aiReferral || post.aiCitations ? (
+            <span
+              className="inline-flex items-center gap-1"
+              title={t("row.aiTitle", {
+                sessions: post.aiReferral?.sessions ?? 0,
+                citations: post.aiCitations?.count ?? 0,
+              })}
+            >
+              <Bot className="size-3.5 text-muted-foreground" />
+              {formatNumber(post.aiReferral?.sessions ?? 0)}
+              {post.aiCitations ? (
+                <Badge variant="info" size="sm">
+                  {post.aiCitations.count}
+                </Badge>
+              ) : null}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">–</span>
+          )}
+        </TableCell>
         <TableCell>
           {post.targetKeyword ? (
             <div>
@@ -166,10 +191,10 @@ export function BlogPostTableRow({
       </TableRow>
       {isOpen ? (
         <TableRow className="bg-muted/30 hover:bg-muted/30">
-          <TableCell colSpan={10} className="p-0">
-            <BlogPostQueries
+          <TableCell colSpan={11} className="p-0 whitespace-normal">
+            <PageInsightsPanel
               projectId={projectId}
-              url={post.url}
+              post={post}
               dateRange={dateRange}
             />
           </TableCell>

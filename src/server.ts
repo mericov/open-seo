@@ -223,6 +223,15 @@ export default {
       return;
     }
     if (controller.cron === MCP_OAUTH_PURGE_CRON) {
+      try {
+        await withPgClient(async () => {
+          const { runWeeklyPageChecks } =
+            await import("@/server/features/blog-tracking/services/BlogWeeklyCheckService");
+          await runWeeklyPageChecks();
+        });
+      } catch (err) {
+        console.error("[cron] Page tracking checks failed:", err);
+      }
       // Only hosted mode runs the OAuth provider (and has OAUTH_KV bound).
       if (isHostedAuthMode(getAuthMode(env.AUTH_MODE))) {
         const result = await openSeoOAuthProvider.purgeExpiredData(
