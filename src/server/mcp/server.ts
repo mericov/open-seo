@@ -149,6 +149,11 @@ import {
   writeShopifyThemeFilesTool,
   publishShopifyThemeTool,
 } from "@/server/mcp/tools/shopify-theme-tools";
+import {
+  getSocialContextTool,
+  saveBrandKitTool,
+  saveSocialMediaTool,
+} from "@/server/mcp/tools/social-tools";
 
 type ToolSchema = z.ZodType | z.ZodRawShape;
 
@@ -215,7 +220,7 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
       title: "MericSEO",
       version: "0.0.12",
       description:
-        "SEO research tools for AI agents: keyword research and metrics, SERP and local SERP results, domain and backlink analysis, rank tracking, Google Search Console performance, a guided blog writer (start with start_blog_post), and Shopify store management (start with get_shopify_overview).",
+        "SEO research tools for AI agents: keyword research and metrics, SERP and local SERP results, domain and backlink analysis, rank tracking, Google Search Console performance, a guided blog writer (start with start_blog_post), Shopify store management (start with get_shopify_overview), and a social & ads studio (start with get_social_context).",
       websiteUrl: "https://openseo.so",
       icons: [
         {
@@ -342,6 +347,9 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(readShopifyThemeFilesTool);
   register(writeShopifyThemeFilesTool);
   register(publishShopifyThemeTool);
+  register(getSocialContextTool);
+  register(saveSocialMediaTool);
+  register(saveBrandKitTool);
 
   return server;
 }

@@ -12,6 +12,7 @@ import enDigitalPr from "./en/digitalPr.json";
 import enInboundLeads from "./en/inboundLeads.json";
 import enTrafficHistory from "./en/trafficHistory.json";
 import enShopify from "./en/shopify.json";
+import enSocial from "./en/social.json";
 import trAuth from "./tr/auth.json";
 import trBlogTracking from "./tr/blogTracking.json";
 import trBlogWriter from "./tr/blogWriter.json";
@@ -26,6 +27,7 @@ import trDigitalPr from "./tr/digitalPr.json";
 import trInboundLeads from "./tr/inboundLeads.json";
 import trTrafficHistory from "./tr/trafficHistory.json";
 import trShopify from "./tr/shopify.json";
+import trSocial from "./tr/social.json";
 
 export const resources = {
   en: {
@@ -43,6 +45,7 @@ export const resources = {
     inboundLeads: enInboundLeads,
     trafficHistory: enTrafficHistory,
     shopify: enShopify,
+    social: enSocial,
   },
   tr: {
     auth: trAuth,
@@ -59,6 +62,7 @@ export const resources = {
     inboundLeads: trInboundLeads,
     trafficHistory: trTrafficHistory,
     shopify: trShopify,
+    social: trSocial,
   },
 } as const;
 

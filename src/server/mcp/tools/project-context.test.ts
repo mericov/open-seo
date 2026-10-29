@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   listKeyPages: vi.fn(),
   listResearchLog: vi.fn(),
   listTemplates: vi.fn(),
+  get: vi.fn(),
   deleteSection: vi.fn(),
   deleteResearchLogEntries: vi.fn(),
 }));
@@ -42,6 +43,9 @@ vi.mock(
   "@/server/features/reports/repositories/ReportTemplateRepository",
   () => ({ ReportTemplateRepository: mocks }),
 );
+vi.mock("@/server/features/social/repositories/BrandKitRepository", () => ({
+  BrandKitRepository: mocks,
+}));
 
 beforeEach(() => {
   mocks.getProjectForOrganization.mockResolvedValue({ id: "project_1" });
@@ -50,6 +54,7 @@ beforeEach(() => {
   mocks.listKeyPages.mockResolvedValue([]);
   mocks.listResearchLog.mockResolvedValue([]);
   mocks.listTemplates.mockResolvedValue([]);
+  mocks.get.mockResolvedValue(null);
 });
 
 describe("update_project_context", () => {

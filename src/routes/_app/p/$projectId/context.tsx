@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProjectPageHeader } from "@/client/features/projects/ProjectPageHeader";
 import { ProjectContextPage } from "@/client/features/projects/project-context/ProjectContextPage";
+import { BrandKitCard } from "@/client/features/social/BrandKitCard";
 
 export const Route = createFileRoute("/_app/p/$projectId/context")({
   component: ProjectContextRoute,
@@ -14,6 +15,8 @@ function ProjectContextRoute() {
         <ProjectPageHeader projectId={projectId} title="Context" />
 
         <ProjectContextPage projectId={projectId} />
+
+        <BrandKitCard projectId={projectId} />
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ export async function sealSecret(value: string) {
   return symmetricEncrypt({ key: await secretKey(), data: value });
 }
 
-async function openSecret(value: string) {
+export async function openSecret(value: string) {
   return symmetricDecrypt({ key: await secretKey(), data: value });
 }
 

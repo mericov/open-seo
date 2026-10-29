@@ -277,6 +277,11 @@ export default {
           await import("@/server/features/ai-visibility/services/scheduledAiVisibility");
         await runScheduledAiVisibility();
       }),
+      withPgClient(async () => {
+        const { runScheduledSocialPublishing } =
+          await import("@/server/features/social/services/SocialPublisher");
+        await runScheduledSocialPublishing();
+      }),
     ]);
     for (const result of checks)
       if (result.status === "rejected") throw result.reason;

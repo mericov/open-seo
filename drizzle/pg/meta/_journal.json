@@ -372,6 +372,13 @@
       "when": 1793198863685,
       "tag": "0052_lethal_bloodstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1793262057926,
+      "tag": "0053_social_foundation",
+      "breakpoints": true
     }
   ]
 }

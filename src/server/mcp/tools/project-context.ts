@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { ProjectContextService } from "@/server/features/project-context/services/ProjectContextService";
+import {
+  BrandKitService,
+  renderBrandKit,
+} from "@/server/features/social/services/BrandKitService";
 import { buildProjectMeta } from "@/server/mcp/context";
 import { mcpResponse } from "@/server/mcp/formatters";
 import {
@@ -51,13 +55,15 @@ export const getProjectContextTool = {
   },
   handler: withMcpProjectAuth(
     async (args: z.infer<z.ZodObject<typeof getInputSchema>>, context) => {
-      const projectContext = await ProjectContextService.getProjectContext(
-        args.projectId,
-      );
+      const [projectContext, brandKit] = await Promise.all([
+        ProjectContextService.getProjectContext(args.projectId),
+        BrandKitService.get(args.projectId),
+      ]);
       return mcpResponse({
-        text: ProjectContextService.renderProjectContextMarkdown(
-          projectContext,
-        ),
+        text: [
+          ProjectContextService.renderProjectContextMarkdown(projectContext),
+          renderBrandKit(brandKit),
+        ].join("\n\n"),
         meta: buildProjectMeta(
           context,
           args.projectId,

@@ -7,7 +7,8 @@
     "aiVisibility": "AI Görünürlüğü",
     "mySite": "Sitem",
     "aiTools": "AI Araçları",
-    "digitalPr": "Digital PR"
+    "digitalPr": "Digital PR",
+    "socialAds": "Sosyal ve Reklam"
   },
   "items": {
     "dashboard": "Dashboard",
@@ -31,7 +32,8 @@
     "prGap": "Rakip Boşluğu",
     "prMedia": "Medya Veritabanı",
     "prOutreach": "Gönderim",
-    "shopify": "Shopify"
+    "shopify": "Shopify",
+    "socialStudio": "Sosyal Stüdyo"
   },
   "account": {
     "helpCommunity": "Yardım ve Topluluk",

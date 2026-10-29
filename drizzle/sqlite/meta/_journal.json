@@ -526,6 +526,13 @@
       "when": 1793198862956,
       "tag": "0074_military_cable",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "6",
+      "when": 1793262057109,
+      "tag": "0075_social_foundation",
+      "breakpoints": true
     }
   ]
 }

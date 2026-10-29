@@ -281,6 +281,13 @@ const resolveSelfHostAccess = (
         domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
         path: "api/inbound-leads",
       });
+      yield* publicPathBypass({
+        policyId: "SelfHostSocialMediaBypass",
+        applicationId: "SelfHostSocialMedia",
+        name: `open-seo ${stage} social media`,
+        domains: customDomain ? [customDomain, workersDomain] : [workersDomain],
+        path: "social-media",
+      });
     }
 
     return { teamDomain, policyAud };

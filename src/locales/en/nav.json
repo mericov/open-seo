@@ -7,7 +7,8 @@
     "aiVisibility": "AI Visibility",
     "mySite": "My Site",
     "aiTools": "AI Tools",
-    "digitalPr": "Digital PR"
+    "digitalPr": "Digital PR",
+    "socialAds": "Social & Ads"
   },
   "items": {
     "dashboard": "Dashboard",
@@ -31,7 +32,8 @@
     "prGap": "Competitor Gap",
     "prMedia": "Media Database",
     "prOutreach": "Outreach",
-    "shopify": "Shopify"
+    "shopify": "Shopify",
+    "socialStudio": "Social Studio"
   },
   "account": {
     "helpCommunity": "Help & Community",

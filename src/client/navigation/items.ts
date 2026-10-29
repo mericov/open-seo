@@ -9,6 +9,7 @@ import {
   Globe,
   Inbox,
   LayoutDashboard,
+  Megaphone,
   Library,
   Link2,
   MessageSquare,
@@ -67,6 +68,11 @@ const projectNavItems = [
     to: "/p/$projectId/shopify" as const,
     label: "nav:items.shopify" as const,
     icon: ShoppingBag,
+  },
+  {
+    to: "/p/$projectId/social" as const,
+    label: "nav:items.socialStudio" as const,
+    icon: Megaphone,
   },
   {
     to: "/p/$projectId/inbound-leads" as const,
@@ -189,6 +195,10 @@ export function getProjectNavGroups(projectId: string) {
         byPath("/p/$projectId/digital-pr/media"),
         byPath("/p/$projectId/digital-pr/outreach"),
       ],
+    },
+    {
+      label: "nav:groups.socialAds" as const,
+      items: [byPath("/p/$projectId/social")],
     },
     {
       label: "nav:groups.mySite" as const,

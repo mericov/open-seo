@@ -34,6 +34,7 @@ import { Route as ApiInboundLeadsRouteImport } from './routes/api/inbound-leads'
 import { Route as AuditTokenRouteImport } from './routes/audit/$token'
 import { Route as LrTokenRouteImport } from './routes/lr/$token'
 import { Route as RReportIdRouteImport } from './routes/r/$reportId'
+import { Route as SocialMediaSplatRouteImport } from './routes/social-media/$'
 import { Route as AppBillingFixPaymentRouteImport } from './routes/_app/billing_.fix-payment'
 import { Route as AppHelpDataforseoApiKeyRouteImport } from './routes/_app/help/dataforseo-api-key'
 import { Route as AppHelpOpenrouterApiKeyRouteImport } from './routes/_app/help/openrouter-api-key'
@@ -65,6 +66,7 @@ import { Route as AppPProjectIdSavedRouteImport } from './routes/_app/p/$project
 import { Route as AppPProjectIdSearchPerformanceRouteImport } from './routes/_app/p/$projectId/search-performance'
 import { Route as AppPProjectIdSettingsRouteImport } from './routes/_app/p/$projectId/settings'
 import { Route as AppPProjectIdShopifyRouteImport } from './routes/_app/p/$projectId/shopify'
+import { Route as AppPProjectIdSocialRouteImport } from './routes/_app/p/$projectId/social'
 import { Route as ApiGa4OauthCallbackRouteImport } from './routes/api/ga4/oauth/callback'
 import { Route as ApiGscOauthCallbackRouteImport } from './routes/api/gsc/oauth/callback'
 import { Route as AppPProjectIdAiVisibilityIndexRouteImport } from './routes/_app/p/$projectId/ai-visibility/index'
@@ -207,6 +209,11 @@ const LrTokenRoute = LrTokenRouteImport.update({
 const RReportIdRoute = RReportIdRouteImport.update({
   id: '/r/$reportId',
   path: '/r/$reportId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SocialMediaSplatRoute = SocialMediaSplatRouteImport.update({
+  id: '/social-media/$',
+  path: '/social-media/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppBillingFixPaymentRoute = AppBillingFixPaymentRouteImport.update({
@@ -372,6 +379,11 @@ const AppPProjectIdShopifyRoute = AppPProjectIdShopifyRouteImport.update({
   path: '/shopify',
   getParentRoute: () => AppPProjectIdRouteRoute,
 } as any)
+const AppPProjectIdSocialRoute = AppPProjectIdSocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => AppPProjectIdRouteRoute,
+} as any)
 const ApiGa4OauthCallbackRoute = ApiGa4OauthCallbackRouteImport.update({
   id: '/api/ga4/oauth/callback',
   path: '/api/ga4/oauth/callback',
@@ -507,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
+  '/social-media/$': typeof SocialMediaSplatRoute
   '/p/$projectId': typeof AppPProjectIdRouteRouteWithChildren
   '/billing/fix-payment': typeof AppBillingFixPaymentRoute
   '/help/dataforseo-api-key': typeof AppHelpDataforseoApiKeyRoute
@@ -537,6 +550,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
   '/p/$projectId/settings': typeof AppPProjectIdSettingsRouteWithChildren
   '/p/$projectId/shopify': typeof AppPProjectIdShopifyRoute
+  '/p/$projectId/social': typeof AppPProjectIdSocialRoute
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/p/$projectId/': typeof AppPProjectIdIndexRoute
@@ -580,6 +594,7 @@ export interface FileRoutesByTo {
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
+  '/social-media/$': typeof SocialMediaSplatRoute
   '/billing/fix-payment': typeof AppBillingFixPaymentRoute
   '/help/dataforseo-api-key': typeof AppHelpDataforseoApiKeyRoute
   '/help/openrouter-api-key': typeof AppHelpOpenrouterApiKeyRoute
@@ -605,6 +620,7 @@ export interface FileRoutesByTo {
   '/p/$projectId/saved': typeof AppPProjectIdSavedRoute
   '/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
   '/p/$projectId/shopify': typeof AppPProjectIdShopifyRoute
+  '/p/$projectId/social': typeof AppPProjectIdSocialRoute
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/p/$projectId': typeof AppPProjectIdIndexRoute
@@ -652,6 +668,7 @@ export interface FileRoutesById {
   '/audit/$token': typeof AuditTokenRoute
   '/lr/$token': typeof LrTokenRoute
   '/r/$reportId': typeof RReportIdRoute
+  '/social-media/$': typeof SocialMediaSplatRoute
   '/_app/': typeof AppIndexRoute
   '/_app/p/$projectId': typeof AppPProjectIdRouteRouteWithChildren
   '/_app/billing_/fix-payment': typeof AppBillingFixPaymentRoute
@@ -683,6 +700,7 @@ export interface FileRoutesById {
   '/_app/p/$projectId/search-performance': typeof AppPProjectIdSearchPerformanceRoute
   '/_app/p/$projectId/settings': typeof AppPProjectIdSettingsRouteWithChildren
   '/_app/p/$projectId/shopify': typeof AppPProjectIdShopifyRoute
+  '/_app/p/$projectId/social': typeof AppPProjectIdSocialRoute
   '/api/ga4/oauth/callback': typeof ApiGa4OauthCallbackRoute
   '/api/gsc/oauth/callback': typeof ApiGscOauthCallbackRoute
   '/_app/p/$projectId/': typeof AppPProjectIdIndexRoute
@@ -729,6 +747,7 @@ export interface FileRouteTypes {
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
+    | '/social-media/$'
     | '/p/$projectId'
     | '/billing/fix-payment'
     | '/help/dataforseo-api-key'
@@ -759,6 +778,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/search-performance'
     | '/p/$projectId/settings'
     | '/p/$projectId/shopify'
+    | '/p/$projectId/social'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
     | '/p/$projectId/'
@@ -802,6 +822,7 @@ export interface FileRouteTypes {
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
+    | '/social-media/$'
     | '/billing/fix-payment'
     | '/help/dataforseo-api-key'
     | '/help/openrouter-api-key'
@@ -827,6 +848,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/saved'
     | '/p/$projectId/search-performance'
     | '/p/$projectId/shopify'
+    | '/p/$projectId/social'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
     | '/p/$projectId'
@@ -873,6 +895,7 @@ export interface FileRouteTypes {
     | '/audit/$token'
     | '/lr/$token'
     | '/r/$reportId'
+    | '/social-media/$'
     | '/_app/'
     | '/_app/p/$projectId'
     | '/_app/billing_/fix-payment'
@@ -904,6 +927,7 @@ export interface FileRouteTypes {
     | '/_app/p/$projectId/search-performance'
     | '/_app/p/$projectId/settings'
     | '/_app/p/$projectId/shopify'
+    | '/_app/p/$projectId/social'
     | '/api/ga4/oauth/callback'
     | '/api/gsc/oauth/callback'
     | '/_app/p/$projectId/'
@@ -941,6 +965,7 @@ export interface RootRouteChildren {
   AuditTokenRoute: typeof AuditTokenRoute
   LrTokenRoute: typeof LrTokenRoute
   RReportIdRoute: typeof RReportIdRoute
+  SocialMediaSplatRoute: typeof SocialMediaSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAutumnSplatRoute: typeof ApiAutumnSplatRoute
   STokenOgDotpngRoute: typeof STokenOgDotpngRoute
@@ -1125,6 +1150,13 @@ declare module '@tanstack/react-router' {
       path: '/r/$reportId'
       fullPath: '/r/$reportId'
       preLoaderRoute: typeof RReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social-media/$': {
+      id: '/social-media/$'
+      path: '/social-media/$'
+      fullPath: '/social-media/$'
+      preLoaderRoute: typeof SocialMediaSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/billing_/fix-payment': {
@@ -1342,6 +1374,13 @@ declare module '@tanstack/react-router' {
       path: '/shopify'
       fullPath: '/p/$projectId/shopify'
       preLoaderRoute: typeof AppPProjectIdShopifyRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
+    '/_app/p/$projectId/social': {
+      id: '/_app/p/$projectId/social'
+      path: '/social'
+      fullPath: '/p/$projectId/social'
+      preLoaderRoute: typeof AppPProjectIdSocialRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
     '/api/ga4/oauth/callback': {
@@ -1588,6 +1627,7 @@ interface AppPProjectIdRouteRouteChildren {
   AppPProjectIdSearchPerformanceRoute: typeof AppPProjectIdSearchPerformanceRoute
   AppPProjectIdSettingsRoute: typeof AppPProjectIdSettingsRouteWithChildren
   AppPProjectIdShopifyRoute: typeof AppPProjectIdShopifyRoute
+  AppPProjectIdSocialRoute: typeof AppPProjectIdSocialRoute
   AppPProjectIdIndexRoute: typeof AppPProjectIdIndexRoute
   AppPProjectIdReportsReportIdRoute: typeof AppPProjectIdReportsReportIdRoute
   AppPProjectIdReportsTemplatesRoute: typeof AppPProjectIdReportsTemplatesRoute
@@ -1615,6 +1655,7 @@ const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
   AppPProjectIdSearchPerformanceRoute: AppPProjectIdSearchPerformanceRoute,
   AppPProjectIdSettingsRoute: AppPProjectIdSettingsRouteWithChildren,
   AppPProjectIdShopifyRoute: AppPProjectIdShopifyRoute,
+  AppPProjectIdSocialRoute: AppPProjectIdSocialRoute,
   AppPProjectIdIndexRoute: AppPProjectIdIndexRoute,
   AppPProjectIdReportsReportIdRoute: AppPProjectIdReportsReportIdRoute,
   AppPProjectIdReportsTemplatesRoute: AppPProjectIdReportsTemplatesRoute,
@@ -1702,6 +1743,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuditTokenRoute: AuditTokenRoute,
   LrTokenRoute: LrTokenRoute,
   RReportIdRoute: RReportIdRoute,
+  SocialMediaSplatRoute: SocialMediaSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAutumnSplatRoute: ApiAutumnSplatRoute,
   STokenOgDotpngRoute: STokenOgDotpngRoute,

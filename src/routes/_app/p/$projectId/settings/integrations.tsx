@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { GoogleConnectionCard } from "@/client/features/integrations/GoogleConnectionCard";
 import { CrawlerAccessSettings } from "@/client/features/settings/CrawlerAccessSettings";
 import { ShopifyConnectionCard } from "@/client/features/shopify/ShopifyConnectionCard";
+import { MetaConnectionCard } from "@/client/features/social/MetaConnectionCard";
 
 export const Route = createFileRoute(
   "/_app/p/$projectId/settings/integrations",
@@ -38,6 +39,10 @@ function ProjectIntegrationsRoute() {
 
       <section id="shopify" className="scroll-mt-6">
         <ShopifyConnectionCard projectId={projectId} />
+      </section>
+
+      <section id="meta" className="scroll-mt-6">
+        <MetaConnectionCard projectId={projectId} />
       </section>
 
       <CrawlerAccessSettings projectId={projectId} />

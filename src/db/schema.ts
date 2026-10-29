@@ -16,6 +16,7 @@ import * as sqliteDigitalPr from "./digital-pr.schema";
 import * as sqliteInboundLeads from "./inbound-leads.schema";
 import * as sqliteTrafficHistory from "./traffic-history.schema";
 import * as sqliteShopify from "./shopify.schema";
+import * as sqliteSocial from "./social.schema";
 import * as pgApp from "./pg/app.schema";
 import * as pgProjectContext from "./pg/project-context.schema";
 import * as pgReports from "./pg/reports.schema";
@@ -33,6 +34,7 @@ import * as pgDigitalPr from "./pg/digital-pr.schema";
 import * as pgInboundLeads from "./pg/inbound-leads.schema";
 import * as pgTrafficHistory from "./pg/traffic-history.schema";
 import * as pgShopify from "./pg/shopify.schema";
+import * as pgSocial from "./pg/social.schema";
 
 // Canonical schema barrel. Repositories import their tables from here and the
 // provider-aware `db` from "@/db", so each repository is written ONCE for both
@@ -60,7 +62,8 @@ type AppSchema = typeof sqliteApp &
   typeof sqliteDigitalPr &
   typeof sqliteInboundLeads &
   typeof sqliteTrafficHistory &
-  typeof sqliteShopify;
+  typeof sqliteShopify &
+  typeof sqliteSocial;
 
 const runtimeSchema =
   getDatabaseProvider() === "postgres"
@@ -82,6 +85,7 @@ const runtimeSchema =
         ...pgInboundLeads,
         ...pgTrafficHistory,
         ...pgShopify,
+        ...pgSocial,
       }
     : {
         ...sqliteApp,
@@ -101,6 +105,7 @@ const runtimeSchema =
         ...sqliteInboundLeads,
         ...sqliteTrafficHistory,
         ...sqliteShopify,
+        ...sqliteSocial,
       };
 
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- guarded by schema-parity.test.ts
@@ -188,4 +193,9 @@ export const {
   prGapDomainHits,
   shopifyConnections,
   shopifyBlogArticles,
+  metaConnections,
+  projectBrandKits,
+  socialMediaAssets,
+  socialPosts,
+  socialPostMedia,
 } = schema;
