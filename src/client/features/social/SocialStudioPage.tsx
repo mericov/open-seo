@@ -5,10 +5,12 @@ import {
   MetaConnectionCard,
   MetaSetupGuide,
 } from "@/client/features/social/MetaConnectionCard";
+import { useProjectMarket } from "@/client/features/projects/useProjectMarket";
+import { SocialCalendar } from "@/client/features/social/SocialCalendar";
 import { SocialContextPanel } from "@/client/features/social/SocialContextPanel";
 import { SocialMediaLibrary } from "@/client/features/social/SocialMediaLibrary";
 
-export const SOCIAL_TABS = ["setup", "context", "media"] as const;
+export const SOCIAL_TABS = ["calendar", "context", "media", "setup"] as const;
 type SocialTab = (typeof SOCIAL_TABS)[number];
 
 export function SocialStudioPage({
@@ -21,6 +23,7 @@ export function SocialStudioPage({
   onTabChange: (tab: SocialTab) => void;
 }) {
   const { t } = useTranslation("social");
+  const market = useProjectMarket(projectId);
   return (
     <div className="h-full overflow-auto bg-background px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -35,7 +38,12 @@ export function SocialStudioPage({
             label: t(`tabs.${value}`),
           }))}
         />
-        {tab === "setup" ? (
+        {tab === "calendar" ? (
+          <SocialCalendar
+            projectId={projectId}
+            languageCode={market?.languageCode ?? "en"}
+          />
+        ) : tab === "setup" ? (
           <div className="space-y-4">
             <MetaConnectionCard projectId={projectId} />
             <MetaSetupGuide />

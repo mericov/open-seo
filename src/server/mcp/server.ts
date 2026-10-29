@@ -154,6 +154,16 @@ import {
   saveBrandKitTool,
   saveSocialMediaTool,
 } from "@/server/mcp/tools/social-tools";
+import {
+  planSocialMonthTool,
+  prepareSocialImageTool,
+  socialIdeasFromBlogTool,
+} from "@/server/mcp/tools/social-planning-tools";
+import {
+  listSocialPostsTool,
+  saveSocialPostsTool,
+  scheduleSocialPostsTool,
+} from "@/server/mcp/tools/social-post-tools";
 
 type ToolSchema = z.ZodType | z.ZodRawShape;
 
@@ -350,6 +360,12 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(getSocialContextTool);
   register(saveSocialMediaTool);
   register(saveBrandKitTool);
+  register(planSocialMonthTool);
+  register(socialIdeasFromBlogTool);
+  register(saveSocialPostsTool);
+  register(prepareSocialImageTool);
+  register(scheduleSocialPostsTool);
+  register(listSocialPostsTool);
 
   return server;
 }

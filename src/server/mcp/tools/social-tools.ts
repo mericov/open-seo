@@ -4,6 +4,7 @@ import {
   renderBrandKit,
 } from "@/server/features/social/services/BrandKitService";
 import { SocialContextService } from "@/server/features/social/services/SocialContextService";
+import { SocialPostService } from "@/server/features/social/services/SocialPostService";
 import { SocialMediaService } from "@/server/features/social/services/SocialMediaService";
 import { buildProjectMeta } from "@/server/mcp/context";
 import { mcpResponse } from "@/server/mcp/formatters";
@@ -84,6 +85,12 @@ const mediaInputSchema = {
     .max(200)
     .optional()
     .describe("Short description, e.g. '4:5 product shot with headline'."),
+  postId: z
+    .string()
+    .optional()
+    .describe(
+      "Attach the file to this social post draft (appended after existing media).",
+    ),
 } as const;
 
 export const saveSocialMediaTool = {
@@ -115,8 +122,12 @@ export const saveSocialMediaTool = {
         source: args.source,
         label: args.label ?? null,
       });
+      if (args.postId)
+        await SocialPostService.attachMedia(args.projectId, args.postId, [
+          asset.id,
+        ]);
       return mcpResponse({
-        text: `Saved media ${asset.id}: ${asset.url} (${asset.contentType}${asset.width ? `, ${asset.width}×${asset.height}` : ""}).`,
+        text: `${args.postId ? `Attached to post ${args.postId}. ` : ""}Saved media ${asset.id}: ${asset.url} (${asset.contentType}${asset.width ? `, ${asset.width}×${asset.height}` : ""}).`,
         meta: buildProjectMeta(
           context,
           args.projectId,

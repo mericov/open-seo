@@ -13,7 +13,10 @@ import {
   deleteSocialMedia,
   importSocialMedia,
   uploadSocialMedia,
+  type listSocialMedia,
 } from "@/serverFunctions/social";
+
+export type MediaAsset = Awaited<ReturnType<typeof listSocialMedia>>[number];
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
@@ -34,7 +37,7 @@ async function toJpegIfNeeded(file: File): Promise<Blob> {
   );
 }
 
-async function blobToBase64(blob: Blob) {
+export async function blobToBase64(blob: Blob) {
   const bytes = new Uint8Array(await blob.arrayBuffer());
   let binary = "";
   for (let i = 0; i < bytes.length; i += 0x8000) {
@@ -48,7 +51,7 @@ export function SocialMediaLibrary({
   onPick,
 }: {
   projectId: string;
-  onPick?: (assetId: string) => void;
+  onPick?: (asset: MediaAsset) => void;
 }) {
   const { t } = useTranslation("social");
   const queryClient = useQueryClient();
@@ -179,7 +182,7 @@ export function SocialMediaLibrary({
                 type="button"
                 className="block aspect-square w-full"
                 disabled={!onPick}
-                onClick={() => onPick?.(asset.id)}
+                onClick={() => onPick?.(asset)}
               >
                 {asset.contentType.startsWith("video/") ? (
                   <video

@@ -89,3 +89,31 @@ export const socialPostContentSchema = z.object({
 });
 
 export type SocialPostContent = z.infer<typeof socialPostContentSchema>;
+
+export const listSocialPostsSchema = z.object({
+  ...projectIdShape,
+  from: z.string().datetime({ offset: true }),
+  to: z.string().datetime({ offset: true }),
+});
+
+export const saveSocialPostSchema = z.object({
+  ...projectIdShape,
+  postId: z.string().optional(),
+  post: socialPostContentSchema,
+});
+
+export const socialPostIdsSchema = z.object({
+  ...projectIdShape,
+  postIds: z.array(z.string().min(1)).min(1).max(100),
+});
+
+export const rescheduleSocialPostSchema = z.object({
+  ...projectIdShape,
+  postId: z.string().min(1),
+  scheduledAt: z.string().datetime({ offset: true }).nullable(),
+});
+
+export const socialPostIdSchema = z.object({
+  ...projectIdShape,
+  postId: z.string().min(1),
+});

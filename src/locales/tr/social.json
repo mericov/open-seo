@@ -4,7 +4,8 @@
   "tabs": {
     "setup": "Kurulum",
     "context": "İçerik bağlamı",
-    "media": "Medya"
+    "media": "Medya",
+    "calendar": "Takvim"
   },
   "connection": {
     "title": "Meta (Facebook ve Instagram)",
@@ -106,5 +107,102 @@
     "deleted": "Dosya silindi",
     "tooLarge": "25 MB'tan büyük dosyaları bağlantıdan almalısın.",
     "copied": "Bağlantı kopyalandı"
+  },
+  "calendar": {
+    "week": "Hafta",
+    "month": "Ay",
+    "today": "Bugün",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "newPost": "Yeni post",
+    "approveSelected": "Seçilenleri onayla ({{count}})",
+    "approved": "{{count}} post onaylandı",
+    "approveSkipped": "{{count}} post atlandı: {{reasons}}",
+    "unscheduled": "Zamanlanmamış taslaklar",
+    "unscheduledHint": "Zamanlamak için bir taslağı güne sürükle.",
+    "moved": "Post taşındı",
+    "timezoneNote": "Saatler {{timezone}} saat dilimine göre.",
+    "noConnection": "Meta henüz bağlı değil; onaylanan postlar yayınlanamaz. Kurulum sekmesinden bağla.",
+    "legend": "Taslak → onaylandı → zamanlandı → yayınlandı / hata. Senin onayın olmadan hiçbir şey paylaşılmaz."
+  },
+  "status": {
+    "draft": "Taslak",
+    "approved": "Onaylandı",
+    "scheduled": "Zamanlandı",
+    "publishing": "Yayınlanıyor",
+    "published": "Yayınlandı",
+    "failed": "Hata"
+  },
+  "platform": {
+    "instagram": "Instagram",
+    "facebook": "Facebook"
+  },
+  "format": {
+    "feed_square": "Feed 1:1",
+    "feed_portrait": "Feed 4:5",
+    "carousel": "Carousel",
+    "story": "Story 9:16",
+    "reel": "Reels"
+  },
+  "ideaType": {
+    "informative": "Bilgilendirici",
+    "fun": "Eğlenceli",
+    "product": "Ürün",
+    "seasonal": "Sezonluk",
+    "blog_promo": "Blog tanıtımı"
+  },
+  "editor": {
+    "newTitle": "Yeni post",
+    "editTitle": "Postu düzenle",
+    "platform": "Platform",
+    "format": "Format",
+    "ideaType": "Tür",
+    "title": "İç başlık",
+    "hook": "Hook (ilk satır)",
+    "caption": "Açıklama metni",
+    "hashtags": "Hashtag'ler",
+    "hashtagsHint": "Boşluk ya da virgülle ayır, # koyma.",
+    "language": "Dil",
+    "link": "Sitedeki link",
+    "linkHint": "Sitede var olan bir sayfa olmalı; kaydederken kontrol edilir ve UTM eklenir.",
+    "trackedUrl": "Takipli link",
+    "storyLink": "Story link sticker adresi (Instagram'da elle ekle)",
+    "date": "Tarih",
+    "time": "Saat",
+    "media": "Medya",
+    "addMedia": "Kütüphaneden ekle",
+    "compose": "Görsel hazırla",
+    "removeMedia": "Kaldır",
+    "context": "Kullanılan bağlam",
+    "keyword": "Hedef keyword",
+    "source": "Kaynak",
+    "notes": "Notlar",
+    "save": "Taslağı kaydet",
+    "saved": "Taslak kaydedildi",
+    "approve": "Onayla",
+    "unapprove": "Taslağa geri al",
+    "delete": "Sil",
+    "deleted": "Post silindi",
+    "error": "Hata",
+    "live": "Yayındaki postu aç",
+    "reapproveNote": "Değişiklik kaydedilirse onaylı post tekrar taslağa döner.",
+    "pickMedia": "Medya seç"
+  },
+  "composer": {
+    "title": "Görsel hazırlayıcı",
+    "base": "Temel görsel",
+    "aspect": "Boyut",
+    "headline": "Metin",
+    "position": "Metin yeri",
+    "top": "Üst",
+    "bottom": "Alt",
+    "center": "Orta",
+    "textColor": "Metin rengi",
+    "bandColor": "Bant rengi",
+    "logo": "Logo ekle",
+    "save": "Görseli kaydet",
+    "saved": "Görsel kaydedildi ve eklendi",
+    "fillNote": "Kare bir görselden 9:16 story yaparken arka plan görselin bulanık kopyasıyla doldurulur. Gerçek genişletme (outpaint) için Claude'dan Higgsfield reframe çalıştırmasını iste.",
+    "noBase": "Önce bir görsel ekle ya da seç."
   }
 }

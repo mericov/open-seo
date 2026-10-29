@@ -14,7 +14,7 @@ function bareHost(value: string) {
   );
 }
 
-export async function siteHosts(projectId: string) {
+async function siteHosts(projectId: string) {
   const [project, shopify] = await Promise.all([
     ProjectRepository.getProjectById(projectId),
     ShopifyConnectionRepository.getByProjectId(projectId),

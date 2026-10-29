@@ -9,10 +9,16 @@ import { BrandKitService } from "@/server/features/social/services/BrandKitServi
 import { MetaConnectionService } from "@/server/features/social/services/MetaConnectionService";
 import { SocialContextService } from "@/server/features/social/services/SocialContextService";
 import { SocialMediaService } from "@/server/features/social/services/SocialMediaService";
+import { SocialPostService } from "@/server/features/social/services/SocialPostService";
 import { requireProjectContext } from "@/serverFunctions/middleware";
 import {
   connectMetaSchema,
   importSocialMediaSchema,
+  listSocialPostsSchema,
+  rescheduleSocialPostSchema,
+  saveSocialPostSchema,
+  socialPostIdSchema,
+  socialPostIdsSchema,
   saveBrandKitSchema,
   socialContextSchema,
   socialMediaIdSchema,
@@ -147,4 +153,60 @@ export const deleteSocialMedia = createServerFn({ method: "POST" })
   .validator(socialMediaIdSchema)
   .handler(async ({ data, context }) =>
     SocialMediaService.remove(context.projectId, data.assetId),
+  );
+
+export const listSocialPosts = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(listSocialPostsSchema)
+  .handler(async ({ data, context }) =>
+    SocialPostService.list(context.projectId, data.from, data.to),
+  );
+
+export const saveSocialPost = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(saveSocialPostSchema)
+  .handler(async ({ data, context }) =>
+    withSocialMessage(() =>
+      SocialPostService.save(
+        context.projectId,
+        { ...data.post, postId: data.postId },
+        "user",
+      ),
+    ),
+  );
+
+export const approveSocialPosts = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(socialPostIdsSchema)
+  .handler(async ({ data, context }) =>
+    SocialPostService.approve(context.projectId, data.postIds),
+  );
+
+export const unapproveSocialPosts = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(socialPostIdsSchema)
+  .handler(async ({ data, context }) =>
+    SocialPostService.unapprove(context.projectId, data.postIds),
+  );
+
+export const rescheduleSocialPost = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(rescheduleSocialPostSchema)
+  .handler(async ({ data, context }) =>
+    withSocialMessage(() =>
+      SocialPostService.reschedule(
+        context.projectId,
+        data.postId,
+        data.scheduledAt,
+      ),
+    ),
+  );
+
+export const deleteSocialPost = createServerFn({ method: "POST" })
+  .middleware(requireProjectContext)
+  .validator(socialPostIdSchema)
+  .handler(async ({ data, context }) =>
+    withSocialMessage(() =>
+      SocialPostService.remove(context.projectId, data.postId),
+    ),
   );

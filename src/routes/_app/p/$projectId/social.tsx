@@ -10,12 +10,12 @@ import {
 } from "@/client/features/social/SocialStudioPage";
 
 const searchSchema = z.object({
-  tab: z.enum(SOCIAL_TABS).default("setup").catch("setup"),
+  tab: z.enum(SOCIAL_TABS).default("calendar").catch("calendar"),
 });
 
 export const Route = createFileRoute("/_app/p/$projectId/social")({
   validateSearch: searchSchema,
-  search: { middlewares: [stripSearchParams({ tab: "setup" })] },
+  search: { middlewares: [stripSearchParams({ tab: "calendar" })] },
   component: SocialRoute,
 });
 
