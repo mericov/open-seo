@@ -65,10 +65,15 @@ export async function verifySiteUrl(projectId: string, rawUrl: string) {
   return finalUrl.href;
 }
 
-export function withUtm(url: string, source: string, campaign: string) {
+export function withUtm(
+  url: string,
+  source: string,
+  campaign: string,
+  medium = "social",
+) {
   const parsed = new URL(url);
   parsed.searchParams.set("utm_source", source);
-  parsed.searchParams.set("utm_medium", "social");
+  parsed.searchParams.set("utm_medium", medium);
   parsed.searchParams.set("utm_campaign", campaign);
   return parsed.href;
 }

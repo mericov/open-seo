@@ -379,6 +379,13 @@
       "when": 1793262057926,
       "tag": "0053_social_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1793265440074,
+      "tag": "0054_ad_studio",
+      "breakpoints": true
     }
   ]
 }

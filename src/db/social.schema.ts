@@ -9,6 +9,11 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { projects } from "./app.schema";
 import {
+  AD_DRAFT_KINDS,
+  AD_DRAFT_STATUSES,
+  AD_FORMATS,
+  AD_PAGE_KINDS,
+  AD_VARIATION_FIELDS,
   SOCIAL_CONTEXT_SOURCES,
   SOCIAL_IDEA_TYPES,
   SOCIAL_MEDIA_SOURCES,
@@ -162,5 +167,147 @@ export const socialPostMedia = sqliteTable(
   (table) => [
     primaryKey({ columns: [table.postId, table.assetId] }),
     index("social_post_media_asset_idx").on(table.assetId),
+  ],
+);
+
+export const adCompetitorPages = sqliteTable(
+  "ad_competitor_pages",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    pageId: text("page_id").notNull(),
+    pageName: text("page_name").notNull(),
+    domain: text("domain"),
+    kind: text("kind", { enum: AD_PAGE_KINDS }).notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("ad_competitor_pages_project_page_idx").on(
+      table.projectId,
+      table.pageId,
+    ),
+  ],
+);
+
+export const competitorAds = sqliteTable(
+  "competitor_ads",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    libraryId: text("library_id").notNull(),
+    pageId: text("page_id").notNull(),
+    pageName: text("page_name").notNull(),
+    country: text("country"),
+    snapshotUrl: text("snapshot_url").notNull(),
+    headline: text("headline"),
+    body: text("body"),
+    description: text("description"),
+    cta: text("cta"),
+    format: text("format", { enum: AD_FORMATS }).notNull().default("unknown"),
+    hook: text("hook"),
+    angle: text("angle"),
+    offer: text("offer"),
+    mediaUrl: text("media_url"),
+    transcript: text("transcript"),
+    sceneSummary: text("scene_summary"),
+    startedAt: text("started_at"),
+    stoppedAt: text("stopped_at"),
+    lastSeenAt: text("last_seen_at").notNull(),
+    active: integer("active", { mode: "boolean" }).notNull(),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    uniqueIndex("competitor_ads_project_library_idx").on(
+      table.projectId,
+      table.libraryId,
+    ),
+    index("competitor_ads_project_page_idx").on(table.projectId, table.pageId),
+  ],
+);
+
+export const adDrafts = sqliteTable(
+  "ad_drafts",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: AD_DRAFT_KINDS }).notNull(),
+    status: text("status", { enum: AD_DRAFT_STATUSES })
+      .notNull()
+      .default("draft"),
+    name: text("name").notNull(),
+    angle: text("angle"),
+    script: text("script"),
+    cta: text("cta").notNull(),
+    landingUrl: text("landing_url").notNull(),
+    trackedUrl: text("tracked_url").notNull(),
+    targetKeyword: text("target_keyword"),
+    sourceType: text("source_type", { enum: SOCIAL_CONTEXT_SOURCES }),
+    sourceTitle: text("source_title"),
+    sourceUrl: text("source_url"),
+    inspiration: text("inspiration"),
+    contextNotes: text("context_notes"),
+    metaCampaignId: text("meta_campaign_id"),
+    metaAdSetId: text("meta_ad_set_id"),
+    metaCreativeId: text("meta_creative_id"),
+    metaAdId: text("meta_ad_id"),
+    errorMessage: text("error_message"),
+    createdBy: text("created_by", { enum: ["user", "mcp"] }).notNull(),
+    approvedAt: text("approved_at"),
+    sentAt: text("sent_at"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(current_timestamp)`),
+  },
+  (table) => [
+    index("ad_drafts_project_updated_idx").on(table.projectId, table.updatedAt),
+  ],
+);
+
+export const adDraftVariations = sqliteTable(
+  "ad_draft_variations",
+  {
+    id: text("id").primaryKey(),
+    draftId: text("draft_id")
+      .notNull()
+      .references(() => adDrafts.id, { onDelete: "cascade" }),
+    field: text("field", { enum: AD_VARIATION_FIELDS }).notNull(),
+    position: integer("position").notNull(),
+    value: text("value").notNull(),
+  },
+  (table) => [
+    index("ad_draft_variations_draft_idx").on(table.draftId, table.field),
+  ],
+);
+
+export const adDraftMedia = sqliteTable(
+  "ad_draft_media",
+  {
+    draftId: text("draft_id")
+      .notNull()
+      .references(() => adDrafts.id, { onDelete: "cascade" }),
+    assetId: text("asset_id")
+      .notNull()
+      .references(() => socialMediaAssets.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.draftId, table.assetId] }),
+    index("ad_draft_media_asset_idx").on(table.assetId),
   ],
 );

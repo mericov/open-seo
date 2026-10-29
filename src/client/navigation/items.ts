@@ -10,6 +10,7 @@ import {
   Inbox,
   LayoutDashboard,
   Megaphone,
+  Target,
   Library,
   Link2,
   MessageSquare,
@@ -73,6 +74,11 @@ const projectNavItems = [
     to: "/p/$projectId/social" as const,
     label: "nav:items.socialStudio" as const,
     icon: Megaphone,
+  },
+  {
+    to: "/p/$projectId/ads" as const,
+    label: "nav:items.adStudio" as const,
+    icon: Target,
   },
   {
     to: "/p/$projectId/inbound-leads" as const,
@@ -198,7 +204,7 @@ export function getProjectNavGroups(projectId: string) {
     },
     {
       label: "nav:groups.socialAds" as const,
-      items: [byPath("/p/$projectId/social")],
+      items: [byPath("/p/$projectId/social"), byPath("/p/$projectId/ads")],
     },
     {
       label: "nav:groups.mySite" as const,

@@ -1,3 +1,4 @@
+import { AdArchiveService } from "@/server/features/social/services/AdArchiveService";
 import { renderBrandKit } from "@/server/features/social/services/BrandKitService";
 import type { SocialContext } from "@/server/features/social/services/SocialContextService";
 
@@ -154,6 +155,22 @@ export function renderSocialContext(context: SocialContext) {
       `Latest AI visibility check (${context.aiVisibility.latest.checkedAt}): brand mentioned in ${context.aiVisibility.latest.brandMentioned} of ${context.aiVisibility.latest.answers} answers.`,
       "",
     );
+  if (context.ads.competitorReport && context.ads.competitorReport.total > 0)
+    lines.push(AdArchiveService.renderReport(context.ads.competitorReport), "");
+  else
+    lines.push(
+      "## Competitor ad archive",
+      "Empty. Fill it with save_competitor_ads.",
+      "",
+    );
+  list(
+    lines,
+    "Our ad drafts (do not repeat their angles)",
+    context.ads.ourAds.map(
+      (row) =>
+        `- [${row.status}] ${row.kind}: ${row.name}${row.angle ? ` | angle: ${row.angle}` : ""} → ${row.landingUrl}`,
+    ),
+  );
   list(
     lines,
     "Performance of our posts and ads",

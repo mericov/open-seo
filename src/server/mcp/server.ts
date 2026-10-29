@@ -164,6 +164,15 @@ import {
   saveSocialPostsTool,
   scheduleSocialPostsTool,
 } from "@/server/mcp/tools/social-post-tools";
+import {
+  addAdCompetitorPagesTool,
+  getCompetitorAdReportTool,
+  listAdDraftsTool,
+  saveAdDraftTool,
+  saveCompetitorAdsTool,
+  sendAdToMetaTool,
+  startAdStudioTool,
+} from "@/server/mcp/tools/ad-studio-tools";
 
 type ToolSchema = z.ZodType | z.ZodRawShape;
 
@@ -366,6 +375,13 @@ export function createOpenSeoMcpServer(authProps: McpProps) {
   register(prepareSocialImageTool);
   register(scheduleSocialPostsTool);
   register(listSocialPostsTool);
+  register(startAdStudioTool);
+  register(addAdCompetitorPagesTool);
+  register(saveCompetitorAdsTool);
+  register(getCompetitorAdReportTool);
+  register(saveAdDraftTool);
+  register(listAdDraftsTool);
+  register(sendAdToMetaTool);
 
   return server;
 }

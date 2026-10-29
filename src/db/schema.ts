@@ -198,4 +198,9 @@ export const {
   socialMediaAssets,
   socialPosts,
   socialPostMedia,
+  adCompetitorPages,
+  competitorAds,
+  adDrafts,
+  adDraftVariations,
+  adDraftMedia,
 } = schema;

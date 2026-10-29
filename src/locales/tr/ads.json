@@ -1,0 +1,102 @@
+{
+  "title": "Reklam Stüdyosu",
+  "description": "Rakip reklam analizi ve bu projenin verisine dayanan Meta reklam taslakları. Meta'ya her şey PAUSED olarak gider.",
+  "tabs": {
+    "archive": "Rakip reklamları",
+    "report": "Ne işe yarıyor",
+    "drafts": "Bizim reklamlarımız"
+  },
+  "pages": {
+    "title": "Takip edilen sayfalar",
+    "hint": "Rakiplerin ve benzer markaların Facebook sayfaları. Sayfa ID'lerini bulmasını ve reklamlarını çekmesini Claude'dan iste (start_ad_studio).",
+    "pageId": "Sayfa ID",
+    "pageName": "Ad",
+    "kind": "Tür",
+    "competitor": "Rakip",
+    "similar": "Benzer marka",
+    "add": "Sayfa ekle",
+    "added": "Sayfa eklendi",
+    "remove": "Kaldır",
+    "empty": "Henüz sayfa yok."
+  },
+  "archive": {
+    "empty": "Henüz reklam yok. Claude'a \"bu proje için rakip reklamlarını çek\" de.",
+    "winnersOnly": "Sadece kazananlar (30+ gün)",
+    "winner": "Kazanan",
+    "days": "{{count}} gün",
+    "active": "Yayında",
+    "inactive": "Durmuş",
+    "snapshot": "Ad Library'de aç",
+    "hook": "Hook",
+    "angle": "Açı",
+    "offer": "Teklif",
+    "cta": "CTA",
+    "transcript": "Transkript",
+    "scenes": "Sahneler",
+    "delete": "Sil",
+    "format": {
+      "ugc_video": "UGC video",
+      "static": "Statik",
+      "carousel": "Carousel",
+      "unknown": "Bilinmiyor"
+    }
+  },
+  "report": {
+    "empty": "Reklamlar kaydedilip etiketlendikçe rapor dolar."
+  },
+  "drafts": {
+    "new": "Yeni reklam",
+    "empty": "Henüz reklam taslağı yok. Claude'dan reklam yazmasını iste (start_ad_studio) ya da buradan oluştur.",
+    "kind": {
+      "ugc": "UGC",
+      "static": "Statik"
+    },
+    "status": {
+      "draft": "Taslak",
+      "approved": "Onaylandı",
+      "sent": "Meta'da (duraklatılmış)",
+      "failed": "Hata"
+    },
+    "openInMeta": "Ads Manager'da aç"
+  },
+  "editor": {
+    "newTitle": "Yeni reklam",
+    "editTitle": "Reklamı düzenle",
+    "kind": "Tür",
+    "name": "Ad",
+    "angle": "Açı",
+    "script": "UGC senaryosu",
+    "cta": "CTA butonu",
+    "landingUrl": "Açılış sayfası",
+    "landingHint": "Sitede var olan bir sayfa olmalı; kaydederken kontrol edilir ve UTM eklenir (utm_medium=paid_social).",
+    "trackedUrl": "Takipli link",
+    "primaryTexts": "Ana metinler",
+    "headlines": "Başlıklar",
+    "descriptions": "Açıklamalar",
+    "hooks": "Hook varyasyonları",
+    "addItem": "Ekle",
+    "media": "Görsel ya da video",
+    "context": "Kullanılan bağlam",
+    "inspiration": "İlham",
+    "save": "Taslağı kaydet",
+    "saved": "Reklam taslağı kaydedildi",
+    "approve": "Onayla",
+    "approved": "Reklam onaylandı",
+    "unapprove": "Taslağa geri al",
+    "delete": "Sil",
+    "deleted": "Reklam taslağı silindi",
+    "send": "Meta'ya gönder (PAUSED)",
+    "error": "Hata"
+  },
+  "send": {
+    "title": "Meta'ya PAUSED olarak gönder",
+    "body": "MericSEO reklam hesabında kampanya, ad set ve reklamı PAUSED durumda oluşturur. Sen Ads Manager'da açana kadar hiçbir şey yayına girmez, harcama olmaz.",
+    "campaignId": "Mevcut kampanya ID (isteğe bağlı)",
+    "campaignHint": "Boş bırakırsan duraklatılmış yeni bir trafik kampanyası açılır.",
+    "budget": "Ad set günlük bütçesi (hesap para birimi, isteğe bağlı)",
+    "countries": "Ülkeler",
+    "countriesHint": "Virgülle ayrılmış ISO kodları, ör. US ya da TR.",
+    "confirm": "Duraklatılmış reklamı oluştur",
+    "sent": "Meta'da duraklatılmış olarak oluşturuldu"
+  }
+}

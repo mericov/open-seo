@@ -6,6 +6,8 @@ import { ProjectContextService } from "@/server/features/project-context/service
 import { ProjectRepository } from "@/server/features/projects/repositories/ProjectRepository";
 import { ShopifyConnectionRepository } from "@/server/features/shopify/repositories/ShopifyConnectionRepository";
 import { SocialContextRepository } from "@/server/features/social/repositories/SocialContextRepository";
+import { AdDraftRepository } from "@/server/features/social/repositories/AdDraftRepository";
+import { AdArchiveService } from "@/server/features/social/services/AdArchiveService";
 import { BrandKitService } from "@/server/features/social/services/BrandKitService";
 import {
   loadAnalytics,
@@ -21,7 +23,7 @@ import {
 } from "@/server/features/social/services/shopifySiteData";
 import { TURKEY_LOCATION_CODE } from "@/shared/social";
 
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const CACHE_TTL_SECONDS = 3 * 24 * 60 * 60;
 
@@ -150,6 +152,8 @@ async function build(projectId: string) {
     history,
     aiPrompts,
     aiVisibility,
+    adReport,
+    adDrafts,
   ] = await Promise.all([
     attempt("saved keywords", missing, () =>
       KeywordResearchService.getSavedKeywords({
@@ -171,6 +175,10 @@ async function build(projectId: string) {
     attempt("AI visibility results", missing, () =>
       SocialContextRepository.latestAiRunVisibility(projectId),
     ),
+    attempt("competitor ad archive", missing, () =>
+      AdArchiveService.report(projectId),
+    ),
+    attempt("ad drafts", missing, () => AdDraftRepository.list(projectId, 40)),
   ]);
 
   if (!shopify)
@@ -228,6 +236,16 @@ async function build(projectId: string) {
     aiVisibility: {
       prompts: aiPrompts ?? [],
       latest: aiVisibility,
+    },
+    ads: {
+      competitorReport: adReport,
+      ourAds: (adDrafts ?? []).map((draft) => ({
+        name: draft.name,
+        kind: draft.kind,
+        status: draft.status,
+        angle: draft.angle,
+        landingUrl: draft.landingUrl,
+      })),
     },
     performance: [] as { label: string; value: string }[],
     missing,

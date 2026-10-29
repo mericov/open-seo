@@ -48,6 +48,7 @@ import { Route as STokenIndexRouteImport } from './routes/s/$token/index'
 import { Route as STokenOgDotpngRouteImport } from './routes/s/$token/og[.]png'
 import { Route as STokenRawRouteImport } from './routes/s/$token/raw'
 import { Route as AppPProjectIdIndexRouteImport } from './routes/_app/p/$projectId/index'
+import { Route as AppPProjectIdAdsRouteImport } from './routes/_app/p/$projectId/ads'
 import { Route as AppPProjectIdAiVisibilityRouteImport } from './routes/_app/p/$projectId/ai-visibility'
 import { Route as AppPProjectIdBacklinksRouteImport } from './routes/_app/p/$projectId/backlinks'
 import { Route as AppPProjectIdBlogTrackingRouteImport } from './routes/_app/p/$projectId/blog-tracking'
@@ -280,6 +281,11 @@ const STokenRawRoute = STokenRawRouteImport.update({
 const AppPProjectIdIndexRoute = AppPProjectIdIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppPProjectIdRouteRoute,
+} as any)
+const AppPProjectIdAdsRoute = AppPProjectIdAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
   getParentRoute: () => AppPProjectIdRouteRoute,
 } as any)
 const AppPProjectIdAiVisibilityRoute =
@@ -532,6 +538,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AppSettingsIndexRoute
   '/onboarding/': typeof AuthenticatedOnboardingIndexRoute
   '/s/$token/': typeof STokenIndexRoute
+  '/p/$projectId/ads': typeof AppPProjectIdAdsRoute
   '/p/$projectId/ai-visibility': typeof AppPProjectIdAiVisibilityRouteWithChildren
   '/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/p/$projectId/blog-tracking': typeof AppPProjectIdBlogTrackingRoute
@@ -606,6 +613,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsIndexRoute
   '/onboarding': typeof AuthenticatedOnboardingIndexRoute
   '/s/$token': typeof STokenIndexRoute
+  '/p/$projectId/ads': typeof AppPProjectIdAdsRoute
   '/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/p/$projectId/blog-tracking': typeof AppPProjectIdBlogTrackingRoute
   '/p/$projectId/blog-writer': typeof AppPProjectIdBlogWriterRoute
@@ -682,6 +690,7 @@ export interface FileRoutesById {
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_authenticated/onboarding/': typeof AuthenticatedOnboardingIndexRoute
   '/s/$token/': typeof STokenIndexRoute
+  '/_app/p/$projectId/ads': typeof AppPProjectIdAdsRoute
   '/_app/p/$projectId/ai-visibility': typeof AppPProjectIdAiVisibilityRouteWithChildren
   '/_app/p/$projectId/backlinks': typeof AppPProjectIdBacklinksRoute
   '/_app/p/$projectId/blog-tracking': typeof AppPProjectIdBlogTrackingRoute
@@ -760,6 +769,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/onboarding/'
     | '/s/$token/'
+    | '/p/$projectId/ads'
     | '/p/$projectId/ai-visibility'
     | '/p/$projectId/backlinks'
     | '/p/$projectId/blog-tracking'
@@ -834,6 +844,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/onboarding'
     | '/s/$token'
+    | '/p/$projectId/ads'
     | '/p/$projectId/backlinks'
     | '/p/$projectId/blog-tracking'
     | '/p/$projectId/blog-writer'
@@ -909,6 +920,7 @@ export interface FileRouteTypes {
     | '/_app/settings/'
     | '/_authenticated/onboarding/'
     | '/s/$token/'
+    | '/_app/p/$projectId/ads'
     | '/_app/p/$projectId/ai-visibility'
     | '/_app/p/$projectId/backlinks'
     | '/_app/p/$projectId/blog-tracking'
@@ -1248,6 +1260,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/p/$projectId/'
       preLoaderRoute: typeof AppPProjectIdIndexRouteImport
+      parentRoute: typeof AppPProjectIdRouteRoute
+    }
+    '/_app/p/$projectId/ads': {
+      id: '/_app/p/$projectId/ads'
+      path: '/ads'
+      fullPath: '/p/$projectId/ads'
+      preLoaderRoute: typeof AppPProjectIdAdsRouteImport
       parentRoute: typeof AppPProjectIdRouteRoute
     }
     '/_app/p/$projectId/ai-visibility': {
@@ -1609,6 +1628,7 @@ const AppPProjectIdSettingsRouteWithChildren =
   )
 
 interface AppPProjectIdRouteRouteChildren {
+  AppPProjectIdAdsRoute: typeof AppPProjectIdAdsRoute
   AppPProjectIdAiVisibilityRoute: typeof AppPProjectIdAiVisibilityRouteWithChildren
   AppPProjectIdBacklinksRoute: typeof AppPProjectIdBacklinksRoute
   AppPProjectIdBlogTrackingRoute: typeof AppPProjectIdBlogTrackingRoute
@@ -1637,6 +1657,7 @@ interface AppPProjectIdRouteRouteChildren {
 }
 
 const AppPProjectIdRouteRouteChildren: AppPProjectIdRouteRouteChildren = {
+  AppPProjectIdAdsRoute: AppPProjectIdAdsRoute,
   AppPProjectIdAiVisibilityRoute: AppPProjectIdAiVisibilityRouteWithChildren,
   AppPProjectIdBacklinksRoute: AppPProjectIdBacklinksRoute,
   AppPProjectIdBlogTrackingRoute: AppPProjectIdBlogTrackingRoute,

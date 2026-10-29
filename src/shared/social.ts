@@ -75,3 +75,34 @@ export function defaultTimezone(locationCode: number) {
 }
 
 export const SOCIAL_MEDIA_PATH_PREFIX = "/social-media/";
+
+export const AD_FORMATS = [
+  "ugc_video",
+  "static",
+  "carousel",
+  "unknown",
+] as const;
+export const AD_PAGE_KINDS = ["competitor", "similar"] as const;
+export const AD_DRAFT_KINDS = ["ugc", "static"] as const;
+export const AD_DRAFT_STATUSES = [
+  "draft",
+  "approved",
+  "sent",
+  "failed",
+] as const;
+export const AD_VARIATION_FIELDS = [
+  "primary_text",
+  "headline",
+  "description",
+  "hook",
+] as const;
+export const AD_CTA_TYPES = [
+  "SHOP_NOW",
+  "LEARN_MORE",
+  "ORDER_NOW",
+  "GET_OFFER",
+  "SIGN_UP",
+  "CONTACT_US",
+  "BOOK_NOW",
+] as const;
+export const WINNER_MIN_DAYS = 30;

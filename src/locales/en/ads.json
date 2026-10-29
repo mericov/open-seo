@@ -1,0 +1,102 @@
+{
+  "title": "Ad Studio",
+  "description": "Competitor ad research and Meta ad drafts built on this project's data. Everything goes to Meta as PAUSED.",
+  "tabs": {
+    "archive": "Competitor ads",
+    "report": "What works",
+    "drafts": "Our ads"
+  },
+  "pages": {
+    "title": "Tracked pages",
+    "hint": "Facebook pages of competitors and similar brands. Ask Claude to find page IDs and pull their ads (start_ad_studio).",
+    "pageId": "Page ID",
+    "pageName": "Name",
+    "kind": "Type",
+    "competitor": "Competitor",
+    "similar": "Similar brand",
+    "add": "Add page",
+    "added": "Page added",
+    "remove": "Remove",
+    "empty": "No pages yet."
+  },
+  "archive": {
+    "empty": "No ads yet. In Claude, say: \"pull competitor ads for this project\".",
+    "winnersOnly": "Only winners (30+ days)",
+    "winner": "Winner",
+    "days": "{{count}} days",
+    "active": "Active",
+    "inactive": "Stopped",
+    "snapshot": "Open in Ad Library",
+    "hook": "Hook",
+    "angle": "Angle",
+    "offer": "Offer",
+    "cta": "CTA",
+    "transcript": "Transcript",
+    "scenes": "Scenes",
+    "delete": "Delete",
+    "format": {
+      "ugc_video": "UGC video",
+      "static": "Static",
+      "carousel": "Carousel",
+      "unknown": "Unknown"
+    }
+  },
+  "report": {
+    "empty": "The report fills in as ads are saved and tagged."
+  },
+  "drafts": {
+    "new": "New ad",
+    "empty": "No ad drafts yet. Ask Claude to write ads (start_ad_studio) or create one here.",
+    "kind": {
+      "ugc": "UGC",
+      "static": "Static"
+    },
+    "status": {
+      "draft": "Draft",
+      "approved": "Approved",
+      "sent": "In Meta (paused)",
+      "failed": "Error"
+    },
+    "openInMeta": "Open in Ads Manager"
+  },
+  "editor": {
+    "newTitle": "New ad",
+    "editTitle": "Edit ad",
+    "kind": "Type",
+    "name": "Name",
+    "angle": "Angle",
+    "script": "UGC script",
+    "cta": "CTA button",
+    "landingUrl": "Landing page",
+    "landingHint": "Must be a page on the site; it is checked and gets UTM tags (utm_medium=paid_social).",
+    "trackedUrl": "Tracked link",
+    "primaryTexts": "Primary texts",
+    "headlines": "Headlines",
+    "descriptions": "Descriptions",
+    "hooks": "Hook variations",
+    "addItem": "Add",
+    "media": "Image or video",
+    "context": "Context used",
+    "inspiration": "Inspiration",
+    "save": "Save draft",
+    "saved": "Ad draft saved",
+    "approve": "Approve",
+    "approved": "Ad approved",
+    "unapprove": "Back to draft",
+    "delete": "Delete",
+    "deleted": "Ad draft deleted",
+    "send": "Send to Meta (paused)",
+    "error": "Error"
+  },
+  "send": {
+    "title": "Send to Meta as PAUSED",
+    "body": "MericSEO creates the campaign, ad set and ad in your ad account with status PAUSED. Nothing runs or spends until you turn it on in Ads Manager.",
+    "campaignId": "Existing campaign ID (optional)",
+    "campaignHint": "Leave empty to create a new paused traffic campaign.",
+    "budget": "Daily budget for the ad set (account currency, optional)",
+    "countries": "Countries",
+    "countriesHint": "ISO codes separated by commas, e.g. US or TR.",
+    "confirm": "Create paused ad",
+    "sent": "Created in Meta as paused"
+  }
+}
